@@ -1,0 +1,52 @@
+/* Component Big Button */
+.buttonBig {
+    border: 1px solid;
+    border-radius: 44px;
+    padding: 0.5rem 1.5rem;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+
+/* #### Component Styling #### */
+
+/* Orange */
+.vibrantStyle {
+    background: var(--text-colour-vibrant);
+    color: var(--text-colour-dark);
+}
+
+.buttonBig.vibrantStyle:hover {
+    background: #C589F4;
+}
+
+.buttonBig.vibrantStyle:disabled {
+    background: #D0D0D0;
+    color: var(--text-colour-dark);
+}
+
+/* Transparent Orange */
+.transparentVibrantStyle {
+    background: transparent;
+    color: var(--text-colour-vibrant);
+}
+
+.buttonBig.transparentVibrantStyle:hover {
+    background: var(--text-colour-light);
+    color: var(--text-colour-dark);
+}
+
+/* Transparent Dark */
+.transparentDarkStyle {
+    background: transparent;
+    color: var(--text-colour-dark);
+}
+
+.buttonBig.transparentDarkStyle:hover {
+    background: var(--text-colour-dark);
+    color: var(--text-colour-light);
+}

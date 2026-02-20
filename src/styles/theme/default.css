@@ -1,0 +1,226 @@
+:root {    
+
+    /* Text Colours */
+    --text-colour-dark: #191C2E;
+    --text-colour-vibrant: #EBA439;
+    --text-colour-light: #ffffff;
+
+    
+    /* Typography */
+
+    /* Basic/H1 */
+    --font-h1-family: Lexend;
+    --font-h1-weight: 700;
+    --font-h1-size: 4rem;
+    --font-h1-line-height: 110%;
+    --font-h1-letter-spacing: 0;
+    --font-h1-text-decoration: None;
+    --font-h1-text-transform: initial;
+
+    /* Basic/H2 */
+    --font-h2-family: Lexend;
+    --font-h2-weight: 600;
+    --font-h2-size: 3.4375rem;
+    --font-h2-line-height: 120%;
+    --font-h2-letter-spacing: 0;
+    --font-h2-text-decoration: None;
+    --font-h2-text-transform: initial;
+
+    /* Basic/H3 */
+    --font-h3-family: Lexend;
+    --font-h3-weight: 600;
+    --font-h3-size: 3.125rem;
+    --font-h3-line-height: normal;
+    --font-h3-letter-spacing: -1.5%;
+    --font-h3-text-decoration: None;
+    --font-h3-text-transform: initial;
+
+    /* Basic/H4 */
+    --font-h4-family: Lexend;
+    --font-h4-weight: 600;
+    --font-h4-size: 2.625rem;
+    --font-h4-line-height: normal;
+    --font-h4-letter-spacing: -1.5%;
+    --font-h4-text-decoration: None;
+    --font-h4-text-transform: initial;
+
+    /* Basic/H5 */
+    --font-h5-family: Lexend;
+    --font-h5-weight: 600;
+    --font-h5-size: 2rem;
+    --font-h5-line-height: 2.125rem;
+    --font-h5-letter-spacing: -1.5%;
+    --font-h5-text-decoration: None;
+    --font-h5-text-transform: initial;
+
+    /* Basic/H6 */
+    --font-h6-family: Lexend;
+    --font-h6-weight: 600;
+    --font-h6-size: 1.75rem;
+    --font-h6-line-height: 120%;
+    --font-h6-letter-spacing: -1.5%;
+    --font-h6-text-decoration: None;
+    --font-h6-text-transform: initial;
+
+    /* Basic/SubtitleSemiBig */
+    --font-subtitleSemiBig-family: Lexend;
+    --font-subtitleSemiBig-weight: 600;
+    --font-subtitleSemiBig-size: 1.5rem;
+    --font-subtitleSemiBig-line-height: normal;
+    --font-subtitleSemiBig-letter-spacing: -2%;
+    --font-subtitleSemiBig-text-decoration: None;
+    --font-subtitleSemiBig-text-transform: initial;
+
+    /* Basic/Subtext */
+    --font-subText-family: Lexend;
+    --font-subText-weight: 400;
+    --font-subText-size: 1.5rem;
+    --font-subText-line-height: 150%;
+    --font-subText-letter-spacing: 0;
+    --font-subText-text-decoration: None;
+    --font-subText-text-transform: initial;
+
+    /* Basic/GameTitle */
+    --font-gameTitle-family: Lexend;
+    --font-gameTitle-weight: 500;
+    --font-gameTitle-size: 1.5rem;
+    --font-gameTitle-line-height: 120%;
+    --font-gameTitle-letter-spacing: 0;
+    --font-gameTitle-text-decoration: None;
+    --font-gameTitle-text-transform: uppercase;
+
+    /* Basic/SubTitle */
+    --font-subTitle-family: Lexend;
+    --font-subTitle-weight: 400;
+    --font-subTitle-size: 1.25rem;
+    --font-subTitle-line-height: 130%;
+    --font-subTitle-letter-spacing: 0;
+    --font-subTitle-text-decoration: None;
+    --font-subTitle-text-transform: initial;
+
+    /* Basic/SubtitleSemi */
+    --font-subtitleSemi-family: Lexend;
+    --font-subtitleSemi-weight: 600;
+    --font-subtitleSemi-size: 1.25rem;
+    --font-subtitleSemi-line-height: normal;
+    --font-subtitleSemi-letter-spacing: -1.5%;
+    --font-subtitleSemi-text-decoration: None;
+    --font-subtitleSemi-text-transform: initial;
+
+    /* Basic/StatsText */
+    --font-statsText-family: Lexend;
+    --font-statsText-weight: 600;
+    --font-statsText-size: 1.125rem;
+    --font-statsText-line-height: 1.125rem;
+    --font-statsText-letter-spacing: 0;
+    --font-statsText-text-decoration: None;
+    --font-statsText-text-transform: initial;
+
+    /* Basic/StatsTitle */
+    --font-statsTitle-family: Lexend;
+    --font-statsTitle-weight: 400;
+    --font-statsTitle-size: 1.125rem;
+    --font-statsTitle-line-height: 1.25rem;
+    --font-statsTitle-letter-spacing: 0;
+    --font-statsTitle-text-decoration: None;
+    --font-statsTitle-text-transform: initial;
+
+    /* Basic/BodyText */
+    --font-bodyText-family: Lexend;
+    --font-bodyText-weight: 400;
+    --font-bodyText-size: 1rem;
+    --font-bodyText-line-height: 130%;
+    --font-bodyText-letter-spacing: 0;
+    --font-bodyText-text-decoration: None;
+    --font-bodyText-text-transform: initial;
+
+    /* Basic/BodyTextMedium */
+    --font-bodyTextMedium-family: Lexend;
+    --font-bodyTextMedium-weight: 500;
+    --font-bodyTextMedium-size: 1rem;
+    --font-bodyTextMedium-line-height: 145%;
+    --font-bodyTextMedium-letter-spacing: 0;
+    --font-bodyTextMedium-text-decoration: None;
+    --font-bodyTextMedium-text-transform: initial;
+
+    /* Basic/CapsTitleText */
+    --font-capsTitleText-family: Lexend;
+    --font-capsTitleText-weight: 500;
+    --font-capsTitleText-size: 1rem;
+    --font-capsTitleText-line-height: normal;
+    --font-capsTitleText-letter-spacing: 0;
+    --font-capsTitleText-text-decoration: None;
+    --font-capsTitleText-text-transform: uppercase;
+
+    /* Basic/BodyTextSmall */
+    --font-bodyTextSmall-family: Lexend;
+    --font-bodyTextSmall-weight: 400;
+    --font-bodyTextSmall-size: 0.875rem;
+    --font-bodyTextSmall-line-height: 130%;
+    --font-bodyTextSmall-letter-spacing: 0;
+    --font-bodyTextSmall-text-decoration: None;
+    --font-bodyTextSmall-text-transform: initial;
+
+    /* Basic/BodyTextSmallSemi */
+    --font-bodyTextSmallSemi-family: Lexend;
+    --font-bodyTextSmallSemi-weight: 600;
+    --font-bodyTextSmallSemi-size: 0.875rem;
+    --font-bodyTextSmallSemi-line-height: 130%;
+    --font-bodyTextSmallSemi-letter-spacing: 0;
+    --font-bodyTextSmallSemi-text-decoration: None;
+    --font-bodyTextSmallSemi-text-transform: initial;
+
+    /* Basic/BodyTextSmallest */
+    --font-bodyTextSmallest-family: Lexend;
+    --font-bodyTextSmallest-weight: 400;
+    --font-bodyTextSmallest-size: 0.75rem;
+    --font-bodyTextSmallest-line-height: normal;
+    --font-bodyTextSmallest-letter-spacing: 0;
+    --font-bodyTextSmallest-text-decoration: None;
+    --font-bodyTextSmallest-text-transform: initial;
+
+    /* Basic/BodyTextSmallestSemiCaps */
+    --font-bodyTextSmallestSemiCaps-family: Lexend;
+    --font-bodyTextSmallestSemiCaps-weight: 600;
+    --font-bodyTextSmallestSemiCaps-size: 0.75rem;
+    --font-bodyTextSmallestSemiCaps-line-height: normal;
+    --font-bodyTextSmallestSemiCaps-letter-spacing: 0;
+    --font-bodyTextSmallestSemiCaps-text-decoration: None;
+    --font-bodyTextSmallestSemiCaps-text-transform: uppercase;
+
+    /* Basic/SmallestLabel */
+    --font-smallestLabel-family: Lexend;
+    --font-smallestLabel-weight: 500;
+    --font-smallestLabel-size: 0.625rem;
+    --font-smallestLabel-line-height: normal;
+    --font-smallestLabel-letter-spacing: 0;
+    --font-smallestLabel-text-decoration: None;
+    --font-smallestLabel-text-transform: uppercase;
+
+    /* Button/buttonText */
+    --font-buttonText-family: Lexend;
+    --font-buttonText-weight: 600;
+    --font-buttonText-size: 1rem;
+    --font-buttonText-line-height: normal;
+    --font-buttonText-letter-spacing: 0;
+    --font-buttonText-text-decoration: None;
+    --font-buttonText-text-transform: initial;
+
+    /* Button/buttonTextSmall */
+    --font-buttonTextSmall-family: Lexend;
+    --font-buttonTextSmall-weight: 600;
+    --font-buttonTextSmall-size: 0.875rem;
+    --font-buttonTextSmall-line-height: normal;
+    --font-buttonTextSmall-letter-spacing: 0;
+    --font-buttonTextSmall-text-decoration: None;
+    --font-buttonTextSmall-text-transform: initial;
+
+
+}
+
+.gradientOne {
+    background: linear-gradient(90deg, #EBA439 0%, #C589F4 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}

@@ -1,0 +1,17 @@
+:root {
+    --max-width: 1440px;
+
+    --padding-sm: 5rem;
+    --padding-md: 7.5rem;
+    --padding-lg: 10 rem;
+
+    --padding-outer-sides: 7.5rem;
+    --padding-outer-tops: 1.75rem;
+
+    --space-sm: 1rem;
+    --space-md: 1.875rem;
+
+    --colour-text-primary: #191C2E;
+    --colour-text-secondary: #EBA439;
+    --colour-text-tertiary: #ffffff;
+}

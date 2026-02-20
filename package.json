@@ -1,0 +1,21 @@
+{
+  "name": "instances-frontend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "@builder.io/qwik": "^1.19.0",
+    "@qwikdev/astro": "^0.8.3",
+    "astro": "^5.17.1"
+  }
+}

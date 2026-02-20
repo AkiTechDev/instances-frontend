@@ -1,0 +1,927 @@
+---
+// Welcome to Astro! Everything between these triple-dash code fences
+// is your "component frontmatter". It never runs in the browser.
+console.log('This runs in your terminal, not the browser!');
+
+import "../styles/global.css"
+import "../styles/variables.module.css"
+
+import "../styles/theme/default.css"
+import colourStyles from "../styles/theme/colours.module.css"
+import "../styles/reset.css"
+import typo from "../styles/typography.module.css"
+
+import buttonBig from "../styles/components/buttonBig.module.css"
+
+import headerLogo from "../assets/headerLogo.svg?url"
+import iconDiamond from "../assets/iconDiamond.svg?url"
+
+import sectionOneBackground from "../assets/landingIcon.svg"
+const sectionOneBackgroundUrl = `url(${sectionOneBackground.src})`;
+
+import promoBackgroundImage from "../assets/promoBackground.svg?url";
+
+import instanceIcon from "../assets/instanceIcon.svg"
+const instanceIconUrl = `url(${instanceIcon.src})`
+
+import processStep1 from "../assets/processStep1.svg?url";
+import processStep2 from "../assets/processStep2.svg?url";
+import processStep3 from "../assets/processStep3.svg?url";
+
+import shapeOne from "../assets/shapeOne.svg?url";
+import shapeTwo from "../assets/shapeTwo.svg?url";
+import messageIcon from "../assets/messageIcon.svg?url";
+import backgroundGlow from "../assets/backgroundGlow.svg?url";
+import iconExpanded from "../assets/iconExpanded.svg";
+const iconExpandedUrl = `url(${iconExpanded.src})` 
+import iconClosed from "../assets/iconClosed.svg";
+const iconClosedUrl = `url(${iconClosed.src})` 
+
+import Newsletter from "../components/newsletter/Newsletter.astro";
+import Footer from "../components/footer/Footer.astro";
+
+---
+<!-- Below is your "component template." It's just HTML, but with
+    some magic sprinkled in to help you build great templates. -->
+<!doctype html>
+<html lang="en">
+	<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" content="Qwik + Astro integration" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<meta name="generator" content={Astro.generator} />
+		<title>Instances - Powered by Aki Labs</title>
+	</head>
+	<body>
+    <div id="heroBanner">
+      <div class="sectionOneContainer">
+        <header class="header">
+          <img src={headerLogo} />
+          <div class="nav">
+            <a class={typo.bodyText} href="#whywe">Why We</a>
+            <a class={typo.bodyText} href="#process">Process</a>
+            <a class={typo.bodyText} href="#faqs">FAQs</a>
+            <a class={typo.bodyText} href="#privacy-policy">Privacy Policy</a>
+          </div>
+          <div class="getStarted">
+            <button class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class={typo.buttonText}>Log In</p></button>
+            <button class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, typo.h1]}><img src={iconDiamond} /><p class={typo.buttonText}>Get Started</p></button>
+          </div>
+        </header>
+
+        <div class="sectionOneInner">
+          <h1 class={typo.h1}>We handle the servers. You handle the fun.</h1>
+          <p class={typo.subText}>Play instantly with friends, no setup, no subscriptions, just pay when you play.</p>
+          <div class="cta">
+            <button class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, typo.h1]}><p class={typo.buttonText}>Start Playing Now</p></button>
+            <button class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class={typo.buttonText}>Learn More</p></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <section>
+      <div class="promoContainer">
+        <img src={promoBackgroundImage} />
+        <div class="promoCTA">
+          <div class="promoIcon"></div>
+          <div class="promoContent">
+            <h1 class="promoHeader">Get Your First Server Hour Free - <span class="textHiglight">No Credit Card</span> Required!</h1>
+            <p class="promoText">Spin up your first game instance today and see how easy multiplayer hosting can be.</p>
+          </div>
+          <button class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, typo.h1]}><p class={typo.buttonText} style="z-index:2">Start Playing Now</p></button>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="supportedGamesSection">
+        <h2 class={typo.h2}>Supported Games</h2>
+        <div class="gamesList">
+          <div class="supportedGame">
+            <img class="supportedGameImage" src="imgs/Minecraft.avif" />
+            <p class={typo.gameTitle}>Minecraft</p>
+          </div>
+
+          <div class="supportedGame">
+            <img class="supportedGameImage" src="imgs/Minecraft.avif" />
+            <p class={typo.gameTitle}>Terraria</p>
+          </div>
+
+          <div class="supportedGame">
+            <img class="supportedGameImage" src="imgs/Minecraft.avif" />
+            <p class={typo.gameTitle}>CS:GO</p>
+          </div>
+
+          <div class="supportedGame">
+            <img class="supportedGameImage" src="imgs/Minecraft.avif" />
+            <p class={typo.gameTitle}>Valheim</p>
+          </div>
+        </div>
+        <button style="width:33%;" class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle, typo.h1]}><p class={typo.buttonText}>Show More Games</p></button>
+      </div>
+    </section>
+
+    <section class="processSection">
+      <div class="processCardContainer">
+        <div class="processCard">
+          <img src={processStep1} />
+          <div class="processCardContent">
+            <h6 class:list={[typo.h6, colourStyles.gradientOne]}>Select Your Game</h6>
+            <p class={typo.subTitle}>Pick from a list of support open world co-op games.</p>
+          </div>
+        </div>
+
+        <div class="processCard">
+          <img src={processStep2} />
+          <div class="processCardContent">
+            <h6 class:list={[typo.h6, colourStyles.gradientOne]}>Customize Your Instance</h6>
+            <p class={typo.subTitle}>Name it, pick your region, subscription type, and expected players.</p>
+          </div>
+        </div>
+
+        <div class="processCard">
+          <img src={processStep3} />
+          <div class="processCardContent">
+            <h6 class:list={[typo.h6, colourStyles.gradientOne]}>Start Playing</h6>
+            <p class={typo.subTitle}>Launch instantly and invite friends and enjoy your favourite games.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="processContentContainer">
+        <div class="processContent">
+          <h2 class={typo.h2}>Start Playing in 3 Steps</h2>
+          <div class="processBenefit">
+            <div class="purpleLogo"></div>
+            <p class={typo.subTitle}>No tech skills needed.</p>
+          </div>
+          <div class="processBenefit">
+            <div class="purpleLogo"></div>
+            <p class={typo.subTitle}>Pay-as-you-go!</p>
+          </div>
+        </div>
+        <img src="imgs/static1.png" style="max-width:100%;height:auto;"/>
+      </div>
+    </section>
+
+    <section class="servicePropsSection">
+      <div class="propsContainer">
+        <div class="propsBackgroundContainer">
+          <img src={shapeOne} style="transform: rotate(270deg)" />
+          <img src={shapeOne} />
+          <img src={shapeTwo} />
+          <img src={shapeOne} style="transform: rotate(90deg)"/>
+        </div>
+
+        <div class="serviceCardContainer">
+          <div class="serviceCard">
+            <h5 class={typo.h5}>No setup, no stress</h5>
+            <p class={typo.subTitle}>Launch your own game world in seconds, no port forwarding, no config files, no downtime.</p>
+          </div>
+
+          <div class="serviceCard">
+            <h5 class={typo.h5}>No setup, no stress</h5>
+            <p class={typo.subTitle}>Launch your own game world in seconds, no port forwarding, no config files, no downtime.</p>
+          </div>
+
+          <div class="serviceCard">
+            <h5 class={typo.h5}>No setup, no stress</h5>
+            <p class={typo.subTitle}>Launch your own game world in seconds, no port forwarding, no config files, no downtime.</p>
+          </div>
+
+          <div class="serviceCard">
+            <h5 class={typo.h5}>No setup, no stress</h5>
+            <p class={typo.subTitle}>Launch your own game world in seconds, no port forwarding, no config files, no downtime.</p>
+          </div>
+
+        </div>
+      </div>
+      <div class="propsHeadingContainer">
+        <div class="propsHeadingContent">
+          <h2 class={typo.h2}>Host Your Own Game Server Instantly!</h2>
+          <p class={typo.subTitle}>Instances take care of the servers, so you can focus on gaming with friends – anytime, anywhere.</p>
+        </div>
+        <img src={messageIcon} />
+      </div>
+    </section>
+
+    <section class="previewContainer">
+      <div class="ctaContainer">
+        <div class="ctaContent">
+          <h2 class={typo.h2}>How It Looks</h2>
+          <p class={typo.subTitle}>Manage your active instances, switch between games, and invite friends – all in one place.</p>
+        </div>
+        <div class="ctaButtons">
+          <button class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle]}><p class={typo.buttonText}>Start Playing Now</p></button>
+          <button class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class={typo.buttonText}>Learn More</p></button>
+        </div>
+      </div>
+
+      <img class="backgroundGlow" src={backgroundGlow} />
+
+      <img src="imgs/preview.png" style="margin-top: -6rem; margin-left:-2rem; max-width: 100%; height: auto; z-index:2;" />
+    </section>
+
+    <section class="faqContainer">
+      <div class="faqHeaderContainer">
+        <h3 class={typo.h3}>Frequently Asked Questions</h3>
+        <p class={typo.subTitle}>No tech skills needed. Pay-as-you-go!</p>
+      </div>
+
+      <div class="commonQuestionsContainer">
+        <div class="faqCard">
+          <input id="faqCard1" type="checkbox" />
+          <div class="faqCardBackground"></div>
+          <label for="faqCard1" class="faqCardLabel">
+            <p class={typo.subTitle}>Do I need to install anything to use this platform?</p>
+            <!-- img src={iconExpanded} />--> 
+          </label>
+          <div class="faqCardContent">
+            <p class={typo.bodyTextSmall} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+          </div>
+        </div>
+
+        <div class="faqCard">
+          <input id="faqCard2" type="checkbox" />
+          <div class="faqCardBackground"></div>
+          <label for="faqCard2" class="faqCardLabel">
+            <p class={typo.subTitle}>Which Games are supported?</p>
+            <!-- img src={iconExpanded} />--> 
+          </label>
+          <div class="faqCardContent">
+            <p class={typo.bodyTextSmall} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+          </div>
+        </div>
+
+        <div class="faqCard">
+          <input id="faqCard3" type="checkbox" />
+          <div class="faqCardBackground"></div>
+          <label for="faqCard3" class="faqCardLabel">
+            <p class={typo.subTitle}>How does billing works?</p>
+            <!-- img src={iconExpanded} />--> 
+          </label>
+          <div class="faqCardContent">
+            <p class={typo.bodyTextSmall} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+          </div>
+        </div>
+
+        <div class="faqCard">
+          <input id="faqCard4" type="checkbox" />
+          <div class="faqCardBackground"></div>
+          <label for="faqCard4" class="faqCardLabel">
+            <p class={typo.subTitle}>Can I upgrade or downgrade my server later?</p>
+            <!-- img src={iconExpanded} />--> 
+          </label>
+          <div class="faqCardContent">
+            <p class={typo.bodyTextSmall} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+          </div>
+        </div>
+
+        <div class="faqCard">
+          <input id="faqCard5" type="checkbox" />
+          <div class="faqCardBackground"></div>
+          <label for="faqCard5" class="faqCardLabel">
+            <p class={typo.subTitle}>Is there customer support available?</p>
+            <!-- img src={iconExpanded} />--> 
+          </label>
+          <div class="faqCardContent">
+            <p class={typo.bodyTextSmall} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <Newsletter />
+
+    <Footer />
+
+
+	</body>
+</html>
+
+
+
+<style define:vars={{sectionOneBackgroundUrl, instanceIconUrl}}>
+  #heroBanner {
+    background-image: var(--sectionOneBackgroundUrl);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+  }
+
+  .sectionOneContainer {
+    max-width: 1440px;
+    padding-left: 120px;
+    padding-right: 120px;
+    padding-bottom: 82px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .header {
+    padding-top: 28px;
+    padding-bottom: 28px;
+  }
+
+  .nav {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+  }
+
+  .getStarted {
+    display: flex;
+    gap: var(--space-sm);
+    flex-shrink: 0;
+
+    align-items: stretch;
+  }
+
+  header {
+    background-color: transparent;
+
+    display: flex;
+    align-items: center;
+    
+    font-family: Lexend;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 400;
+    color: #ffffff;
+  }
+
+  a {
+      text-decoration: inherit;
+      color: inherit;
+  }
+
+  button {
+      font: inherit
+  }
+
+  .sectionOneInner {
+    padding: 5.625rem 0rem 3.25rem;
+    gap: 2.625rem;
+
+    margin: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    max-width: 36.875rem;
+  }
+
+  .sectionOneText {
+    align-items: center;
+    margin: 0;
+
+    max-width: 34.125rem;
+  }
+
+  .cta {
+    display: flex;
+    gap: 1.25rem;
+    padding: 0%;
+    align-items: flex-start;
+
+  }
+
+  .promoBackground {
+    background: linear-gradient(180deg, #22263E 0%, #191C2E 100%);
+  }
+
+  .promoContainer {
+    max-width: var(--max-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 5rem;
+    padding-right: 5rem;
+    padding-top: 2.5rem;
+    padding-bottom: 0;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    position: relative;
+  }
+
+  .promoCTA {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    padding: 3.5rem 10rem 4rem;
+    gap: 2.5rem;
+    isolation: isolate;
+
+    background: rgba(14, 24, 42, 0.7);
+    background-blend-mode: overlay, normal;
+    backdrop-filter: blur(1rem);
+    border-radius: 0.625rem;
+
+    margin-top: -18rem;
+    z-index: 0;
+  }
+
+  .promoIcon {
+    z-index: 1;
+    position: absolute;
+    inset: 0;
+    background-color: #ffffff;
+
+    mask: var(--instanceIconUrl) repeat 50% 50%;
+    opacity: 0.02;
+
+  }
+
+  .promoContent {
+    gap: 1.5rem;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+  }
+  .promoHeader {
+    font-family: Lexend;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 3rem;
+    align-items: center;
+    flex-direction: row;
+    text-align: center;
+    text-transform: uppercase;
+
+    color: #ffffff;
+
+    margin: 0;
+    max-width: 60rem;
+    z-index: inherit;
+  }
+
+  .textHiglight {
+    display: inline;
+    background: linear-gradient(90deg, #EBA439 0%, #C589F4 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+
+    z-index: inherit;
+  }
+
+  .promoText {
+    margin: 0;
+
+    text-align: center;
+    font-family: Lexend;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 1.375rem;
+    max-width: 37.5rem;
+
+    z-index: inherit;    
+  }
+
+  .supportedGamesSection {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+  
+    display: flex;
+    flex-direction: column;
+    padding-left: 5rem;
+    padding-right: 5rem;
+    padding-bottom: 5rem;
+    padding-top: 6.25rem;
+
+    gap: 3.5rem;
+    text-align: center;
+    align-items: center;
+  }
+
+  .supportedGame {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    gap: 1.5rem;
+
+    max-width: 18.75rem;
+    transition: transform 0.3 ease;
+  }
+
+  .supportedGame:hover {
+    transform: scale(1.3);
+    z-index:10;
+    
+    color: var(--text-colour-vibrant);
+  }
+
+  .supportedGame:hover .supportedGameImage {
+    border: 2px solid var(--text-colour-light);
+  }
+
+
+  .gamesList {
+    display: flex;
+    justify-content: center;
+    flex-direction: row;
+    gap: 1.625rem;
+
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-content: flex-start;
+    flex-grow: 0;
+  }
+  
+
+  .supportedGameImage {
+    max-width: 100%;
+    height: 10.68rem;
+    border-radius: 0.625rem;
+  }
+
+
+</style>
+
+<style>
+  .processSection {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+
+
+    padding-top: 7.6875rem;
+    padding-bottom: 7.6875rem;
+    padding-left: 10rem;
+    padding-right: 10rem;
+
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+
+  }
+
+  .processCardContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    isolation: isolate;
+
+    overflow-y: auto;
+
+  }
+
+  .processCard {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    gap: 2.25rem;
+
+    isolation: isolate;
+  }
+
+  .processCardContent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 1.5rem 0 3rem;
+    gap: 1.25rem;
+  }
+
+  .processContentContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.625rem;
+
+    padding-left: 7.5rem;
+  }
+
+  .processContent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2rem;
+  }
+
+  .processBenefit {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .purpleLogo {
+    width: 20px;
+    height: 20px;
+    background-color: #C589F4;
+    -webkit-mask: var(--instanceIconUrl) no-repeat center;
+    mask: var(--instanceIconUrl) no-repeat center;
+  }
+</style>
+
+<style>
+  .servicePropsSection {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+
+    display: grid;
+    grid-template-columns: 4fr 2fr;
+    padding-bottom: 3.5rem;
+  }
+
+  .propsContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    gap: 1.5rem;
+    isolation: isolate;
+
+    max-width: 766px;
+  }
+
+  .propsBackgroundContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: repeat(2, 1fr);
+    gap: 1.5rem;
+    opacity: 0.5;
+    filter: blur(8px);
+
+    position: absolute;
+  }
+
+  .propsBackgroundContainer img {
+    aspect-ratio: 1 / 1;
+  }
+
+  .serviceCardContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-start;
+    align-content: center;
+    gap: 1.5rem;
+    isolation: isolate;
+  }
+
+  .serviceCard {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2.5rem 1.75rem;
+    gap: 2.5rem;
+
+    background: linear-gradient(295.31deg, rgba(14, 19, 44, 0.2) 4.75%, rgba(48, 58, 106, 0.2) 86.61%);
+    box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(22px);
+    /* Note: backdrop-filter has minimal browser support */
+    border-radius: 10px;
+
+    max-width: 315px;
+  }
+
+  .propsHeadingContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+
+    max-width: 450px;
+  }
+
+  .propsHeadingContent {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.75rem;
+  }
+
+</style>
+
+<style>
+  .previewContainer {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    padding-bottom: 100px;
+    
+  }
+
+  .ctaContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2.8125rem 0px;
+    gap: 2rem;
+
+    z-index: 3;
+  }  
+
+  .ctaContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem; 
+
+    text-align: center;
+    max-width: 622px;
+
+    z-index: inherit;
+  }
+
+  .ctaButtons {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.25rem;
+    isolation: isolate;
+
+    z-index: inherit;
+  }
+
+  .backgroundGlow {
+    position: absolute;
+    margin-top: -24.5rem;
+    max-width: 100%;
+    height: auto;
+  }
+</style>
+
+<style define:vars={{iconExpandedUrl, iconClosedUrl}}>
+  .faqContainer {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+
+    padding: 7.5rem 10rem 6.25rem;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 3rem;
+
+    justify-content: space-between;
+
+    z-index: 2;
+  }
+
+  .faqHeaderContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.5rem;
+    
+    max-width: 500px;
+    z-index: inherit;
+  }
+
+  .commonQuestionsContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.875rem;
+
+    max-width: 750px;
+
+    z-index: inherit;
+  }
+
+  .faqCard {
+    display: flex;
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 1.25rem;
+
+    background: rgba(239, 241, 255, 0.05);
+    border-radius: 8px;
+    color: #ffffff;
+
+    z-index: 0;
+  }
+
+  .faqCardBackground {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    z-index: 2;
+    background: transparent;
+
+    transition: all 0.35s;
+  }
+
+  .faqCardHeader {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+
+    position: relative;
+
+    z-index: 2;
+  }
+
+  .faqCard input {
+    position: absolute;
+    opacity: 0;
+    z-index: -1;
+
+    z-index: 2;
+  }
+
+  .faqCardContent {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.35s;
+    display: block;
+    padding-top: 0;
+
+    z-index: 2;
+
+  }
+
+  .faqCard input:checked ~ .faqCardContent {
+    max-height: 10rem;
+    padding-top: 1.5rem;
+
+    z-index: 2;
+  }
+
+  .faqCard input:checked ~ .faqCardBackground {
+    background: #ffffff;
+  }
+
+  .faqCard input:checked ~ .faqCardLabel {
+    color: #191C2E;
+  }
+
+  .faqCard input:checked ~ img {
+    transform: rotate(180deg);
+  }
+
+
+  .faqCard label {
+    cursor: pointer;
+    z-index: 2;
+  }
+
+  .faqCardLabel {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+    width: 100%;
+
+    justify-content: space-between;
+    z-index: 2;
+  }
+
+  .faqCardLabel::after {
+    content: "\276F";
+    font-size: 1.5rem;
+    color: #191C2E;
+    text-align: center;
+    transform: rotate(90deg);
+    transition: all 0.35s;
+
+    background: var(--iconClosedUrl) no-repeat center;
+    width: 36px;
+    height: 36px;
+  }
+
+  .faqCard input:checked ~ .faqCardLabel::after {
+    transform: rotate(270deg);
+    background: var(--iconExpandedUrl) no-repeat center;
+  }
+
+</style>
+

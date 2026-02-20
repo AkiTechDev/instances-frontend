@@ -1,0 +1,239 @@
+.h1 {
+    font-family:        var(--font-h1-family);
+    font-weight:        var(--font-h1-weight);
+    font-size:          var(--font-h1-size);
+    line-height:        var(--font-h1-line-height);
+    letter-spacing:     var(--font-h1-letter-spacing);
+    text-decoration:    var(--font-h1-text-decoration);
+    text-transform:     var(--font-h1-text-transform);
+}
+
+.h1Caps {
+    font-family:        var(--font-h1-family);
+    font-weight:        600;
+    font-size:          3rem;
+    line-height:        3.75rem;
+    letter-spacing:     var(--font-h1-letter-spacing);
+    text-decoration:    var(--font-h1-text-decoration);
+    text-transform:     uppercase;
+}
+
+.h2 {
+    font-family:        var(--font-h2-family);
+    font-weight:        var(--font-h2-weight);
+    font-size:          var(--font-h2-size);
+    line-height:        var(--font-h2-line-height);
+    letter-spacing:     var(--font-h2-letter-spacing);
+    text-decoration:    var(--font-h2-text-decoration);
+    text-transform:     var(--font-h2-text-transform);
+}
+
+.h3 {
+    font-family:        var(--font-h3-family);
+    font-weight:        var(--font-h3-weight);
+    font-size:          var(--font-h3-size);
+    line-height:        var(--font-h3-line-height);
+    letter-spacing:     var(--font-h3-letter-spacing);
+    text-decoration:    var(--font-h3-text-decoration);
+    text-transform:     var(--font-h3-text-transform);
+}
+
+.h4 {
+    font-family:        var(--font-h4-family);
+    font-weight:        var(--font-h4-weight);
+    font-size:          var(--font-h4-size);
+    line-height:        var(--font-h4-line-height);
+    letter-spacing:     var(--font-h4-letter-spacing);
+    text-decoration:    var(--font-h4-text-decoration);
+    text-transform:     var(--font-h4-text-transform);
+}
+
+.h5 {
+    font-family:        var(--font-h5-family);
+    font-weight:        var(--font-h5-weight);
+    font-size:          var(--font-h5-size);
+    line-height:        var(--font-h5-line-height);
+    letter-spacing:     var(--font-h5-letter-spacing);
+    text-decoration:    var(--font-h5-text-decoration);
+    text-transform:     var(--font-h5-text-transform);
+}
+
+.h6 {
+    font-family:        var(--font-h6-family);
+    font-weight:        var(--font-h6-weight);
+    font-size:          var(--font-h6-size);
+    line-height:        var(--font-h6-line-height);
+    letter-spacing:     var(--font-h6-letter-spacing);
+    text-decoration:    var(--font-h6-text-decoration);
+    text-transform:     var(--font-h6-text-transform);
+}
+
+.subtitleSemiBig {
+    font-family:        var(--font-subtitleSemiBig-family);
+    font-weight:        var(--font-subtitleSemiBig-weight);
+    font-size:          var(--font-subtitleSemiBig-size);
+    line-height:        var(--font-subtitleSemiBig-line-height);
+    letter-spacing:     var(--font-subtitleSemiBig-letter-spacing);
+    text-decoration:    var(--font-subtitleSemiBig-text-decoration);
+    text-transform:     var(--font-subtitleSemiBig-text-transform);
+}
+
+.subText {
+    font-family:        var(--font-subText-family);
+    font-weight:        var(--font-subText-weight);
+    font-size:          var(--font-subText-size);
+    line-height:        var(--font-subText-line-height);
+    letter-spacing:     var(--font-subText-letter-spacing);
+    text-decoration:    var(--font-subText-text-decoration);
+    text-transform:     var(--font-subText-text-transform);
+}
+
+.gameTitle {
+    font-family:        var(--font-gameTitle-family);
+    font-weight:        var(--font-gameTitle-weight);
+    font-size:          var(--font-gameTitle-size);
+    line-height:        var(--font-gameTitle-line-height);
+    letter-spacing:     var(--font-gameTitle-letter-spacing);
+    text-decoration:    var(--font-gameTitle-text-decoration);
+    text-transform:     var(--font-gameTitle-text-transform);
+}
+
+.subTitle {
+    font-family:        var(--font-subTitle-family);
+    font-weight:        var(--font-subTitle-weight);
+    font-size:          var(--font-subTitle-size);
+    line-height:        var(--font-subTitle-line-height);
+    letter-spacing:     var(--font-subTitle-letter-spacing);
+    text-decoration:    var(--font-subTitle-text-decoration);
+    text-transform:     var(--font-subTitle-text-transform);
+}
+
+.subtitleSemi {
+    font-family:        var(--font-subtitleSemi-family);
+    font-weight:        var(--font-subtitleSemi-weight);
+    font-size:          var(--font-subtitleSemi-size);
+    line-height:        var(--font-subtitleSemi-line-height);
+    letter-spacing:     var(--font-subtitleSemi-letter-spacing);
+    text-decoration:    var(--font-subtitleSemi-text-decoration);
+    text-transform:     var(--font-subtitleSemi-text-transform);
+}
+
+.statsText {
+    font-family:        var(--font-statsText-family);
+    font-weight:        var(--font-statsText-weight);
+    font-size:          var(--font-statsText-size);
+    line-height:        var(--font-statsText-line-height);
+    letter-spacing:     var(--font-statsText-letter-spacing);
+    text-decoration:    var(--font-statsText-text-decoration);
+    text-transform:     var(--font-statsText-text-transform);
+}
+
+.statsTitle {
+    font-family:        var(--font-statsTitle-family);
+    font-weight:        var(--font-statsTitle-weight);
+    font-size:          var(--font-statsTitle-size);
+    line-height:        var(--font-statsTitle-line-height);
+    letter-spacing:     var(--font-statsTitle-letter-spacing);
+    text-decoration:    var(--font-statsTitle-text-decoration);
+    text-transform:     var(--font-statsTitle-text-transform);
+}
+
+.bodyText {
+    font-family:        var(--font-bodyText-family);
+    font-weight:        var(--font-bodyText-weight);
+    font-size:          var(--font-bodyText-size);
+    line-height:        var(--font-bodyText-line-height);
+    letter-spacing:     var(--font-bodyText-letter-spacing);
+    text-decoration:    var(--font-bodyText-text-decoration);
+    text-transform:     var(--font-bodyText-text-transform);
+}
+
+.bodyTextMedium {
+    font-family:        var(--font-bodyTextMedium-family);
+    font-weight:        var(--font-bodyTextMedium-weight);
+    font-size:          var(--font-bodyTextMedium-size);
+    line-height:        var(--font-bodyTextMedium-line-height);
+    letter-spacing:     var(--font-bodyTextMedium-letter-spacing);
+    text-decoration:    var(--font-bodyTextMedium-text-decoration);
+    text-transform:     var(--font-bodyTextMedium-text-transform);
+}
+
+.capsTitleText {
+    font-family:        var(--font-capsTitleText-family);
+    font-weight:        var(--font-capsTitleText-weight);
+    font-size:          var(--font-capsTitleText-size);
+    line-height:        var(--font-capsTitleText-line-height);
+    letter-spacing:     var(--font-capsTitleText-letter-spacing);
+    text-decoration:    var(--font-capsTitleText-text-decoration);
+    text-transform:     var(--font-capsTitleText-text-transform);
+}
+
+.bodyTextSmall {
+    font-family:        var(--font-bodyTextSmall-family);
+    font-weight:        var(--font-bodyTextSmall-weight);
+    font-size:          var(--font-bodyTextSmall-size);
+    line-height:        var(--font-bodyTextSmall-line-height);
+    letter-spacing:     var(--font-bodyTextSmall-letter-spacing);
+    text-decoration:    var(--font-bodyTextSmall-text-decoration);
+    text-transform:     var(--font-bodyTextSmall-text-transform);
+}
+
+.bodyTextSmallSemi {
+    font-family:        var(--font-bodyTextSmallSemi-family);
+    font-weight:        var(--font-bodyTextSmallSemi-weight);
+    font-size:          var(--font-bodyTextSmallSemi-size);
+    line-height:        var(--font-bodyTextSmallSemi-line-height);
+    letter-spacing:     var(--font-bodyTextSmallSemi-letter-spacing);
+    text-decoration:    var(--font-bodyTextSmallSemi-text-decoration);
+    text-transform:     var(--font-bodyTextSmallSemi-text-transform);
+}
+
+.bodyTextSmallest {
+    font-family:        var(--font-bodyTextSmallest-family);
+    font-weight:        var(--font-bodyTextSmallest-weight);
+    font-size:          var(--font-bodyTextSmallest-size);
+    line-height:        var(--font-bodyTextSmallest-line-height);
+    letter-spacing:     var(--font-bodyTextSmallest-letter-spacing);
+    text-decoration:    var(--font-bodyTextSmallest-text-decoration);
+    text-transform:     var(--font-bodyTextSmallest-text-transform);
+}
+
+.bodyTextSmallestSemiCaps {
+    font-family:        var(--font-bodyTextSmallestSemiCaps-family);
+    font-weight:        var(--font-bodyTextSmallestSemiCaps-weight);
+    font-size:          var(--font-bodyTextSmallestSemiCaps-size);
+    line-height:        var(--font-bodyTextSmallestSemiCaps-line-height);
+    letter-spacing:     var(--font-bodyTextSmallestSemiCaps-letter-spacing);
+    text-decoration:    var(--font-bodyTextSmallestSemiCaps-text-decoration);
+    text-transform:     var(--font-bodyTextSmallestSemiCaps-text-transform);
+}
+
+.smallestLabel {
+    font-family:        var(--font-smallestLabel-family);
+    font-weight:        var(--font-smallestLabel-weight);
+    font-size:          var(--font-smallestLabel-size);
+    line-height:        var(--font-smallestLabel-line-height);
+    letter-spacing:     var(--font-smallestLabel-letter-spacing);
+    text-decoration:    var(--font-smallestLabel-text-decoration);
+    text-transform:     var(--font-smallestLabel-text-transform);
+}
+
+.buttonText {
+    font-family:        var(--font-buttonText-family);
+    font-weight:        var(--font-buttonText-weight);
+    font-size:          var(--font-buttonText-size);
+    line-height:        var(--font-buttonText-line-height);
+    letter-spacing:     var(--font-buttonText-letter-spacing);
+    text-decoration:    var(--font-buttonText-text-decoration);
+    text-transform:     var(--font-buttonText-text-transform);
+}
+
+.buttonTextSmall {
+    font-family:        var(--font-buttonTextSmall-family);
+    font-weight:        var(--font-buttonTextSmall-weight);
+    font-size:          var(--font-buttonTextSmall-size);
+    line-height:        var(--font-buttonTextSmall-line-height);
+    letter-spacing:     var(--font-buttonTextSmall-letter-spacing);
+    text-decoration:    var(--font-buttonTextSmall-text-decoration);
+    text-transform:     var(--font-buttonTextSmall-text-transform);
+}

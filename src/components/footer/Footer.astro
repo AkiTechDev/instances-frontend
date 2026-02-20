@@ -1,0 +1,42 @@
+<!-- NewsletterSection.astro -->
+---
+import styles from './footer.module.css';
+import typo from "../../styles/typography.module.css";
+
+import footerIcon from "./assets/footerIcon.svg?url";
+import facebookIcon from "./assets/facebookIcon.svg?url";
+import instagramIcon from "./assets/instagramIcon.svg?url";
+import discordIcon from "./assets/discordIcon.svg?url";
+---
+
+<section class={styles.section}>
+    <div class={styles.contentContainer}>
+        <div class={styles.nav}>
+            <a class={typo.bodyText} href="#whywe">Why We</a>
+            <a class={typo.bodyText} href="#process">Process</a>
+            <a class={typo.bodyText} href="#faqs">FAQs</a>
+            <a class={typo.bodyText} href="#privacy-policy">Privacy Policy</a>
+        </div>
+
+        <div class={styles.banner}>
+            <img src={footerIcon} />
+            <div class={styles.socialMedia}>
+                <a><img src={facebookIcon} /></a>
+                <a><img src={instagramIcon} /></a>
+                <a><img src={discordIcon} /></a>
+            </div>
+        </div>
+
+        <div class={styles.contact}>
+            <div class={styles.contactBlock}>
+                <label class={typo.bodyText}>E-mail</label>
+                <p class={typo.bodyText}>aki@aki-labs.com</p>
+            </div>
+            <div class={styles.contactBlock}>
+                <label class={typo.bodyText}>Instagram</label>
+                <p class={typo.bodyText}>@aki_labs</p>
+            </div>
+        </div>
+    </div>
+    <p class={typo.bodyTextSmallest}>©2026 Instances. Powered by Aki Laboratories.</p>
+</section>

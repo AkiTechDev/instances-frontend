@@ -1,0 +1,19 @@
+/* Component */
+.link {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+
+    gap: 0.25rem;
+}
+
+
+/* Style */
+.vibrantLink {
+    color: var(--text-colour-vibrant);
+}
+
+.link.vibrantLink:hover {
+    border-bottom: 1.5px solid var(--text-colour-vibrant);
+}

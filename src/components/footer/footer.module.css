@@ -1,0 +1,75 @@
+
+.section {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 10rem;
+    gap: 2.125rem;
+}
+
+.contentContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    width: 100%;
+}
+
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 1.25rem;
+}
+
+.nav a {
+    text-decoration: none;
+    color: var(--colour-text-tertiary);
+}
+
+.banner {
+    margin-left: auto;
+    margin-right: auto;
+
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.875rem 6.875rem 0;
+    gap: 3rem;
+}
+
+.socialMedia {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.5rem;
+}
+
+.socialMedia a {
+    cursor: pointer;
+}
+
+.contact {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem
+}
+
+.contactBlock {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.contactBlock :nth-child(2) {
+    color: var(--colour-text-secondary);
+}
