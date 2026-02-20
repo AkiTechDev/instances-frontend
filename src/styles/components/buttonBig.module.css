@@ -15,11 +15,13 @@
 /* Orange */
 .vibrantStyle {
     background: var(--text-colour-vibrant);
+    border-color: var(--text-colour-vibrant);
     color: var(--text-colour-dark);
 }
 
 .buttonBig.vibrantStyle:hover {
     background: #C589F4;
+    border-color: #C589F4;
 }
 
 .buttonBig.vibrantStyle:disabled {
@@ -31,6 +33,7 @@
 .transparentVibrantStyle {
     background: transparent;
     color: var(--text-colour-vibrant);
+    border-color: var(--text-colour-vibrant);
 }
 
 .buttonBig.transparentVibrantStyle:hover {
