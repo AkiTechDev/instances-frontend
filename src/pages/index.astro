@@ -39,6 +39,8 @@ import iconClosed from "../assets/iconClosed.svg";
 const iconClosedUrl = `url(${iconClosed.src})` 
 import iconArrow from "../assets/iconArrow.svg?url";
 
+import SupportedGames from "../components/supportedGames/SupportedGames.astro";
+
 import Newsletter from "../components/newsletter/Newsletter.astro";
 import Footer from "../components/footer/Footer.astro";
 
@@ -97,33 +99,7 @@ import Footer from "../components/footer/Footer.astro";
       </div>
     </section>
 
-    <section>
-      <div class="supportedGamesSection">
-        <h2 class={typo.h2}>Supported Games</h2>
-        <div class="gamesList">
-          <div class="supportedGame">
-            <img class="supportedGameImage" src="/instances-frontend/imgs/Minecraft.avif" />
-            <p class={typo.gameTitle}>Minecraft</p>
-          </div>
-
-          <div class="supportedGame">
-            <img class="supportedGameImage" src="/instances-frontend/imgs/Minecraft.avif" />
-            <p class={typo.gameTitle}>Terraria</p>
-          </div>
-
-          <div class="supportedGame">
-            <img class="supportedGameImage" src="/instances-frontend/imgs/Minecraft.avif" />
-            <p class={typo.gameTitle}>CS:GO</p>
-          </div>
-
-          <div class="supportedGame">
-            <img class="supportedGameImage" src="/instances-frontend/imgs/Minecraft.avif" />
-            <p class={typo.gameTitle}>Valheim</p>
-          </div>
-        </div>
-        <button style="width:33%;" class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle, typo.h1]}><p class={typo.buttonText}>Show More Games</p></button>
-      </div>
-    </section>
+    <SupportedGames />
 
     <section class="processSection">
       <div class="processCardContainer">
@@ -502,68 +478,6 @@ import Footer from "../components/footer/Footer.astro";
 
     z-index: inherit;    
   }
-
-  .supportedGamesSection {
-    max-width: 1440px;
-    margin-left: auto;
-    margin-right: auto;
-  
-    display: flex;
-    flex-direction: column;
-    padding-left: 5rem;
-    padding-right: 5rem;
-    padding-bottom: 5rem;
-    padding-top: 6.25rem;
-
-    gap: 3.5rem;
-    text-align: center;
-    align-items: center;
-  }
-
-  .supportedGame {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-    gap: 1.5rem;
-
-    max-width: 18.75rem;
-    transition: transform 0.3 ease;
-  }
-
-  .supportedGame:hover {
-    transform: scale(1.3);
-    z-index:10;
-    
-    color: var(--text-colour-vibrant);
-  }
-
-  .supportedGame:hover .supportedGameImage {
-    border: 2px solid var(--text-colour-light);
-  }
-
-
-  .gamesList {
-    display: flex;
-    justify-content: center;
-    flex-direction: row;
-    gap: 1.625rem;
-
-    flex-wrap: wrap;
-    align-items: flex-start;
-    align-content: flex-start;
-    flex-grow: 0;
-  }
-  
-
-  .supportedGameImage {
-    max-width: 100%;
-    height: 10.68rem;
-    border-radius: 0.625rem;
-  }
-
-
 </style>
 
 <style>

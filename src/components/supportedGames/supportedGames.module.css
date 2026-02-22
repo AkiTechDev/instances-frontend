@@ -1,0 +1,54 @@
+.container {
+    max-width: 1440px;
+    margin-left: auto;
+    margin-right: auto;
+  
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 6.25rem 5rem 5rem;
+
+    gap: 3.5rem;
+    text-align: center;
+    align-items: center;
+}
+
+.gamesContainer {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    align-items: flex-start;
+    gap: 2.5rem 1.625rem; 
+
+    justify-content: center;
+    /* flex-grow: 0; */
+}
+
+.card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0;
+    gap: 1.5rem;
+
+    transition: transform 0.5 ease;
+}
+
+.card:hover {
+    transform: scale(1.13);
+    color: var(--text-colour-vibrant);
+  }
+
+.card:hover > img {
+    border: 3px solid var(--text-colour-light);
+}
+
+
+.card > img {
+    max-width: 300px;
+    height: 10.68rem;
+    border-radius: 0.625rem;
+}
