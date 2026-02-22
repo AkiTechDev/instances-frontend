@@ -3,12 +3,13 @@
 // is your "component frontmatter". It never runs in the browser.
 console.log('This runs in your terminal, not the browser!');
 
+import "../styles/normalise.css"
 import "../styles/global.css"
 import "../styles/variables.module.css"
 
 import "../styles/theme/default.css"
 import colourStyles from "../styles/theme/colours.module.css"
-import "../styles/reset.css"
+
 import typo from "../styles/typography.module.css"
 
 import buttonBig from "../styles/components/buttonBig.module.css"
@@ -36,6 +37,7 @@ import iconExpanded from "../assets/iconExpanded.svg";
 const iconExpandedUrl = `url(${iconExpanded.src})` 
 import iconClosed from "../assets/iconClosed.svg";
 const iconClosedUrl = `url(${iconClosed.src})` 
+import iconArrow from "../assets/iconArrow.svg?url";
 
 import Newsletter from "../components/newsletter/Newsletter.astro";
 import Footer from "../components/footer/Footer.astro";
@@ -100,22 +102,22 @@ import Footer from "../components/footer/Footer.astro";
         <h2 class={typo.h2}>Supported Games</h2>
         <div class="gamesList">
           <div class="supportedGame">
-            <img class="supportedGameImage" src="imgs/Minecraft.avif" />
+            <img class="supportedGameImage" src="/instances-frontend/imgs/Minecraft.avif" />
             <p class={typo.gameTitle}>Minecraft</p>
           </div>
 
           <div class="supportedGame">
-            <img class="supportedGameImage" src="imgs/Minecraft.avif" />
+            <img class="supportedGameImage" src="/instances-frontend/imgs/Minecraft.avif" />
             <p class={typo.gameTitle}>Terraria</p>
           </div>
 
           <div class="supportedGame">
-            <img class="supportedGameImage" src="imgs/Minecraft.avif" />
+            <img class="supportedGameImage" src="/instances-frontend/imgs/Minecraft.avif" />
             <p class={typo.gameTitle}>CS:GO</p>
           </div>
 
           <div class="supportedGame">
-            <img class="supportedGameImage" src="imgs/Minecraft.avif" />
+            <img class="supportedGameImage" src="/instances-frontend/imgs/Minecraft.avif" />
             <p class={typo.gameTitle}>Valheim</p>
           </div>
         </div>
@@ -162,7 +164,7 @@ import Footer from "../components/footer/Footer.astro";
             <p class={typo.subTitle}>Pay-as-you-go!</p>
           </div>
         </div>
-        <img src="imgs/static1.png" style="max-width:100%;height:auto;"/>
+        <img src="/instances-frontend/imgs/static1.png" style="max-width:100%;height:auto;"/>
       </div>
     </section>
 
@@ -177,23 +179,23 @@ import Footer from "../components/footer/Footer.astro";
 
         <div class="serviceCardContainer">
           <div class="serviceCard">
-            <h5 class={typo.h5}>No setup, no stress</h5>
+            <h5 class={typo.h5} style="color: #85B6FF; text-shadow: 0px 0px 4px #2D9CC4;">No setup,<br />no stress</h5>
             <p class={typo.subTitle}>Launch your own game world in seconds, no port forwarding, no config files, no downtime.</p>
           </div>
 
           <div class="serviceCard">
-            <h5 class={typo.h5}>No setup, no stress</h5>
-            <p class={typo.subTitle}>Launch your own game world in seconds, no port forwarding, no config files, no downtime.</p>
+            <h5 class={typo.h5} style="color: #C589F4; text-shadow: 0px 0px 4px #C353FF;">Fair, flexible</br />pricing</h5>
+            <p class={typo.subTitle}>Only pay for the hours you play. No monthly lock-ins or hidden fees.</p>
           </div>
 
           <div class="serviceCard">
-            <h5 class={typo.h5}>No setup, no stress</h5>
-            <p class={typo.subTitle}>Launch your own game world in seconds, no port forwarding, no config files, no downtime.</p>
+            <h5 class={typo.h5} style="color: #EBA439; text-shadow: 0px 0px 4px #FF9D00;">Always<br />online</h5>
+            <p class={typo.subTitle}>Your world lives in the cloud, so friends can join anytime, even when you're offline.</p>
           </div>
 
           <div class="serviceCard">
-            <h5 class={typo.h5}>No setup, no stress</h5>
-            <p class={typo.subTitle}>Launch your own game world in seconds, no port forwarding, no config files, no downtime.</p>
+            <h5 class={typo.h5} style="color: #85B6FF; text-shadow: 0px 0px 4px #2D9CC4;">Switch games,<br />not just servers</h5>
+            <p class={typo.subTitle}>Play Minecraft today, Terraria tomorrow, your setup follows you.</p>
           </div>
 
         </div>
@@ -221,7 +223,7 @@ import Footer from "../components/footer/Footer.astro";
 
       <img class="backgroundGlow" src={backgroundGlow} />
 
-      <img src="imgs/preview.png" style="margin-top: -6rem; margin-left:-2rem; max-width: 100%; height: auto; z-index:2;" />
+      <img src="/instances-frontend/imgs/preview.png" style="margin-top: -6rem; margin-left:-2rem; max-width: 100%; height: auto; z-index:2;" />
     </section>
 
     <section class="faqContainer">
@@ -236,7 +238,9 @@ import Footer from "../components/footer/Footer.astro";
           <div class="faqCardBackground"></div>
           <label for="faqCard1" class="faqCardLabel">
             <p class={typo.subTitle}>Do I need to install anything to use this platform?</p>
-            <!-- img src={iconExpanded} />--> 
+            <div class="faqIcon">
+              <img src={iconArrow} />
+            </div>
           </label>
           <div class="faqCardContent">
             <p class={typo.bodyTextSmall} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
@@ -248,7 +252,9 @@ import Footer from "../components/footer/Footer.astro";
           <div class="faqCardBackground"></div>
           <label for="faqCard2" class="faqCardLabel">
             <p class={typo.subTitle}>Which Games are supported?</p>
-            <!-- img src={iconExpanded} />--> 
+            <div class="faqIcon">
+              <img src={iconArrow} />
+            </div>
           </label>
           <div class="faqCardContent">
             <p class={typo.bodyTextSmall} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
@@ -260,7 +266,9 @@ import Footer from "../components/footer/Footer.astro";
           <div class="faqCardBackground"></div>
           <label for="faqCard3" class="faqCardLabel">
             <p class={typo.subTitle}>How does billing works?</p>
-            <!-- img src={iconExpanded} />--> 
+            <div class="faqIcon">
+              <img src={iconArrow} />
+            </div>
           </label>
           <div class="faqCardContent">
             <p class={typo.bodyTextSmall} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
@@ -272,10 +280,12 @@ import Footer from "../components/footer/Footer.astro";
           <div class="faqCardBackground"></div>
           <label for="faqCard4" class="faqCardLabel">
             <p class={typo.subTitle}>Can I upgrade or downgrade my server later?</p>
-            <!-- img src={iconExpanded} />--> 
+            <div class="faqIcon">
+              <img src={iconArrow} />
+            </div>
           </label>
           <div class="faqCardContent">
-            <p class={typo.bodyTextSmall} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+            <p class={typo.bodyTextMedium} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
           </div>
         </div>
 
@@ -284,10 +294,12 @@ import Footer from "../components/footer/Footer.astro";
           <div class="faqCardBackground"></div>
           <label for="faqCard5" class="faqCardLabel">
             <p class={typo.subTitle}>Is there customer support available?</p>
-            <!-- img src={iconExpanded} />--> 
+            <div class="faqIcon">
+              <img src={iconArrow} />
+            </div>
           </label>
           <div class="faqCardContent">
-            <p class={typo.bodyTextSmall} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+            <p class={typo.bodyText} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
           </div>
         </div>
 
@@ -675,15 +687,14 @@ import Footer from "../components/footer/Footer.astro";
   }
 
   .serviceCardContainer {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     align-content: center;
     gap: 1.5rem;
-    isolation: isolate;
+
+    max-width: 766px;
   }
+
 
   .serviceCard {
     display: flex;
@@ -691,7 +702,7 @@ import Footer from "../components/footer/Footer.astro";
     align-items: flex-start;
     justify-content: center;
     padding: 2.5rem 1.75rem;
-    gap: 2.5rem;
+    gap: 1.25rem;
 
     background: linear-gradient(295.31deg, rgba(14, 19, 44, 0.2) 4.75%, rgba(48, 58, 106, 0.2) 86.61%);
     box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.05);
@@ -699,7 +710,10 @@ import Footer from "../components/footer/Footer.astro";
     /* Note: backdrop-filter has minimal browser support */
     border-radius: 10px;
 
-    max-width: 315px;
+  }
+
+  .serviceCard h5 {
+    flex-grow: 1;
   }
 
   .propsHeadingContainer {
@@ -798,7 +812,6 @@ import Footer from "../components/footer/Footer.astro";
     align-items: flex-start;
     gap: 0.5rem;
     
-    max-width: 500px;
     z-index: inherit;
   }
 
@@ -808,7 +821,7 @@ import Footer from "../components/footer/Footer.astro";
     align-items: flex-start;
     gap: 0.875rem;
 
-    max-width: 750px;
+    max-width: 60%;
 
     z-index: inherit;
   }
@@ -884,10 +897,6 @@ import Footer from "../components/footer/Footer.astro";
     color: #191C2E;
   }
 
-  .faqCard input:checked ~ img {
-    transform: rotate(180deg);
-  }
-
 
   .faqCard label {
     cursor: pointer;
@@ -900,27 +909,35 @@ import Footer from "../components/footer/Footer.astro";
     align-items: center;
     gap: 2rem;
     width: 100%;
-
     justify-content: space-between;
+
     z-index: 2;
+    margin-block-start: auto;
+    margin-block-end: auto;
+
+    min-width: 36px;
+    min-height: 36px;
   }
 
-  .faqCardLabel::after {
-    content: "\276F";
-    font-size: 1.5rem;
-    color: #191C2E;
-    text-align: center;
-    transform: rotate(90deg);
-    transition: all 0.35s;
 
-    background: var(--iconClosedUrl) no-repeat center;
+  .faqIcon {
+    background-image: var(--iconClosedUrl);
     width: 36px;
     height: 36px;
+
+    align-content: center;
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    flex: 0 0 36px;
+
+    transition: all 0.35s;
   }
 
-  .faqCard input:checked ~ .faqCardLabel::after {
-    transform: rotate(270deg);
-    background: var(--iconExpandedUrl) no-repeat center;
+  .faqCard input:checked ~ .faqCardLabel > .faqIcon {
+    transform: rotate(180deg);
+    background-image: var(--iconExpandedUrl);
   }
 
 </style>
