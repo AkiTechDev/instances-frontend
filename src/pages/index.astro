@@ -856,7 +856,7 @@ import Footer from "../components/footer/Footer.astro";
 
 </style>
 
-<script>
+<script is:inline>
   import { login, signUp, msalInstance } from "../lib/auth";
 
   await msalInstance.handleRedirectPromise();
