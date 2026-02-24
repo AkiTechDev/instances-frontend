@@ -4,9 +4,10 @@ import styles from './footer.module.css';
 import typo from "../../styles/typography.module.css";
 
 import footerIcon from "./assets/footerIcon.svg?url";
-import facebookIcon from "./assets/facebookIcon.svg?url";
-import instagramIcon from "./assets/instagramIcon.svg?url";
-import discordIcon from "./assets/discordIcon.svg?url";
+import facebookIcon from "./assets/facebookIcon.svg";
+const facebookIconUrl = `url(${facebookIcon.src})`;
+import instagramIcon from "./assets/instagramIcon.svg";
+import discordIcon from "./assets/discordIcon.svg";
 ---
 
 <section class={styles.section}>
@@ -21,9 +22,15 @@ import discordIcon from "./assets/discordIcon.svg?url";
         <div class={styles.banner}>
             <img src={footerIcon} />
             <div class={styles.socialMedia}>
-                <a><img src={facebookIcon} /></a>
-                <a><img src={instagramIcon} /></a>
-                <a><img src={discordIcon} /></a>
+                <a href="https://www.facebook.com/profile.php?id=61567620143464" target="_blank">
+                    <div class:list={[styles.facebookContact, styles.bannerContactIcon]} style={`--facebookIconUrl: url(${facebookIcon.src})`}></div>
+                </a>
+                <a href="https://www.instagram.com/aki_labs" target="_blank">
+                    <div class:list={[styles.instagramIcon, styles.bannerContactIcon]} style={`--instagramIconUrl: url(${instagramIcon.src})`}></div>
+                </a>
+                <a href="https://discord.gg/nhCEXaZVMX" target="_blank">
+                    <div class:list={[styles.discordIcon, styles.bannerContactIcon]} style={`--discordIconUrl: url(${discordIcon.src})`}></div>
+                </a>
             </div>
         </div>
 

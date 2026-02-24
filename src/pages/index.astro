@@ -69,8 +69,8 @@ import Footer from "../components/footer/Footer.astro";
             <a class={typo.bodyText} href="#privacy-policy">Privacy Policy</a>
           </div>
           <div class="getStarted">
-            <button class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class={typo.buttonText}>Log In</p></button>
-            <button class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, typo.h1]}><img src={iconDiamond} /><p class={typo.buttonText}>Get Started</p></button>
+            <button data-login class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class={typo.buttonText}>Log In</p></button>
+            <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, typo.h1]}><img src={iconDiamond} /><p class={typo.buttonText}>Get Started</p></button>
           </div>
         </header>
 
@@ -78,7 +78,7 @@ import Footer from "../components/footer/Footer.astro";
           <h1 class={typo.h1}>We handle the servers. You handle the fun.</h1>
           <p class={typo.subText}>Play instantly with friends, no setup, no subscriptions, just pay when you play.</p>
           <div class="cta">
-            <button class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, typo.h1]}><p class={typo.buttonText}>Start Playing Now</p></button>
+            <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, typo.h1]}><p class={typo.buttonText}>Start Playing Now</p></button>
             <button class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class={typo.buttonText}>Learn More</p></button>
           </div>
         </div>
@@ -94,7 +94,7 @@ import Footer from "../components/footer/Footer.astro";
             <h1 class="promoHeader">Get Your First Server Hour Free - <span class="textHiglight">No Credit Card</span> Required!</h1>
             <p class="promoText">Spin up your first game instance today and see how easy multiplayer hosting can be.</p>
           </div>
-          <button class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, typo.h1]}><p class={typo.buttonText} style="z-index:2">Start Playing Now</p></button>
+          <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, typo.h1]}><p class={typo.buttonText} style="z-index:2">Start Playing Now</p></button>
         </div>
       </div>
     </section>
@@ -192,7 +192,7 @@ import Footer from "../components/footer/Footer.astro";
           <p class={typo.subTitle}>Manage your active instances, switch between games, and invite friends – all in one place.</p>
         </div>
         <div class="ctaButtons">
-          <button class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle]}><p class={typo.buttonText}>Start Playing Now</p></button>
+          <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle]}><p class={typo.buttonText}>Start Playing Now</p></button>
           <button class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class={typo.buttonText}>Learn More</p></button>
         </div>
       </div>
@@ -219,7 +219,7 @@ import Footer from "../components/footer/Footer.astro";
             </div>
           </label>
           <div class="faqCardContent">
-            <p class={typo.bodyTextSmall} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+            <p class={typo.bodyText} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
           </div>
         </div>
 
@@ -233,7 +233,7 @@ import Footer from "../components/footer/Footer.astro";
             </div>
           </label>
           <div class="faqCardContent">
-            <p class={typo.bodyTextSmall} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+            <p class={typo.bodyText} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
           </div>
         </div>
 
@@ -247,7 +247,7 @@ import Footer from "../components/footer/Footer.astro";
             </div>
           </label>
           <div class="faqCardContent">
-            <p class={typo.bodyTextSmall} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+            <p class={typo.bodyText} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
           </div>
         </div>
 
@@ -261,7 +261,7 @@ import Footer from "../components/footer/Footer.astro";
             </div>
           </label>
           <div class="faqCardContent">
-            <p class={typo.bodyTextMedium} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+            <p class={typo.bodyText} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
           </div>
         </div>
 
@@ -856,3 +856,16 @@ import Footer from "../components/footer/Footer.astro";
 
 </style>
 
+<script>
+  import { login, signUp, msalInstance } from "../lib/auth";
+
+  await msalInstance.handleRedirectPromise();
+
+  document.querySelectorAll('[data-login]').forEach(btn => {
+    btn.addEventListener('click', login);
+  })
+
+  document.querySelectorAll('[data-signup]').forEach(btn => {
+    btn.addEventListener('click', signUp);
+  })
+</script>

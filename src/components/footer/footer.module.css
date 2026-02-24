@@ -52,8 +52,8 @@
     gap: 1.5rem;
 }
 
-.socialMedia a {
-    cursor: pointer;
+.socialMedia > a:active > .bannerContactIcon {
+    background-color: var(--colour-text-secondary)
 }
 
 .contact {
@@ -72,4 +72,25 @@
 
 .contactBlock :nth-child(2) {
     color: var(--colour-text-secondary);
+}
+
+.bannerContactIcon {
+    background: var(--colour-text-tertiary);
+    width: 40px;
+    height: 40px;
+}
+
+.facebookContact {
+    -webkit-mask: var(--facebookIconUrl) no-repeat center;
+    mask: var(--facebookIconUrl) no-repeat center;
+}
+
+.instagramIcon {
+    -webkit-mask: var(--instagramIconUrl) no-repeat center;
+    mask: var(--instagramIconUrl) no-repeat center;
+}
+
+.discordIcon {
+    -webkit-mask: var(--discordIconUrl) no-repeat center;
+    mask: var(--discordIconUrl) no-repeat center;
 }
