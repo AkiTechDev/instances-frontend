@@ -44,6 +44,8 @@ import SupportedGames from "../components/supportedGames/SupportedGames.astro";
 import Newsletter from "../components/newsletter/Newsletter.astro";
 import Footer from "../components/footer/Footer.astro";
 
+import AuthJS from "../components/auth/auth.astro";
+
 ---
 <!-- Below is your "component template." It's just HTML, but with
     some magic sprinkled in to help you build great templates. -->
@@ -286,6 +288,103 @@ import Footer from "../components/footer/Footer.astro";
 
     <Footer />
 
+    <script>
+      import { EventType, LogLevel, PublicClientApplication } from "@azure/msal-browser";
+
+        export const msalConfig = {
+            auth: {
+                clientId: 'b355e8f6-6973-4b89-821d-f6bada3cde4b',
+                authority: 'https://akilaboratoriesext.ciamlogin.com/f862f504-2fdc-4cb2-aed3-107ac3cb3154', // Replace the placeholder with your tenant subdomain 
+                redirectUri: 'https://instances.aki-labs.com/dashboard', // Points to window.location.origin. You must register this URI on Microsoft Entra admin center/App Registration.
+                postLogoutRedirectUri: '/', // Indicates the page to navigate after logout.
+                navigateToLoginRequestUrl: false, // If "true", will navigate back to the original request location before processing the auth code response.
+            },
+            cache: {
+                cacheLocation: 'sessionStorage',
+                storeAuthStateInCookies: false,
+            },
+            system: {
+                loggerOptions: {
+                    loggerCallback: (
+                        level: LogLevel,
+                        message: string,
+                        containsPii: boolean
+                    ): void => {
+                        if (containsPii) {
+                            return;
+                        }
+                        switch (level) {
+                            case LogLevel.Error:
+                                console.error(message);
+                                return;
+                            case LogLevel.Info:
+                                console.info(message);
+                                return;
+                            case LogLevel.Verbose:
+                                console.debug(message);
+                                return;
+                            case LogLevel.Warning:
+                                console.warn(message);
+                                return;
+                        }
+                    },
+                    piiLoggingEnabled: false,
+                },
+                windowHashTimeout: 60000,
+                iframeHashTimeout: 60000,
+                loadFrameTimeout: 0,
+            },
+        }
+
+        let msalInstance: PublicClientApplication | null = null;
+
+        export async function getMsal() {
+          if (typeof window === 'undefined') return null; // server, skip
+
+          if (!msalInstance) {
+            msalInstance = new PublicClientApplication(msalConfig);
+            await msalInstance.initialize();
+            await msalInstance.handleRedirectPromise();
+          }
+
+          return msalInstance;
+        }
+
+        export async function login() {
+            const accounts = msalInstance?.getAllAccounts();
+            if (accounts && accounts.length > 0) {
+                msalInstance?.setActiveAccount(accounts[0]);
+            } else {
+                await msalInstance?.loginRedirect({
+                    scopes: ["api://Instances/access"],
+                });
+            }
+        }
+
+
+        export async function signUp() {
+            const accounts = msalInstance?.getAllAccounts();
+            if (accounts && accounts.length > 0) {
+                msalInstance?.setActiveAccount(accounts[0]);
+            } else {
+                await msalInstance?.loginRedirect({
+                    scopes: ["api://Instances/access"],
+                    prompt: "create",
+                });
+            }
+        }
+
+        msalInstance = await getMsal();
+        msalInstance?.handleRedirectPromise();
+
+        document.querySelectorAll('[data-login]').forEach(btn => {
+            btn.addEventListener('click', login);
+        })
+
+        document.querySelectorAll('[data-signup]').forEach(btn => {
+            btn.addEventListener('click', signUp);
+        })
+    </script>
 
 	</body>
 </html>
@@ -353,8 +452,6 @@ import Footer from "../components/footer/Footer.astro";
 
   .sectionOneInner {
     padding: 5.625rem 0rem 3.25rem;
-    gap: 2.625rem;
-
     margin: 0;
 
     display: flex;
@@ -362,6 +459,14 @@ import Footer from "../components/footer/Footer.astro";
     justify-content: center;
     align-items: flex-start;
     max-width: 36.875rem;
+  }
+
+  .sectionOneInner > h1 {
+    margin-bottom: var(--margin-text-sm);
+  }
+
+  .sectionOneInner > p {
+    margin-bottom: var(--margin-el-md);
   }
 
   .sectionOneText {
@@ -407,7 +512,6 @@ import Footer from "../components/footer/Footer.astro";
     align-items: center;
 
     padding: 3.5rem 10rem 4rem;
-    gap: 2.5rem;
     isolation: isolate;
 
     background: rgba(14, 24, 42, 0.7);
@@ -431,7 +535,7 @@ import Footer from "../components/footer/Footer.astro";
   }
 
   .promoContent {
-    gap: 1.5rem;
+    gap: var(--margin-text-nm);
     margin: 0;
     display: flex;
     flex-direction: column;
@@ -470,11 +574,15 @@ import Footer from "../components/footer/Footer.astro";
     margin: 0;
 
     text-align: center;
+
     font-family: Lexend;
     font-style: normal;
     font-weight: 600;
     font-size: 1.375rem;
     max-width: 37.5rem;
+    line-height: 150%;
+
+    margin-bottom: var(--margin-el-nm);
 
     z-index: inherit;    
   }
@@ -541,7 +649,10 @@ import Footer from "../components/footer/Footer.astro";
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 2rem;
+  }
+
+  .processContent > h2 {
+    margin-bottom: var(--margin-text-sm);
   }
 
   .processBenefit {
@@ -643,7 +754,7 @@ import Footer from "../components/footer/Footer.astro";
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.75rem;
+    gap: var(--margin-text-sm);
   }
 
 </style>
@@ -667,8 +778,8 @@ import Footer from "../components/footer/Footer.astro";
     flex-direction: column;
     align-items: center;
     padding: 2.8125rem 0px;
-    gap: 2rem;
 
+    gap: var(--margin-el-sm);
     z-index: 3;
   }  
 
@@ -676,8 +787,7 @@ import Footer from "../components/footer/Footer.astro";
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.75rem; 
-
+    gap: var(--margin-text-sm);
     text-align: center;
     max-width: 622px;
 
@@ -724,7 +834,7 @@ import Footer from "../components/footer/Footer.astro";
     flex-direction: column;
     justify-content: space-between;
     align-items: flex-start;
-    gap: 0.5rem;
+    gap: var(--margin-text-sm);
     
     z-index: inherit;
   }
@@ -855,17 +965,3 @@ import Footer from "../components/footer/Footer.astro";
   }
 
 </style>
-
-<script is:inline>
-  import { login, signUp, msalInstance } from "../lib/auth";
-
-  await msalInstance.handleRedirectPromise();
-
-  document.querySelectorAll('[data-login]').forEach(btn => {
-    btn.addEventListener('click', login);
-  })
-
-  document.querySelectorAll('[data-signup]').forEach(btn => {
-    btn.addEventListener('click', signUp);
-  })
-</script>

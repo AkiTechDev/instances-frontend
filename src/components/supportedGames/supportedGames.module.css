@@ -9,7 +9,7 @@
     align-items: center;
     padding: 6.25rem 5rem 5rem;
 
-    gap: 3.5rem;
+    gap: var(--margin-el-lg);
     text-align: center;
     align-items: center;
 }

@@ -14,4 +14,15 @@
     --colour-text-primary: #191C2E;
     --colour-text-secondary: #EBA439;
     --colour-text-tertiary: #ffffff;
+
+
+    --margin-text-sm: 1rem;
+    --margin-text-nm: 1.5rem;
+    --margin-text-md: 2rem;
+    --margin-text-lg: 2.5rem;
+
+    --margin-el-sm: 2rem;
+    --margin-el-nm: 2.5rem;
+    --margin-el-md: 3rem;
+    --margin-el-lg: 3.5rem;
 }

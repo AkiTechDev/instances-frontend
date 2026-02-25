@@ -15,6 +15,9 @@ export default defineConfig({
     host: 'instances.aki-labs.com'
   },
   vite: {
+    ssr: {
+      external: ['@azure/msal-browser'],
+    },
     plugins: [mkcert()]
   }
 });

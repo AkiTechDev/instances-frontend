@@ -45,6 +45,8 @@ export const msalConfig = {
     },
 }
 
+/*
+
 export const msalInstance = new PublicClientApplication(msalConfig);
 
 await msalInstance.initialize();
@@ -54,6 +56,22 @@ msalInstance.addEventCallback((event) => {
         console.log("SIGNED IN");
     }
 });
+
+*/
+
+let msalInstance: PublicClientApplication;
+
+export async function getMsal() {
+  if (typeof window === 'undefined') return null; // server, skip
+
+  if (!msalInstance) {
+    msalInstance = new PublicClientApplication(msalConfig);
+    await msalInstance.initialize();
+    await msalInstance.handleRedirectPromise();
+  }
+
+  return msalInstance;
+}
 
 export async function login() {
     const accounts = msalInstance.getAllAccounts();

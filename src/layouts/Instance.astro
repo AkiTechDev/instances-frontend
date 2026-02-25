@@ -1,0 +1,38 @@
+---
+// Welcome to Astro! Everything between these triple-dash code fences
+// is your "component frontmatter". It never runs in the browser.
+
+import Newsletter from "../components/newsletter/Newsletter.astro";
+import Footer from "../components/footer/Footer.astro";
+
+const { title } = Astro.props;
+---
+<!-- Below is your "component template." It's just HTML, but with
+    some magic sprinkled in to help you build great templates. -->
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="description" content="Qwik + Astro integration" />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+        <title>{title}</title>
+	</head>
+    <body class="grid-container">
+        <p class="item">NAV</p>
+        <slot class="item" />
+
+        <Newsletter class="item"  />
+        <Footer class="item"  />
+    </body>
+</html>
+
+<style>
+    .grid-container {
+        display: grid;
+        grid-template-columns: 100px 1fr;
+        grid-template-rows: 800px;
+    }
+
+</style>
