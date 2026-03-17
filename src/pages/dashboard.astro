@@ -1,12 +1,36 @@
+<!-- Dashboard.astro -->
 ---
 import Instance from '../layouts/Instance.astro';
+import Games from "../components/Instances/games/Games.astro";
 ---
 
 <Instance title="Game Dashboard">
-  <div>
-    <p>My page content, wrapped in a layout!</p>
-  </div>
+  <Games acount=""/>
 </Instance>
+
+<script>
+  import { getMsal } from "../lib/auth"
+  
+  const msalInstance = await getMsal();
+  if (!msalInstance) throw new Error("MSAL not initialized");
+
+  const result = await msalInstance.handleRedirectPromise();
+
+  if (result) {
+    msalInstance.setActiveAccount(result.account)
+  } else {
+    const accounts = msalInstance.getAllAccounts();
+
+    if (accounts.length === 0) {
+      window.location.href = "/instances-frontend/";
+    } else {
+      msalInstance.setActiveAccount(accounts[0])
+    }
+  }
+
+  const account = msalInstance.getActiveAccount();
+  console.log("Account:", account?.name);
+</script>
 
 <style>
   div {

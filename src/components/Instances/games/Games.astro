@@ -1,0 +1,13 @@
+<!-- Games.astro -->
+---
+import "../../../styles/variables.module.css";
+import styles from './Games.module.css';
+import Header from "../header/Header.astro"
+
+import GamesList from "./Games";
+---
+<section class={styles.gridContainer}>
+    <Header />
+
+    <GamesList client:load />
+</section>

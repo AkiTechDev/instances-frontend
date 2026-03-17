@@ -1,9 +1,11 @@
+<!-- Instance.astro -->
 ---
 // Welcome to Astro! Everything between these triple-dash code fences
 // is your "component frontmatter". It never runs in the browser.
 
 import "../styles/normalise.css"
 import "../styles/global.css"
+import "../styles/theme/default.css"
 import "../styles/variables.module.css"
 
 import Nav from "../components/Instances/nav/Nav.astro";
@@ -42,7 +44,7 @@ const { title } = Astro.props;
     .grid-container {
         display: grid;
         grid-template-columns: 100px 1fr;
-        grid-template-rows: 800px;
+        grid-template-rows: minmax(800px, auto);
 
     }
 

@@ -12,7 +12,7 @@ export default defineConfig({
   server: {
     port: 443,
     https: true,
-    host: 'instances.aki-labs.com'
+    host: 'instances.aki-labs.com',
   },
   vite: {
     ssr: {
