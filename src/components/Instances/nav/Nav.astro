@@ -1,7 +1,6 @@
 <!-- Nav.astro -->
 ---
 import styles from './Nav.module.css';
-import typo from "../../../styles/typography.module.css";
 
 import iconLight from "../../../assets/iconLight.svg?url";
 
@@ -9,6 +8,12 @@ import gamesIcon from "./assets/gameMenuIcon.svg";
 import socialIcon from "./assets/socialIcon.svg";
 import exploreIcon from "./assets/exploreIcon.svg";
 import extraIcon from "./assets/extraIcon.svg";
+
+interface Props {
+    menu: string
+};
+
+const { menu } = Astro.props;
 ---
 
 <section class={styles.container}>

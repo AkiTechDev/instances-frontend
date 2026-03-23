@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "astro dev --allowed-hosts instances.aki-labs.com",
+    "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview"
   },
@@ -17,7 +17,8 @@
     "@azure/msal-browser": "^4.5.0",
     "@builder.io/qwik": "^1.19.0",
     "@qwikdev/astro": "^0.8.3",
-    "astro": "^5.17.1"
+    "@tanstack/qwik-table": "^8.21.3",
+    "astro": "^5.18.1"
   },
   "devDependencies": {
     "vite-plugin-mkcert": "^1.17.9"

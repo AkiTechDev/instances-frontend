@@ -104,6 +104,41 @@
         gap: 20px;
     }
 
+    .gamesListContainer {
+        display: grid;
+        grid-template-columns: 1fr;
+        width: 100%;
+    }
+
+    .gamesListViewHeader {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 12px 16px;
+        gap: 12px;
+
+        border-radius: 8px;
+        background-color: var(--colour-text-primary);
+        color: var(--colour-text-tertiary);
+        width: 100%;
+    }
+
+    .gamesListViewHeader > :nth-child(1) {
+        flex: 1;
+        max-width: 68.022%;
+    }
+
+    .gamesListViewHeader > :nth-child(2) {
+        width: 80px;
+        text-align: center;
+        margin: 0 1rem;
+    }
+
+    .gamesListViewHeader > :nth-child(3) {
+        margin-right: auto;
+    }
+
     /* Filter Container  */
 
     .gameFiltersContainer {

@@ -223,3 +223,48 @@
     .toggleContainer input[type="checkbox"]:checked + label::before {
         left: 30px;
     }
+
+    /* List View */
+    .instanceList {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 12px 16px;
+        gap: 12px;
+
+        border-radius: 8px;
+        background-color: var(--colour);
+        width: 100%;
+    }
+
+    .instanceList > :first-child {
+        flex: 1;
+        max-width: 70%;
+    }
+
+    .instanceStatusList {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.25rem 0.5rem;
+        max-width: 130px;
+
+        background: #80F733;
+        border: 1px solid rgba(55, 217, 26, 0.45);
+        border-radius: 16px;
+
+        margin: 0 1rem;
+    }
+
+    .instanceList > .toggleContainer {
+        margin: 0 1rem;
+        position: relative;
+    }
+
+    .instanceList button {
+        width: 22px;
+        height: 22px;
+        background: var(--icon) no-repeat center;
+        border: none;
+    }

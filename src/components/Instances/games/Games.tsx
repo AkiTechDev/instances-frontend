@@ -69,7 +69,10 @@ const GamesList = component$(() => {
         }
     })
 
-    const searchValue = useSignal("");
+    const isListView = useSignal(false);
+
+    const instanceSearchValue = useSignal("");
+
 
     const sidebarFilter = useSignal("all");
     const sidebarSearch = useSignal("");
@@ -78,6 +81,7 @@ const GamesList = component$(() => {
             if (sidebarSearch.value === "") { return true } else { return game.name.toLowerCase().includes(sidebarSearch.value.toLowerCase())}})
         .map(([game_id, ]) => game_id);
     const sidebarCollasped = useSignal(false);
+
 
     return (
         <>
@@ -97,6 +101,7 @@ const GamesList = component$(() => {
                             <div class={styles.searchIcon} style={`--icon: url("${searchIcon.src}")`}></div>
                             <input
                                 type="search"
+                                id="gameSearch"
                                 placeholder="Find your game"
                                 value={sidebarSearch.value}
                                 onClick$={(e) => sidebarCollasped.value = false}
@@ -150,22 +155,42 @@ const GamesList = component$(() => {
                     <div class={styles.gameFiltersContainer}>
                         <label class={styles.searchableContainer}>
                             <div class={styles.searchIcon} style={`--icon: url("${searchIcon.src}")`}></div>
-                            <input type="search" placeholder="Search your instances" bind:value={searchValue}></input>
-                            <button onClick$={() => (searchValue.value = "")} class={[styles.inputClearBtn, searchValue.value ? styles.visible : styles.hidden]} style={`--icon: url("${crossIcon.src}")`}></button>
+                            <input id="instanceSearch" type="search" placeholder="Search your instances" bind:value={instanceSearchValue}></input>
+                            <button onClick$={() => (instanceSearchValue.value = "")} class={[styles.inputClearBtn, instanceSearchValue.value ? styles.visible : styles.hidden]} style={`--icon: url("${crossIcon.src}")`}></button>
                             <button class={`${typo.bodyTextMedium} ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Active Instances</button>
                         </label>
                         <button class={`${typo.bodyTextMedium} ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Date Created</button>
                         <div class={styles.toggleView}>
-                            <input id="viewToggle" type="checkbox" />
+                            <input
+                                id="viewToggle"
+                                type="checkbox"
+                                checked={isListView.value}
+                                onChange$={() => isListView.value = !isListView.value}
+                            />
                             <label for="viewToggle">
                                 <div class={styles.viewIcon} style={`--icon: url("${gridViewIcon.src}")`} />
                                 <div class={styles.viewIcon} style={`--icon: url("${listViewIcon.src}")`} />
                             </label>
                         </div>
                     </div>
-                    <div class={styles.gamesGridContainer}>
-                        {games_list.value.map((item,  i) => (
-                            <InstanceCard user_id={item["user_id"]} name={item["name"]} game={item["game"]} />
+                    <div class={{
+                        [styles.gamesGridContainer]: !isListView.value, [styles.gamesListContainer]: isListView.value
+                    }}>
+                        { isListView.value && (
+                            <div class={styles.gamesListViewHeader}>
+                                <p class={typo.bodyTextSmall}>Instance</p>
+                                <p class={typo.bodyTextSmall}>Status</p>
+                                <p class={typo.bodyTextSmall}>Activity</p>
+                                <p></p>
+                                <p></p>
+                            </div>
+                        )}
+                        {games_list.value
+                            .filter(instance => {
+                                if (instanceSearchValue.value === "") { return true } else { return instance.name.toLowerCase().includes(instanceSearchValue.value.toLowerCase())}
+                            })
+                        .map((item,  i) => (
+                            <InstanceCard key={item["name"]} user_id={item["user_id"]} name={item["name"]} game={item["game"]} listView={isListView.value} idx={i} />
                         ))}
                     </div>
                 </div>
