@@ -6,6 +6,8 @@
         gap: 0.75rem;
 
         position: relative;
+        text-decoration: none;
+        color: var(--colour-text-primary);
     }
 
     .imageWrapper {

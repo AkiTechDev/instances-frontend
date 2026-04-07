@@ -1,0 +1,83 @@
+.gridContainer {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0px, 79px) auto;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "header"
+        "content";
+    overflow: visible;
+
+    background-color: #fff;
+    border-radius: 0px 0px 0px 20px;
+
+    color: var(--colour-text-primary);
+    position: relative;
+
+    transition: all 0.5s ease, clip-path 0.3s ease;
+    gap: 2rem;
+}
+
+.exploreContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    padding-left: var(--margin-el-md);
+    padding-right: var(--margin-el-sm);
+
+    gap: 40px;
+}
+
+.exploreHeader {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.gamesContainer {
+    display: grid;
+
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 2rem;
+
+    width: 100%;
+}
+
+
+.gameCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 12px;
+    gap: 12px;
+
+}
+
+.gameCard > img {
+    width: 100%;
+    aspect-ratio: 37/25;
+
+    border-radius: 8px;
+}
+
+.gameCard > p {
+    font-family: 'Lexend';
+    font-style: normal;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 120%;
+    /* identical to box height, or 24px */
+    display: flex;
+    align-items: center;
+    text-align: center;
+    text-transform: capitalize;
+
+    color: var(--colour-text-primary);
+}
+
+.gameCard:hover {
+    transform: scale(1.15);
+    cursor: pointer;
+}
+

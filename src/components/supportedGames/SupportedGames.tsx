@@ -1,4 +1,4 @@
-import { component$, Resource, useResource$, useSignal, useStore } from "@builder.io/qwik";
+import { createSignal, createResource, Show, For } from "solid-js";
 
 import styles from "./supportedGames.module.css";
 import typo from "../../styles/typography.module.css";
@@ -41,12 +41,13 @@ function shuffleArray(array: string[]) {
         [array[i], array[j]] = [array[j], array[i]];
     }
 
-    return 
+    return array;
 }
 
-const SupportedGameCard = component$(() => {
-    const showAll = useSignal(false)
-    const games = useResource$(async () => {
+const SupportedGameCard = () => {
+    const [showAll, setShowAll] = createSignal(false);
+
+    const [games] = createResource<string[]>(async () => {
         try {
             const resp = await fetch('https://api.instances.aki-labs.com/instances/types', {
                 method: "GET",
@@ -61,7 +62,7 @@ const SupportedGameCard = component$(() => {
 
             shuffleArray(json);
 
-            return json as string[];
+            return shuffleArray(json) as string[];
         } catch (error) {
             console.log(error);
             return [] as string[];
@@ -71,29 +72,29 @@ const SupportedGameCard = component$(() => {
 
     return (
         <>
-        <Resource
-            value={games}
-            onPending={() => <p>Loading ...</p>}
-            onRejected={(error: any) => <p> Error: {error.message}</p>}
-            onResolved={(games: string[]) => (
+        <Show when={!games.loading} fallback={<p>Loading</p>}>
+            <Show when={!games.error} fallback={<p>Error</p>}>
                 <div class={styles.gamesContainer}>
-                    {(showAll.value ? games : games.slice(0, 4)).map((game, index) => (
-                        <div class={styles.card}>
-                            <img src={'/instances-frontend/imgs/' + game + '/banner.avif'} />
-                            <p class={typo.subTitle}>{supportedGames[game].name}</p>
-                        </div>
-                    ))}
+                    <For each={showAll() ? games() : games()?.slice(0, 4)}>
+                        {(game) => (
+                            <div class={styles.card}>
+                                <img src={'/instances-frontend/imgs/' + game + '/banner.avif'} />
+                                <p class={typo.subTitle}>{supportedGames[game].name}</p>
+                            </div>
+                        )}
+                    </For>
                 </div>
-            )}
-        />
-        <button style="width:33%;" class={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]} onClick$={() => showAll.value = !showAll.value}><p class={typo.buttonText}>{showAll.value ? 'Show Less Games' : 'Show More Games'}</p></button>
+            </Show>
+        </Show>
+        <button
+            style="width:33%;"
+            class={`${buttonBig.buttonBig} ${buttonBig.transparentVibrantStyle}`}
+            onClick={() => setShowAll(prev => !prev)}
+        >
+            <p class={typo.buttonText}>{showAll() ? 'Show Less Games' : 'Show More Games'}</p>
+        </button>
         </>
     )
-})
+};
 
 export default SupportedGameCard
-
-
-const SupportedGameButton = component$(() => {
-    return null
-})

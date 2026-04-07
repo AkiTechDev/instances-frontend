@@ -1,0 +1,16 @@
+<!-- Dashboard.astro -->
+---
+import Instance from "../../layouts/Instance.astro";
+import games from "../../lib/games";
+
+export async function getStaticPaths() {
+  const pages = Object.entries(games).map(([id, ]) => {
+    return { params: { game: id, game_id: "hi" }}
+  })
+
+  console.log(pages);
+  return pages
+}
+
+---
+<Instance></Instance>
