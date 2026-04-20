@@ -4,6 +4,7 @@
     align-items: flex-start;
 
     gap: 0.25rem;
+    padding-right: 0.5rem;
 }
 
 .instanceConfigSettingsContainer > label {
@@ -31,3 +32,10 @@
 .select::-ms-expand {
   display: none;
 }
+
+.fieldXS   { grid-column: span 1; }   /* checkbox, toggle */
+.fieldSM   { grid-column: span 2; }   /* short number, zip code */
+.fieldMD   { grid-column: span 3; }   /* first name, date */
+.field-lg   { grid-column: span 6; }   /* email, phone */
+.field-xl   { grid-column: span 8; }   /* address */
+.field-full { grid-column: span 12; }  /* textarea, full-width inputs */

@@ -1,0 +1,114 @@
+
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+
+    background: #E2E3EB;
+    border-radius: 50px;
+
+    border: 0;
+    position: relative;
+
+    container-type: inline-size;
+}
+
+
+.container summary {
+  gap: clamp(0.125rem, 10cqi, 0.25rem);
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  border-radius: 50px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  cursor: pointer;
+
+  container-type: inline-size;
+}
+
+.container summary::-webkit-details-marker {
+  display: none; 
+}
+
+.container:hover {
+    background-color: rgba(197, 137, 244, 0.2);   
+}
+
+.dot {
+  width: clamp(3px, 10cqi, 5px);
+  height: clamp(3px, 10cqi, 5px);
+  border-radius: 50%;
+  background: var(--colour-text-primary);
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.container[open] summary > .dot:nth-child(1) {
+  transform: translateY(clamp(5px, 20cqi, 9px)) rotate(45deg) scaleX(3);
+  border-radius: 2px;
+}
+
+.container[open] summary > .dot:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.container[open] summary > .dot:nth-child(3) {
+  transform: translateY(clamp(-9px, -20cqi, -5px)) rotate(-45deg) scaleX(3);
+  border-radius: 2px;
+}
+
+
+/* Drop Down Box Style */
+
+.options {
+  box-sizing: border-box;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.75rem 0rem;
+
+  background-color: var(--colour-text-tertiary);
+  border: 1.5px solid #E2E3EB;
+  border-radius: 8px;
+
+  position: absolute;
+  left: 0;
+  top: 105%;
+
+  white-space: nowrap;
+  gap: 0.5rem;
+
+  padding-left: 1rem;
+  padding-right: 0.5rem;
+
+  z-index: 100; /* For some reason an element in another grid is visible ontop of this element */
+}
+
+.options button {
+  border: none;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+
+.options button:hover {
+  color: var(--colour-text-secondary);
+  text-decoration: underline;
+}
+
+.options button:visited {
+  color: var(--colour-text-secondary);
+  text-decoration: underline;
+}
+
+.alignRight {
+  left: auto;
+  right: 0;
+}

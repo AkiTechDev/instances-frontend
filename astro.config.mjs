@@ -9,6 +9,8 @@ export default defineConfig({
   base: '/instances-frontend/',
   integrations: [solidJs()],
 
+  prefetch: true,
+
   server: {
     port: 443,
     https: true,

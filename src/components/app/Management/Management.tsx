@@ -1,4 +1,4 @@
-import { createAsync, query, redirect, reload, revalidate, useNavigate, useParams } from "@solidjs/router"
+import { createAsync, revalidate, useNavigate, useParams } from "@solidjs/router"
 
 import styles from "./Management.module.css";
 import typo from "../../../styles/typography.module.css";
@@ -9,107 +9,22 @@ import iconArrow from "../../../assets/iconArrow.svg";
 import btnWithIcon from "../../../styles/components/buttonWithIcons.module.css";
 import btn from "../../../styles/components/buttonBig.module.css";
 import stopIcon from "./assets/stopIcon.svg";
+import playIcon from "./assets/playIcon.svg";
 import clipboardIcon from "./assets/clipboardIcon.svg";
 
 import games from "../../../lib/games";
 import Tooltip from "../Test/Test";
 
-import { type Instance } from "../Dashboard/Dashboard";
+import { getInstanceConfig, getInstanceEndpoint, getInstanceStatus, toggleInstance, type Instance } from "../../../lib/apis";
 import { useMsal } from "../Auth/MsalProvider";
 import { createSignal, Show } from "solid-js";
 import ManagementInstanceConfigForm from "../ManagementInstanceConfiguration/ManagementInstanceConfiguration";
 import { regions } from "../../../lib/regions";
 import ManagementGameConfiguration from "../ManagementGameConfiguration/ManagementGameConfiguration";
+import InstanceOptions from "../InstanceOptions/InstanceOptions";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-export interface InstanceConfig {
-    memory: number,
-    cpu: number,
-    plan: string
-    domain: string,
-    game: any
-}
-
-export interface InstanceEndpoint {
-    endpoint: string,
-}
-
-export const getInstanceEndpoint = query(async (getToken: (scopes: string[]) => Promise<string>, instance: Instance): Promise<InstanceEndpoint> => {
-    const token = await getToken(["api://Instances/access"]);
-    const resp = await fetch(`https://api.instances.aki-labs.com/${instance.game}/${instance.name}`, {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
-    });
-
-    if (!resp.ok) {
-        return redirect("/instances-frontend/dashboard");
-    }
-    
-    return await resp.json() as InstanceEndpoint;
-}, "endpoint");
-
-export const getInstanceConfig = query(async (getToken: (scopes: string[]) => Promise<string>, endpoint: string): Promise<InstanceConfig> => {
-    const token = await getToken(["api://Instances/access"]);
-    const resp = await fetch(`${endpoint}/config`, {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
-    });
-
-    if (!resp.ok) throw new Error("Failed to fetch Instance configuration");
-
-    const data = await resp.json();
-    console.log("Config", data);
-
-    return data
-}, "instanceConfig")
-
-export interface InstanceStatus {
-    ipv6: string,
-    ipv4?: string,
-    domain?: string,
-}
-
-export interface InstanceStatusBadRequest {
-    code: string,
-    message: string,
-    details: null
-}
-
-export const getInstanceStatus = query(async (getToken: (scopes: string[]) => Promise<string>, endpoint: string): Promise<InstanceStatus | InstanceStatusBadRequest> => {
-    const token = await getToken(["api://Instances/access"]);
-    const resp = await fetch(`${endpoint}/status`, {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
-    });
-
-    if (!resp.ok) return await resp.json() as InstanceStatusBadRequest;
-
-    const data = await resp.json();
-    console.log("Status", data);
-
-    return data
-}, "instanceStatus")
-
-export const toggleInstance = async (getToken: (scopes: string[]) => Promise<string>, endpoint: string, isRunning: boolean): Promise<string> => {
-    const token = await getToken(["api://Instances/access"]);
-    const uri = isRunning ? "stop" : "start";
-
-    const resp = await fetch(`${endpoint}/${uri}`, {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
-    });
-    const data = await resp.json();
-    return data
-};
 
 const Management = () => {
     const params = useParams();
@@ -184,8 +99,9 @@ const Management = () => {
                         </div>
 
                         <div class={styles.quickActions}>
-                            <button class={btnWithIcon.buttonSlim} style={`--icon: url(${stopIcon.src})`} onClick={() => toggleInstanceButton()}><p class={typo.buttonText}>{isRunning() ? "Stop Game" : "Start Game"}</p></button>
+                            <button class={btnWithIcon.buttonSlim} style={`--icon: url(${ isRunning() ? stopIcon.src : playIcon.src})`} onClick={() => toggleInstanceButton()}><p class={typo.buttonText}>{isRunning() ? "Stop Game" : "Start Game"}</p></button>
                             <button class={`${btn.buttonBig} ${btn.transparentDarkStyle}`}><p class={typo.buttonText}>Invite Friends</p></button>
+                            <InstanceOptions endpoint={endpoint()!.endpoint} instance={instance} />
                         </div>
 
                         <div class={styles.connectivity}>
@@ -238,7 +154,7 @@ const Management = () => {
                         </div>
 
                         <Show when={config()}>
-                            <ManagementGameConfiguration config={config()!.game } />
+                            <ManagementGameConfiguration config={config()!.game} endpoint={endpoint()!.endpoint} />
                         </Show>
 
                     </div>

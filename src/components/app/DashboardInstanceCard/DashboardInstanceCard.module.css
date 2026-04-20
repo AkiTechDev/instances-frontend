@@ -69,12 +69,12 @@
         width: 100%;
     }
 
-    .gamecardInfo button {
+    .gamecardInfo details {
         width: 22px;
         height: 22px;
-        background: var(--icon) no-repeat center;
 
         border: none;
+        z-index: 10;
     }
 
     .metaText {
@@ -269,4 +269,12 @@
         height: 22px;
         background: var(--icon) no-repeat center;
         border: none;
+    }
+
+    .instanceList details {
+        width: 22px;
+        height: 22px;
+
+        border: none;
+        z-index: 10;
     }

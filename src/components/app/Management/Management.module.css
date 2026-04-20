@@ -124,11 +124,17 @@
     padding-right: var(--margin-text-nm);
 
     width: 100%;
+    height: 52px;
 }
 
 .quickActions > button {
-    width: calc((100% - 52px) / 2);
-    height: 52px;
+    width: 45%;
+    height: 100%;
+}
+
+.quickActions > details {
+    height: 100%;
+    aspect-ratio: 1/1;
 }
 
 .connectivity {
@@ -202,6 +208,7 @@
 
 .instanceConfigHeader > p {
     opacity: 0.6;
+    z-index: 0;
 }
 
 /* Game Configuration Section */

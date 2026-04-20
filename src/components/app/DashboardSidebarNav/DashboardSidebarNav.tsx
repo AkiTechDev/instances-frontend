@@ -1,4 +1,4 @@
-import { createEffect, createSignal } from "solid-js"
+import { createEffect, createSignal, type Setter } from "solid-js"
 
 import styles from "../Dashboard/Dashboard.module.css";
 import typo from "../../../styles/typography.module.css"
@@ -12,8 +12,9 @@ import iconPlus from "../../../assets/iconPlus.svg";
 import sidebarIcon from "./assets/sidebarIcon.svg";
 import searchIcon from "./assets/searchIcon.svg";
 import allGamesIcon from "./assets/allGamesIcon.svg";
+import type { ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
 
-const DashboardSidebarNav = (props: { filter: any, setFilter: any }) => {
+const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateIntanceModal: (options: ModalOptions) => void}) => {
     const [searchText, setSearchText] = createSignal("");
     const [collapsed, setCollapsed] = createSignal(false);
 
@@ -28,7 +29,7 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any }) => {
             }}></a>
             <div class={styles.sidebarHeader}>
                 <p class={typo.subtitleSemi}>My Games</p>
-                <button class={btnWithIcon.buttonSlim} style={`--icon: url(${iconPlus.src})`}><p class={typo.buttonTextSmall}>Create new Game</p></button>
+                <button class={btnWithIcon.buttonSlim} style={`--icon: url(${iconPlus.src})`} onClick={() => props.openCreateIntanceModal({game_id: null, allow_game_change: true})}><p class={typo.buttonTextSmall}>Create new Game</p></button>
                 <label class={styles.searchableContainer}>
                     <div class={styles.searchIcon} style={`--icon: url("${searchIcon.src}")`}></div>
                     <input

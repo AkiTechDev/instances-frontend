@@ -485,6 +485,10 @@
         padding: 0 0.25rem;
     }
 
+    .sidebarGame:hover {
+        background-color: #DADADA;
+    }
+
     .sidebarGame input[type="radio"]:checked + label {
         background-color: #E0E0E0;
     }

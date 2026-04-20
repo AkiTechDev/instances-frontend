@@ -1,4 +1,4 @@
-import { createSignal, Match, Switch, For, createEffect } from "solid-js";
+import { createSignal, Match, Switch, For, createEffect, Show } from "solid-js";
 import { createAsync, query } from "@solidjs/router";
 import DashboardHeader from "../DashboardHeader/DashboardHeader";
 import DashboardSidebarNav from "../DashboardSidebarNav/DashboardSidebarNav";
@@ -9,6 +9,7 @@ import styles from "./Dashboard.module.css";
 import typo from "../../../styles/typography.module.css"
 
 import buttonBig from "../../../styles/components/buttonBig.module.css";
+import btnWithIcon from "../../../styles/components/buttonWithIcons.module.css";
 
 // No Instances Imports
 import mouseImage from "./assets/mouse.png?url";
@@ -21,34 +22,14 @@ import gridViewIcon from "./assets/gridViewIcon.svg";
 import listViewIcon from "./assets/listViewIcon.svg";
 import iconArrow from "../../../assets/iconArrow.svg";
 import searchIcon from "./assets/searchIcon.svg";
-import crossIcon from "./assets/crossIcon.svg";
+import crossIcon from "../../../assets/crossIcon.svg";
+import instanceIcon from "../../../assets/instanceIcon.svg";
 import DashboardInstanceCard from "../DashboardInstanceCard/DashboardInstanceCard";
+import CreateInstanceModal, { type ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
 
-export interface Instance {
-    user_id: string,
-    name: string,
-    game: string,
-}
+import { getBestRegion, regions } from "../../../lib/regions";
+import { getInstances, type Instance } from "../../../lib/apis";
 
-export const getInstances = query(async (getToken: (scopes: string[]) => Promise<string>): Promise<Instance[]> => {
-    const token = await getToken(["api://Instances/access"]);
-    const resp = await fetch("https://api.instances.aki-labs.com/instances/list", {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
-    });
-
-    if (!resp.ok) throw new Error("Failed to fetch list of Instances");
-
-    return (await resp.json()).map((instance: string) => {
-        const parts = instance.split("/");
-        return {
-            user_id: parts[0],
-            game: parts[1],
-            name: parts[2]
-        }
-    })}, "instances");
 
 const Dashboard = () => {
     const { getToken } = useMsal()
@@ -56,13 +37,35 @@ const Dashboard = () => {
         initialValue: [],
     });
 
+    const [openModal, setOpenModal] = createSignal(false);
+    const [modalOptions, setModalOptions] = createSignal<ModalOptions>({game_id: null, allow_game_change: true})
+
     const [gameFilter, setGameFilter] = createSignal("all");
     const [instanceSearchText, setInstanceSearchText] = createSignal("");
 
     const [isListView, setIsListView] = createSignal(false);
 
+    createEffect(() => {
+        document.body.style.overflow = openModal() ? 'hidden' : '';
+    });
+
+    const regionsByLatency = createAsync(async () => {
+        let ordered_regions = getBestRegion();
+        return Object.fromEntries((await ordered_regions).map(({ region }) => [region, regions[region]]));
+    })
+
+
+    const OpenCreateInstanceModal = (options: ModalOptions) => {
+        setModalOptions(options);
+        setOpenModal(true);
+    }
+
+
     return (
         <section class={styles.gridContainer}>
+            <Show when={openModal()}>
+                <CreateInstanceModal setIsOpen={setOpenModal} game_id={modalOptions()["game_id"]} allow_game_change={modalOptions()["allow_game_change"]} regions={regionsByLatency()} />
+            </Show>
             <DashboardHeader />
             <Switch>
                 <Match when={instances().length === 0}>
@@ -76,11 +79,11 @@ const Dashboard = () => {
                     </div>
                 </Match>
                 <Match when={instances().length > 0}>
-                    <DashboardSidebarNav filter={gameFilter} setFilter={setGameFilter} />
+                    <DashboardSidebarNav filter={gameFilter} setFilter={setGameFilter} openCreateIntanceModal={OpenCreateInstanceModal}/>
                     <div class={styles.gamesContainer}>
                         <div class={styles.gamesListHeader}>
                             <h4 class={typo.h4}>{(gameFilter() === "all") ? "All Instances" : games[gameFilter()].name}</h4>
-                            <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle}`} style={`--icon: url(${buttonIcon.src})`}><p class={typo.buttonText}>Add New Instance</p></button>
+                            <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.buttonBig}`} style={`--icon: url(${instanceIcon.src})`}><p class={typo.buttonText} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}>Add new Instance</p></button>
                         </div>
                         <div class={styles.gameFiltersContainer}>
                             <label class={styles.searchableContainer}>

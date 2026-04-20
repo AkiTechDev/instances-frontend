@@ -1,7 +1,7 @@
 
 import { createSignal, createUniqueId } from "solid-js";
 import { A, createAsync, query } from "@solidjs/router";
-import { type Instance } from "../Dashboard/Dashboard";
+import { type Instance } from "../../../lib/apis";
 
 import styles from "./DashboardInstanceCard.module.css";
 import typo from "../../../styles/typography.module.css";
@@ -9,6 +9,7 @@ import typo from "../../../styles/typography.module.css";
 import games from "../../../lib/games";
 import statusIndicator from "./assets/statusIndicator.svg";
 import cardOptionsIcon from "./assets/cardIcon.svg";
+import InstanceOptions from "../InstanceOptions/InstanceOptions";
 
 const DashboardInstanceCard = (props: { instance: Instance, listView: boolean, idx: number}) => {
     const id = createUniqueId();
@@ -33,7 +34,7 @@ const DashboardInstanceCard = (props: { instance: Instance, listView: boolean, i
                     <div class={styles.textWrapper}>
                         <div class={styles.gamecardInfo}>
                             <p class={typo.statsText}>{props.instance.name}</p>
-                            <button style={`--icon: url(${cardOptionsIcon.src})`}></button>
+                            <InstanceOptions endpoint="test" instance={props.instance} />
                         </div>
                         <p class={styles.metaText}>Active 4 hours ago</p>
                     </div>
@@ -54,7 +55,7 @@ const DashboardInstanceCard = (props: { instance: Instance, listView: boolean, i
                             <p class={typo.smallestLabel}>OFF</p>
                         </label>
                     </div>
-                    <button style={`--icon: url(${cardOptionsIcon.src})`}></button>
+                    <InstanceOptions endpoint="test" instance={props.instance} />
                 </A>
             )}
         </>

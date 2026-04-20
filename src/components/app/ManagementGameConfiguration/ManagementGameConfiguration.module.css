@@ -1,0 +1,21 @@
+.toggleContainer {
+    display: flex;
+    flex-direction: row;
+    align-items:last baseline;
+    padding-bottom: 0.5rem;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.instanceConfigSettings {
+    display: grid;
+    /*grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));*/
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    width: 100%;
+}
+
+.instanceConfigSettings > button {
+    justify-self: end;
+    grid-column: span 4;
+}

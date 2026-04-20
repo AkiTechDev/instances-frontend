@@ -7,7 +7,7 @@ export interface Game {
     profiles: {[id: string]: InstanceProfile},
 };
 
-interface InstanceProfile {
+export interface InstanceProfile {
     cpu: number,
     memory: number
 }
