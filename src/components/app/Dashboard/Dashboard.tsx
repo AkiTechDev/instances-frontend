@@ -91,7 +91,7 @@ const Dashboard = () => {
                 <div class={styles.gamesContainer}>
                     <div class={styles.gamesListHeader}>
                         <h4 class={typo.h4}>{(gameFilter() === "all") ? "All Instances" : games[gameFilter()].name}</h4>
-                        <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.buttonBig}`} style={`--icon: url(${instanceIcon.src})`}><p class={typo.buttonText} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}>Add new Instance</p></button>
+                        <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.buttonBig}`} style={`--icon: url(${instanceIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}><p class={typo.buttonText}>Add new Instance</p></button>
                     </div>
                     <div class={styles.gameFiltersContainer}>
                         <label class={styles.searchableContainer}>
