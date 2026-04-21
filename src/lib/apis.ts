@@ -1,4 +1,15 @@
 import { query, redirect } from "@solidjs/router";
+import { msalInstance } from "../components/app/Auth/MsalProvider";
+
+const getToken = async (scopes: string[]) => {
+    const account = msalInstance.getActiveAccount();
+    if (!account) throw new Error("No active account");
+
+    return msalInstance.acquireTokenSilent({
+      scopes: scopes,
+      account,
+    })
+}
 
 export interface Instance {
     user_id: string,
@@ -6,12 +17,13 @@ export interface Instance {
     game: string,
 }
 
-export const getInstances = query(async (getToken: (scopes: string[]) => Promise<string>): Promise<Instance[]> => {
+export const getInstances = query(async (): Promise<Instance[]> => {
+    console.log("GETTING INSTANCES");
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch("https://api.instances.aki-labs.com/instances/list", {
         method: "GET",
         headers: {
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token.accessToken}`
         }
     });
 
@@ -39,12 +51,13 @@ export interface InstanceEndpoint {
     endpoint: string,
 }
 
-export const getInstanceEndpoint = query(async (getToken: (scopes: string[]) => Promise<string>, instance: Instance): Promise<InstanceEndpoint> => {
+export const getInstanceEndpoint = query(async (instance: Instance): Promise<string> => {
+    console.log("GETTING INSTANCE ENDPOINT", instance);
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch(`https://api.instances.aki-labs.com/${instance.game}/${instance.name}`, {
         method: "GET",
         headers: {
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token.accessToken}`
         }
     });
 
@@ -52,15 +65,20 @@ export const getInstanceEndpoint = query(async (getToken: (scopes: string[]) => 
         throw redirect("/instances-frontend/dashboard");
     }
     
-    return await resp.json() as InstanceEndpoint;
+    return (await resp.json() as InstanceEndpoint).endpoint;
 }, "endpoint");
 
-export const getInstanceConfig = query(async (getToken: (scopes: string[]) => Promise<string>, endpoint: string): Promise<InstanceConfig> => {
+export const getInstanceConfig = query(async (endpoint: string): Promise<InstanceConfig> => {
     const token = await getToken(["api://Instances/access"]);
+
+    if (endpoint === undefined) {
+        throw new Error("Invalid endpoint");
+    };
+
     const resp = await fetch(`${endpoint}/config`, {
         method: "GET",
         headers: {
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token.accessToken}`
         }
     });
 
@@ -84,31 +102,36 @@ export interface InstanceStatusBadRequest {
     details: null
 }
 
-export const getInstanceStatus = query(async (getToken: (scopes: string[]) => Promise<string>, endpoint: string): Promise<InstanceStatus | InstanceStatusBadRequest> => {
+export const getInstanceStatus = async (endpoint: string): Promise<InstanceStatus> => {
+    console.log("GETTING INSTANCE STATUS")
     const token = await getToken(["api://Instances/access"]);
+
+    if (endpoint === undefined) {
+        throw new Error("Invalid endpoint");
+    };
+
     const resp = await fetch(`${endpoint}/status`, {
         method: "GET",
         headers: {
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token.accessToken}`
         }
     });
 
-    if (!resp.ok) return await resp.json() as InstanceStatusBadRequest;
+    if (!resp.ok) throw new Error("Instance not running", await resp.json());
 
     const data = await resp.json();
-    console.log("Status", data);
 
-    return data
-}, "instanceStatus")
+    return data as InstanceStatus
+};
 
-export const toggleInstance = async (getToken: (scopes: string[]) => Promise<string>, endpoint: string, isRunning: boolean): Promise<string> => {
+export const toggleInstance = async (endpoint: string, isRunning: boolean): Promise<string> => {
     const token = await getToken(["api://Instances/access"]);
     const uri = isRunning ? "stop" : "start";
 
     const resp = await fetch(`${endpoint}/${uri}`, {
         method: "GET",
         headers: {
-            "Authorization": `Bearer ${token}`
+            "Authorization": `Bearer ${token.accessToken}`
         }
     });
     const data = await resp.json();
@@ -123,12 +146,12 @@ export interface PostInstanceConfig {
     auto_start: boolean    
 }
 
-export const postInstanceConfig = async ( getToken: (scopes: string[]) => Promise<string>, endpoint: string, config: PostInstanceConfig): Promise<string> => {
+export const postInstanceConfig = async (endpoint: string, config: PostInstanceConfig): Promise<string> => {
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch(`${endpoint}/config/instance`, {
         method: "POST",
         headers: {
-            "Authorization": `Bearer ${token}`,
+            "Authorization": `Bearer ${token.accessToken}`,
             "Content-Type": "application/json"
         },
         body: JSON.stringify(config)
@@ -143,12 +166,12 @@ export const postInstanceConfig = async ( getToken: (scopes: string[]) => Promis
 };
 
 
-export const postGameConfig = async ( getToken: (scopes: string[]) => Promise<string>, endpoint: string, config: any): Promise<string> => {
+export const postGameConfig = async (endpoint: string, config: any): Promise<string> => {
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch(`${endpoint}/config/game`, {
         method: "POST",
         headers: {
-            "Authorization": `Bearer ${token}`,
+            "Authorization": `Bearer ${token.accessToken}`,
             "Content-Type": "application/json"
         },
         body: JSON.stringify(config)
@@ -163,12 +186,12 @@ export const postGameConfig = async ( getToken: (scopes: string[]) => Promise<st
 };
 
 
-export const postDownloadGameData = async ( getToken: (scopes: string[]) => Promise<string>, endpoint: string): Promise<string> => {
+export const postDownloadGameData = async (endpoint: string): Promise<string> => {
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch(`${endpoint}/download`, {
         method: "POST",
         headers: {
-            "Authorization": `Bearer ${token}`,
+            "Authorization": `Bearer ${token.accessToken}`,
         },
     });
 
@@ -180,12 +203,12 @@ export const postDownloadGameData = async ( getToken: (scopes: string[]) => Prom
     return data["message"]
 };
 
-export const deleteInstance = async ( getToken: (scopes: string[]) => Promise<string>, instance: Instance): Promise<string> => {
+export const deleteInstance = async (instance: Instance): Promise<string> => {
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch(`https://api.instances.aki-labs.com/${instance.game}/${instance.name}`, {
         method: "DELETE",
         headers: {
-            "Authorization": `Bearer ${token}`,
+            "Authorization": `Bearer ${token.accessToken}`,
         },
     });
 
@@ -206,12 +229,12 @@ export interface PutCreateInstance {
     region: string
 };
 
-export const putCreateInstance = async ( getToken: (scopes: string[]) => Promise<string>, game_id: string, instance_name: string, config: any): Promise<string> => {
+export const putCreateInstance = async (game_id: string, instance_name: string, config: any): Promise<string> => {
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch(`https://api.instances.aki-labs.com/${game_id}/${instance_name}`, {
         method: "PUT",
         headers: {
-            "Authorization": `Bearer ${token}`,
+            "Authorization": `Bearer ${token.accessToken}`,
             "Content-Type": "application/json"
         },
         body: JSON.stringify(config)

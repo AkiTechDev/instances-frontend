@@ -13,13 +13,10 @@ import iconTick from "../../../assets/iconTick.svg";
 import FormTextInput from "../FormModules/FormTextInput";
 import FormNumberInput from "../FormModules/FormNumberInput";
 import FormCheckbox from "../FormModules/FormCheckbox";
-import { useMsal } from "../Auth/MsalProvider";
 import { postGameConfig } from "../../../lib/apis";
 
 
 const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> = (props) => {
-    const { getToken } = useMsal();
-
     const gameForm = createForm({
         schema: MinecraftJavaConfigurationSchema,
         initialInput: props.config
@@ -29,7 +26,7 @@ const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> 
 
     const submitForm: SubmitHandler<typeof MinecraftJavaConfigurationSchema> = async (values) => {
         if (gameForm.isValid) {
-            await postGameConfig(getToken, props.endpoint, values)
+            await postGameConfig(props.endpoint, values)
         }
     }
 

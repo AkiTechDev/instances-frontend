@@ -9,7 +9,6 @@ import { deleteInstance, postDownloadGameData, type Instance } from "../../../li
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 const InstanceOptions: Component<{ endpoint: string, instance: Instance }> = (props) => {
-    const { getToken } = useMsal();
     const navigate = useNavigate();
     const id = createUniqueId();
     let elRef: HTMLDetailsElement | undefined;
@@ -41,10 +40,10 @@ const InstanceOptions: Component<{ endpoint: string, instance: Instance }> = (pr
                 <span class={styles.dot}></span>
             </summary>
             <div class={styles.options}>
-                <button class={typo.bodyTextMedium} onclick={async () => {await postDownloadGameData(getToken, props.endpoint); sleep(1); closeMenu() }}>Download Game Data</button>
+                <button class={typo.bodyTextMedium} onclick={async () => {await postDownloadGameData(props.endpoint); sleep(1); closeMenu() }}>Download Game Data</button>
                 <button class={typo.bodyTextMedium} disabled>Transfer Ownership</button>
                 <button class={typo.bodyTextMedium} disabled>Change Instance Location</button>
-                <button class={typo.bodyTextMedium} onclick={async () => {await deleteInstance(getToken, props.instance); navigate("/instances-frontend/dashboard", { replace: true }) }}>Delete Instance</button>
+                <button class={typo.bodyTextMedium} onclick={async () => {await deleteInstance(props.instance); navigate("/instances-frontend/dashboard", { replace: true }) }}>Delete Instance</button>
             </div>
         </details>
     )

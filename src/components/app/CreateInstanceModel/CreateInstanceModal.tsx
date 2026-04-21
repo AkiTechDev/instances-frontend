@@ -1,6 +1,6 @@
 import { createEffect, createMemo, createSignal, For, Show, type Component, type Setter, onCleanup } from "solid-js"
 import { Portal } from "solid-js/web"
-import { createAsync } from "@solidjs/router";
+
 import * as v from 'valibot';
 
 import styles from "./CreateInstanceModal.module.css";
@@ -8,8 +8,7 @@ import typo from "../../../styles/typography.module.css";
 import games, { fgCalc } from "../../../lib/games";
 import instance_tiers from "../../../lib/instance_tiers";
 
-import { type InstanceProfile } from "../../../lib/games";
-import { getBestRegion, regions } from "../../../lib/regions";
+import { regions } from "../../../lib/regions";
 import { createForm, Field, Form, useField, type SubmitHandler } from "@formisch/solid";
 import FormSelect from "../FormModules/FormSelect";
 import FormTextInput from "../FormModules/FormTextInput";
@@ -19,7 +18,6 @@ import selectStyles from "../FormModules/FormSelect.module.css";
 import submitBtnStyle from "../../../styles/components/formSubmitButton.module.css";
 import iconTick from "../../../assets/iconTick.svg";
 import iconCross from "../../../assets/crossIcon.svg";
-import { useMsal } from "../Auth/MsalProvider";
 import { putCreateInstance, type PutCreateInstance } from "../../../lib/apis";
 
 export interface ModalOptions {
@@ -29,7 +27,6 @@ export interface ModalOptions {
 
 
 const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: string | null, allow_game_change: boolean, regions: {[id: string]: string} | undefined}> = (props) => {
-    const { getToken } = useMsal();
     const [gameId, setGameId] = createSignal(props.game_id);
     const [instanceName, setInstanceName] = createSignal(fullSeverName(generateRandomName()));
     let mainBodyRef: HTMLDivElement | undefined;
@@ -114,7 +111,7 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                     };
 
                     console.log(`Creating Instance: ${gameId()}/${formData["instance_name"].replaceAll(" ", "")}`, new_config);
-                    await putCreateInstance(getToken, gameId()!, formData["instance_name"].replaceAll(' ', ''), new_config)
+                    await putCreateInstance(gameId()!, formData["instance_name"].replaceAll(' ', ''), new_config)
                     props.setIsOpen(false);
                 }
             }

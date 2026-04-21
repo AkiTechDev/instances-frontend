@@ -16,7 +16,7 @@ const RootSidebarNav = () => (
         <A href="/instances-frontend/explore" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${exploreIcon.src})`}>
             
         </A>
-        <A href="/instances-frontend/social" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${socialIcon.src})`}>
+        <A href="https://discord.gg/nhCEXaZVMX" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${socialIcon.src})`}>
             
         </A>
         <A href="/instances-frontend/extra" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${extraIcon.src})`}>

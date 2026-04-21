@@ -1,8 +1,7 @@
-import { createSignal, Match, Switch, For, createEffect, Show } from "solid-js";
+import { createSignal, Match, Switch, For, createEffect, Show, Suspense } from "solid-js";
 import { createAsync, query } from "@solidjs/router";
 import DashboardHeader from "../DashboardHeader/DashboardHeader";
 import DashboardSidebarNav from "../DashboardSidebarNav/DashboardSidebarNav";
-import { useMsal } from "../Auth/MsalProvider";
 
 // Dashboard Imports
 import styles from "./Dashboard.module.css";
@@ -32,8 +31,7 @@ import { getInstances, type Instance } from "../../../lib/apis";
 
 
 const Dashboard = () => {
-    const { getToken } = useMsal()
-    const instances = createAsync(() => getInstances(getToken), {
+    const instances = createAsync(() => getInstances(), {
         initialValue: [],
     });
 
@@ -67,80 +65,91 @@ const Dashboard = () => {
                 <CreateInstanceModal setIsOpen={setOpenModal} game_id={modalOptions()["game_id"]} allow_game_change={modalOptions()["allow_game_change"]} regions={regionsByLatency()} />
             </Show>
             <DashboardHeader />
-            <Switch>
-                <Match when={instances().length === 0}>
-                    <div class={styles.noInstancesContainer}>
-                        <img src={mouseImage} />
-                        <div class={styles.noContent}>
-                            <h6 class={typo.h6}>No Games Added Yet!</h6>
-                            <p class={typo.statsTitle}>All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
-                        </div>
-                        <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle}`} style={`--icon: url(${buttonIcon.src})`}><p class={typo.buttonText}>Create new Game</p></button>
+            <Suspense fallback={
+                <div class={styles.noInstancesContainer}>
+                    <img src={mouseImage} />
+                    <div class={styles.noContent}>
+                        <h6 class={typo.h6}>No Games Added Yet!</h6>
+                        <p class={typo.statsTitle}>All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
                     </div>
-                </Match>
-                <Match when={instances().length > 0}>
-                    <DashboardSidebarNav filter={gameFilter} setFilter={setGameFilter} openCreateIntanceModal={OpenCreateInstanceModal}/>
-                    <div class={styles.gamesContainer}>
-                        <div class={styles.gamesListHeader}>
-                            <h4 class={typo.h4}>{(gameFilter() === "all") ? "All Instances" : games[gameFilter()].name}</h4>
-                            <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.buttonBig}`} style={`--icon: url(${instanceIcon.src})`}><p class={typo.buttonText} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}>Add new Instance</p></button>
-                        </div>
-                        <div class={styles.gameFiltersContainer}>
-                            <label class={styles.searchableContainer}>
-                                <div class={styles.searchIcon} style={`--icon: url("${searchIcon.src}")`}></div>
-                                <input id="instanceSearch" type="search" placeholder="Search your instances" value={instanceSearchText()} onInput={(e) => setInstanceSearchText(e.currentTarget.value)}></input>
-                                <button onClick={() => (setInstanceSearchText(""))} class={`${styles.inputClearBtn} ${instanceSearchText() ? styles.visible : styles.hidden}`} style={`--icon: url("${crossIcon.src}")`}></button>
-                                <button class={`${typo.bodyTextMedium} ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Active Instances</button>
+                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle}`} style={`--icon: url(${buttonIcon.src})`}><p class={typo.buttonText}>Create new Game</p></button>
+                </div>
+            }>
+            {instances().length === 0 && (
+                <div class={styles.noInstancesContainer}>
+                    <img src={mouseImage} />
+                    <div class={styles.noContent}>
+                        <h6 class={typo.h6}>No Games Added Yet!</h6>
+                        <p class={typo.statsTitle}>All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
+                    </div>
+                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle}`} style={`--icon: url(${buttonIcon.src})`}><p class={typo.buttonText}>Create new Game</p></button>
+                </div>
+            )}
+            { instances().length > 0 && (
+                <>
+                <DashboardSidebarNav filter={gameFilter} setFilter={setGameFilter} openCreateIntanceModal={OpenCreateInstanceModal}/>
+                <div class={styles.gamesContainer}>
+                    <div class={styles.gamesListHeader}>
+                        <h4 class={typo.h4}>{(gameFilter() === "all") ? "All Instances" : games[gameFilter()].name}</h4>
+                        <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.buttonBig}`} style={`--icon: url(${instanceIcon.src})`}><p class={typo.buttonText} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}>Add new Instance</p></button>
+                    </div>
+                    <div class={styles.gameFiltersContainer}>
+                        <label class={styles.searchableContainer}>
+                            <div class={styles.searchIcon} style={`--icon: url("${searchIcon.src}")`}></div>
+                            <input id="instanceSearch" type="search" placeholder="Search your instances" value={instanceSearchText()} onInput={(e) => setInstanceSearchText(e.currentTarget.value)}></input>
+                            <button onClick={() => (setInstanceSearchText(""))} class={`${styles.inputClearBtn} ${instanceSearchText() ? styles.visible : styles.hidden}`} style={`--icon: url("${crossIcon.src}")`}></button>
+                            <button class={`${typo.bodyTextMedium} ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Active Instances</button>
+                        </label>
+                        <button class={`${typo.bodyTextMedium} ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Date Created</button>
+                        <div class={styles.toggleView}>
+                            <input
+                                id="viewToggle"
+                                type="checkbox"
+                                checked={isListView()}
+                                onChange={() => setIsListView(!isListView())}
+                            />
+                            <label for="viewToggle">
+                                <div class={styles.viewIcon} style={`--icon: url("${gridViewIcon.src}")`} />
+                                <div class={styles.viewIcon} style={`--icon: url("${listViewIcon.src}")`} />
                             </label>
-                            <button class={`${typo.bodyTextMedium} ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Date Created</button>
-                            <div class={styles.toggleView}>
-                                <input
-                                    id="viewToggle"
-                                    type="checkbox"
-                                    checked={isListView()}
-                                    onChange={() => setIsListView(!isListView())}
-                                />
-                                <label for="viewToggle">
-                                    <div class={styles.viewIcon} style={`--icon: url("${gridViewIcon.src}")`} />
-                                    <div class={styles.viewIcon} style={`--icon: url("${listViewIcon.src}")`} />
-                                </label>
-                            </div>
-                        </div>
-                        <div class={ isListView() ?  styles.gamesListContainer : styles.gamesGridContainer}>
-                            { isListView() && (
-                                <div class={styles.gamesListViewHeader}>
-                                    <p class={typo.bodyTextSmall}>Instance</p>
-                                    <p class={typo.bodyTextSmall}>Status</p>
-                                    <p class={typo.bodyTextSmall}>Activity</p>
-                                    <p></p>
-                                    <p></p>
-                                </div>
-                            )}
-
-                            <For each={instances()
-                                .filter(instance => {
-                                    if (gameFilter() === "all") {
-                                        if (instanceSearchText() === "") {
-                                            return true 
-                                        } else if (instance.name.toLowerCase().includes(instanceSearchText().toLowerCase())) {
-                                            return true
-                                        }
-                                    } else if (gameFilter() !== "") {
-                                        if (instanceSearchText() === "" && instance.game == gameFilter()) {
-                                            return true 
-                                        } else if (instance.name.toLowerCase().includes(instanceSearchText().toLowerCase()) && instance.game == gameFilter()) {
-                                            return true
-                                        }
-                                    }
-                            })}>
-                                {(instance: Instance, idx) => (
-                                    <DashboardInstanceCard instance={instance} listView={isListView()} idx={idx()} />
-                                )}
-                            </For>
                         </div>
                     </div>
-                </Match>
-            </Switch>
+                    <div class={ isListView() ?  styles.gamesListContainer : styles.gamesGridContainer}>
+                        { isListView() && (
+                            <div class={styles.gamesListViewHeader}>
+                                <p class={typo.bodyTextSmall}>Instance</p>
+                                <p class={typo.bodyTextSmall}>Status</p>
+                                <p class={typo.bodyTextSmall}>Activity</p>
+                                <p></p>
+                                <p></p>
+                            </div>
+                        )}
+
+                        <For each={instances()
+                            .filter(instance => {
+                                if (gameFilter() === "all") {
+                                    if (instanceSearchText() === "") {
+                                        return true 
+                                    } else if (instance.name.toLowerCase().includes(instanceSearchText().toLowerCase())) {
+                                        return true
+                                    }
+                                } else if (gameFilter() !== "") {
+                                    if (instanceSearchText() === "" && instance.game == gameFilter()) {
+                                        return true 
+                                    } else if (instance.name.toLowerCase().includes(instanceSearchText().toLowerCase()) && instance.game == gameFilter()) {
+                                        return true
+                                    }
+                                }
+                        })}>
+                            {(instance: Instance, idx) => (
+                                <DashboardInstanceCard instance={instance} listView={isListView()} idx={idx()} />
+                            )}
+                        </For>
+                    </div>
+                </div>
+                </>
+            )}
+            </Suspense>
         </section>
     );
 }

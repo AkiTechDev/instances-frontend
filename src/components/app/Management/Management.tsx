@@ -1,4 +1,4 @@
-import { createAsync, revalidate, useNavigate, useParams } from "@solidjs/router"
+import { action, createAsync, revalidate, useAction, useNavigate, useParams } from "@solidjs/router"
 
 import styles from "./Management.module.css";
 import typo from "../../../styles/typography.module.css";
@@ -17,7 +17,7 @@ import Tooltip from "../Test/Test";
 
 import { getInstanceConfig, getInstanceEndpoint, getInstanceStatus, toggleInstance, type Instance } from "../../../lib/apis";
 import { useMsal } from "../Auth/MsalProvider";
-import { createSignal, Show } from "solid-js";
+import { createEffect, createSignal, Show, Suspense } from "solid-js";
 import ManagementInstanceConfigForm from "../ManagementInstanceConfiguration/ManagementInstanceConfiguration";
 import { regions } from "../../../lib/regions";
 import ManagementGameConfiguration from "../ManagementGameConfiguration/ManagementGameConfiguration";
@@ -31,52 +31,52 @@ const Management = () => {
     const navigate = useNavigate();
     const [isRunning, setIsRunning] = createSignal(false);
 
-    const { getToken, account } = useMsal();
-    const instance: Instance = { game: params?.game || "", name: params?.name || "", user_id: account()?.nativeAccountId || ""};
+    const { account } = useMsal();
+    const instance: Instance = { game: params?.game || "", name: params?.name || "", user_id: account()!.homeAccountId};
 
-    const endpoint = createAsync(() => getInstanceEndpoint(getToken, instance));
-
-    const config = createAsync(() => {
-        if (!endpoint()) return Promise.resolve(undefined);
-        return getInstanceConfig(getToken, endpoint()!.endpoint)}
-    )
+    const endpoint = createAsync(async () => getInstanceEndpoint(instance));
+    const config = createAsync(async () => {
+        if (endpoint()) {
+            return getInstanceConfig(endpoint()!)
+        }
+    });
     let status = createAsync(async () => {
-        if (!endpoint()) return Promise.resolve(undefined);
-
-        const data = await getInstanceStatus(getToken, endpoint()!.endpoint)
-        if ("code" in data) {
-            setIsRunning(false);
-            return null
-        };
-
-        setIsRunning(true);
-        return data
+        if (endpoint()) {
+            return getInstanceStatus(endpoint()!)
+        }
     });
 
+    createEffect(() => {
+        if (status() && "ipv6" in status()!) {
+            setIsRunning(true)
+        } else {
+            setIsRunning(false)
+        }
+    })
 
     const copyText = async (data: string) => {
-        await navigator.clipboard.writeText(data)
+        await navigator.clipboard.writeText(data.replaceAll(" ", ""))
     };
 
     const toggleInstanceButton = async () => {
-        await toggleInstance(getToken, endpoint()?.endpoint || "", isRunning());
+        await toggleInstance(endpoint()!, isRunning());
+
         if (isRunning()) {
-            console.log("STOPPING");
-            status = createAsync(async () => {return null}); 
+            await sleep(2000);
+            status = createAsync(() => getInstanceStatus(endpoint()!))
         } else {
-            console.log("STARTING");
             while (true) {
                 try {
-                    await revalidate("instanceStatus", true);
+                    status = createAsync(() => getInstanceStatus(endpoint()!))
+                    await sleep(5000);
+
                     console.log("REVALIDATING", status())
-
-                    if (status()?.ipv6) {
+                    if (status() && "ipv6" in status()!) {
                         break
-                    }
-
-                    await sleep(15000);
+                    };
                 } catch (err) {
                     console.log("Failed starting status loop", err)
+                    break
                 }
             }
         }
@@ -101,11 +101,9 @@ const Management = () => {
                         <div class={styles.quickActions}>
                             <button class={btnWithIcon.buttonSlim} style={`--icon: url(${ isRunning() ? stopIcon.src : playIcon.src})`} onClick={() => toggleInstanceButton()}><p class={typo.buttonText}>{isRunning() ? "Stop Game" : "Start Game"}</p></button>
                             <button class={`${btn.buttonBig} ${btn.transparentDarkStyle}`}><p class={typo.buttonText}>Invite Friends</p></button>
-                            <InstanceOptions endpoint={endpoint()!.endpoint} instance={instance} />
+                            <InstanceOptions endpoint={endpoint()!} instance={instance} />
                         </div>
-
                         <div class={styles.connectivity}>
-                    
 
                             <div class={styles.connectivityInfo}>
                                 <p class={typo.statsTitle}>Domain</p>
@@ -132,9 +130,7 @@ const Management = () => {
                                 <p class={typo.statsTitle}>Region</p>
                                 <p class={typo.statsText}>{regions["us-east-1"]} </p>
                             </div>
-
                         </div>
-
                     </div>
                     <div class={styles.instanceConfigContainer}>
                         <div class={styles.instanceConfigHeader}>
@@ -142,9 +138,8 @@ const Management = () => {
                             <p class={typo.bodyText}>You can edit the Instance to your preference at any time.</p>
                         </div>
                         <Show when={config()}>
-                            <ManagementInstanceConfigForm config={config()} instance={instance} endpoint={endpoint()!.endpoint} />
+                            <ManagementInstanceConfigForm config={config()!} instance={instance} endpoint={endpoint()!} />
                         </Show>
-
 
                     </div>
                     <div class={styles.instanceConfigContainer}>
@@ -154,9 +149,26 @@ const Management = () => {
                         </div>
 
                         <Show when={config()}>
-                            <ManagementGameConfiguration config={config()!.game} endpoint={endpoint()!.endpoint} />
+                            <ManagementGameConfiguration config={config()!.game} endpoint={endpoint()!} />
                         </Show>
 
+                    </div>
+                </div>
+                <div class={styles.statsContainer}>
+                    <div class={styles.statsControl}>
+                        <a class={typo.subtitleSemi}>
+                            Play Time
+                        </a>
+                        <a class={typo.subtitleSemi}>
+                            Cost History
+                        </a>
+                        <a class={typo.subtitleSemi}>
+                            Server Logs
+                        </a>
+                    </div>
+                    <div class={styles.statsOutput}>
+                        <h1 class={typo.h3}>Under Construction</h1>
+                        <p class={typo.statsTitle}>You will be able to see costs and game stats here</p>
                     </div>
                 </div>
             </div>

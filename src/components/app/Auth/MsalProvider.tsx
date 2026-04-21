@@ -12,7 +12,7 @@ type MsalContextType = {
     logout: () => void;
 };
 
-const MsalContext = createContext<MsalContextType>();
+export const MsalContext = createContext<MsalContextType>();
 
 export function MsalProvider(props: { children?: any }) {
     const [account, setAccount] = createSignal<AccountInfo | null>(
@@ -59,6 +59,9 @@ export function MsalProvider(props: { children?: any }) {
 
 export const useMsal = () => {
     const ctx = useContext(MsalContext);
-    if (!ctx) throw new Error("useMsal must be used inside MsalProvider");
+    if (!ctx) {
+        console.log("CTX", ctx);
+        throw new Error("useMsal must be used inside MsalProvider")
+    };
     return ctx;
 };

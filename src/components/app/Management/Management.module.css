@@ -1,7 +1,7 @@
 .gridContainer {
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: minmax(0px, 79px) 1000px;
+    grid-template-rows: minmax(0px, 79px) 1300px;
     grid-template-columns: 1fr;
     grid-template-areas:
         "header"
@@ -68,7 +68,6 @@
 
     gap: 24px;
     width: 100%;
-    height: 500px;
 }
 
 .panel {
@@ -211,4 +210,64 @@
     z-index: 0;
 }
 
-/* Game Configuration Section */
+
+.statsContainer {
+    padding-top: var(--margin-el-nm);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    width: 100%;
+}
+
+
+
+
+.statsControl {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+
+    background-color: var(--colour-text-tertiary);
+    border-radius: 50px;
+
+    width: min-content;
+    white-space: nowrap;
+}
+
+.statsControl > a {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50px;
+    border: none;
+    padding: 0.5rem 2.5rem;
+
+}
+
+.statsControl > a:active {
+    background: var(--colour-text-primary);
+    color: var(--colour-text-tertiary);
+}
+
+.statsOutput {
+    width: 100%;
+    min-height: 50px;
+    height: 250px;
+
+    border-radius: 10px;
+    background: var(--colour-text-tertiary);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+}
+
+.statsOutput > p {
+    opacity: 0.6;
+}

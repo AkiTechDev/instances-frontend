@@ -1,7 +1,7 @@
 
-import { createSignal, createUniqueId } from "solid-js";
+import { createEffect, createSignal, createUniqueId, Suspense } from "solid-js";
 import { A, createAsync, query } from "@solidjs/router";
-import { type Instance } from "../../../lib/apis";
+import { getInstanceEndpoint, getInstanceStatus, toggleInstance, type Instance } from "../../../lib/apis";
 
 import styles from "./DashboardInstanceCard.module.css";
 import typo from "../../../styles/typography.module.css";
@@ -13,17 +13,36 @@ import InstanceOptions from "../InstanceOptions/InstanceOptions";
 
 const DashboardInstanceCard = (props: { instance: Instance, listView: boolean, idx: number}) => {
     const id = createUniqueId();
+    const [isRunning, setIsRunning] = createSignal(false);
+
+    const endpoint = createAsync(() => getInstanceEndpoint(props.instance))
+    const status = createAsync(() => getInstanceStatus(endpoint()!))
+
+    createEffect(() => {
+        if (status()) {
+            if ("message" in status()!) {
+                setIsRunning(false)
+            } else {
+                setIsRunning(true)
+            }
+        }
+    })
+
+    const toggle = () => {
+        toggleInstance(endpoint()!, isRunning())
+        setIsRunning(!isRunning())
+    }
 
     return (
         <>
             { props.listView === false && (
                 <A href={`/instances-frontend/${props.instance.game}/${props.instance.name}`} class={styles.gameCard}>
                     <div class={styles.imageWrapper} style={`--backgroundImg: url("/instances-frontend/imgs/${props.instance.game}/banner.avif")`}>
-                        <div class={styles.statusContainer} style={`--statusIndicator: url(${statusIndicator.src})`}>
-                            <p class={typo.smallestLabel}>RUNNING</p>
+                        <div class={`${styles.statusContainer} ${isRunning() ? "" : styles.stopped}`} style={`--statusIndicator: url(${statusIndicator.src})`}>
+                            <p class={typo.smallestLabel}>{isRunning() ? "RUNNING" : "STOPPED"}</p>
                         </div>
                         <div class={styles.toggleContainer}>
-                            <input id={`toggle-${id}`} type="checkbox" checked/>
+                            <input id={`toggle-${id}`} type="checkbox" checked={isRunning()} onChange={() => toggle()} onClick={(e) => e.stopImmediatePropagation()} />
                             <label for={`toggle-${id}`}>
                                 <p class={typo.smallestLabel}>ON</p>
                                 <p class={typo.smallestLabel}>OFF</p>
@@ -49,13 +68,15 @@ const DashboardInstanceCard = (props: { instance: Instance, listView: boolean, i
                     </div>
                     <p class={typo.bodyTextSmall}>Active 4 hours ago</p>
                     <div class={styles.toggleContainer}>
-                        <input id={`toggle-${id}`} type="checkbox" checked/>
+                        <input id={`toggle-${id}`} type="checkbox" checked={isRunning()}/>
                         <label for={`toggle-${id}`}>
                             <p class={typo.smallestLabel}>ON</p>
                             <p class={typo.smallestLabel}>OFF</p>
                         </label>
                     </div>
-                    <InstanceOptions endpoint="test" instance={props.instance} />
+                    <Suspense>
+                        <InstanceOptions endpoint={endpoint()!} instance={props.instance} />
+                    </Suspense>
                 </A>
             )}
         </>

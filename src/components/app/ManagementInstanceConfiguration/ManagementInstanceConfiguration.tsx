@@ -2,11 +2,9 @@ import { type Component, createSignal } from "solid-js";
 import { createForm, Form, Field, useField, type SubmitHandler } from "@formisch/solid";
 import * as v from 'valibot';
 import FormSelect from "../FormModules/FormSelect";
-import FormCheckbox from "../FormModules/FormCheckbox";
 
 import games, { fgCalc } from "../../../lib/games";
 import instance_tiers from "../../../lib/instance_tiers";
-import { useMsal } from "../Auth/MsalProvider";
 
 import styles from "./ManagementInstanceConfiguration.module.css";
 import typo from "../../../styles/typography.module.css";
@@ -15,11 +13,10 @@ import selectStyles from "../FormModules/FormSelect.module.css";
 import submitBtnStyle from "../../../styles/components/formSubmitButton.module.css";
 import iconTick from "../../../assets/iconTick.svg";
 import { regions } from "../../../lib/regions";
-import { postInstanceConfig, type Instance, type PostInstanceConfig } from "../../../lib/apis";
+import { postInstanceConfig, type Instance, type InstanceConfig, type PostInstanceConfig } from "../../../lib/apis";
 
 
-const ManagementInstanceConfigForm: Component<{ config: any, instance: Instance, endpoint: string }> = (props) => {
-    const { getToken } = useMsal();
+const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance: Instance, endpoint: string }> = (props) => {
     const profiles = games[props.instance.game].profiles;
     const [currentProfile, setCurrentProfile] = createSignal(Object.keys(profiles).find(k => profiles[k]["cpu"] === props.config["cpu"] && profiles[k]["memory"] === props.config["memory"]) || "ERR")
 
@@ -52,7 +49,7 @@ const ManagementInstanceConfigForm: Component<{ config: any, instance: Instance,
               };
               console.log("ONST : ", values)
               setCurrentProfile(values["profile"])
-              await postInstanceConfig(getToken, props.endpoint, new_config)
+              await postInstanceConfig(props.endpoint, new_config)
           }
       }
     
