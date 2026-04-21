@@ -3,15 +3,11 @@
 import styles from './supportedGames.module.css';
 import typo from "../../styles/typography.module.css";
 
-import buttonBig from "../../styles/components/buttonBig.module.css";
-
-import grainMask from "../../assets/grainMask.svg?url";
-
 import SupportedGameCard from "./SupportedGames";
 ---
 
 <section id="games" class={styles.container}>
     <h2 class={typo.h2}>Supported Games</h2>
 
-    <SupportedGameCard />
+    <SupportedGameCard client:only />
 </section>

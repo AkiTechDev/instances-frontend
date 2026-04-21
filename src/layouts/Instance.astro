@@ -1,4 +1,4 @@
-<!-- Instance.astro -->
+<!-- Dashboard.astro -->
 ---
 // Welcome to Astro! Everything between these triple-dash code fences
 // is your "component frontmatter". It never runs in the browser.
@@ -8,11 +8,10 @@ import "../styles/global.css"
 import "../styles/theme/default.css"
 import "../styles/variables.module.css"
 
-import Nav from "../components/Instances/nav/Nav.astro";
 import Newsletter from "../components/newsletter/Newsletter.astro";
 import Footer from "../components/footer/Footer.astro";
 
-const { title } = Astro.props;
+import AppRouter from "../components/app/Router";
 ---
 <!-- Below is your "component template." It's just HTML, but with
     some magic sprinkled in to help you build great templates. -->
@@ -24,11 +23,10 @@ const { title } = Astro.props;
         <meta name="description" content="Qwik + Astro integration" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="generator" content={Astro.generator} />
-        <title>{title}</title>
+        <title>Instances Dashboard</title>
 	</head>
     <body class="grid-container">
-        <Nav />
-        <slot class="item" />
+        <AppRouter client:only />
 
         <div class="full">
             <Newsletter class="full"  />
@@ -53,3 +51,27 @@ const { title } = Astro.props;
     }
 
 </style>
+
+<script>
+  import { getMsal } from "../lib/auth"
+  
+  const msalInstance = await getMsal();
+  if (!msalInstance) throw new Error("MSAL not initialized");
+
+  const result = await msalInstance.handleRedirectPromise();
+
+  if (result) {
+    msalInstance.setActiveAccount(result.account)
+  } else {
+    const accounts = msalInstance.getAllAccounts();
+
+    if (accounts.length === 0) {
+      window.location.href = "/instances-frontend/";
+    } else {
+      msalInstance.setActiveAccount(accounts[0])
+    }
+  }
+
+  const account = msalInstance.getActiveAccount();
+  console.log("Account:", account?.name);
+</script>

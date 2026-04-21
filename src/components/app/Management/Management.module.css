@@ -1,0 +1,273 @@
+.gridContainer {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0px, 79px) 1300px;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+        "header"
+        "content";
+    overflow: visible;
+
+    background-color: #fff;
+    border-radius: 0px 0px 0px 20px;
+
+    color: var(--colour-text-primary);
+    position: relative;
+
+    transition: all 0.5s ease, clip-path 0.3s ease;
+}
+
+.instanceContainer {
+    padding: 0 var(--margin-el-lg);
+    padding-top: var(--margin-el-sm);
+    background-color: #F5F5F5;
+
+    gap: 24px;
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    border-radius: 0px 0px 0px 20px;
+
+    padding-bottom: 250px;
+}
+
+
+.instanceContainer > p {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    cursor: pointer;
+}
+
+.instanceContainer > p::before {
+    content: "";
+    display: flex;
+    width: 24px;
+    height: 24px;
+
+    transform: rotate(90deg);
+
+
+    background-color: black;
+    mask: var(--icon) no-repeat center;
+    -webkit-mask: var(--icon) no-repeat center;
+
+}
+
+.controlsContainer {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(600px, 1fr)
+    );
+    grid-template-rows: 320px auto;
+
+
+    gap: 24px;
+    width: 100%;
+}
+
+.panel {
+    grid-row: span 2;
+    background: #FFFFFF;
+    background: linear-gradient(0deg,rgba(255, 255, 255, 1) 80%, rgba(255, 255, 255, 0) 100%);
+    display: flex;
+    flex-direction: column;
+    border-radius: 10px;
+    gap: 24px;
+}
+
+
+.bannerWrapper {
+    width: 100%;
+    box-sizing: border-box;
+    aspect-ratio: 16/9;
+    max-height: 320px;
+
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #1F1E1E 100%), var(--backgroundImg) no-repeat center;
+    background-size: cover;
+
+    position: relative;
+
+    padding: 24px 24px 28px;
+    gap: 6px;
+    border-radius: 10px;
+
+    display: flex;
+}
+
+.bannerHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    margin: 0 auto;
+    margin-top: auto;
+
+    color: var(--colour-text-tertiary);
+    width: 100%;
+}
+
+.quickActions {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 16px;
+
+    max-height: 52px;
+    padding-left: var(--margin-text-nm);
+    padding-right: var(--margin-text-nm);
+
+    width: 100%;
+    height: 52px;
+}
+
+.quickActions > button {
+    width: 45%;
+    height: 100%;
+}
+
+.quickActions > details {
+    height: 100%;
+    aspect-ratio: 1/1;
+}
+
+.connectivity {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+
+    padding-left: var(--margin-text-nm);
+    padding-right: var(--margin-text-nm);
+    padding-bottom: var(--margin-text-sm);
+
+    gap: 1rem;
+
+}
+
+.connectivityInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.connectivityInfo > :nth-child(1) {
+    opacity: 0.6;
+}
+
+.copy {
+    display: flex;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.copy::after {
+    content: "";
+    width: 20px;
+    height: 20px;
+    display: flex;
+
+    background-color: #1F1E1E;
+    mask: var(--icon) no-repeat center;
+    -webkit-mask: var(--icon) no-repeat center;
+}
+
+.copy:hover::after {
+    transform: translate(1.15);
+    background-color: #C589F4;
+}
+
+
+/* Instance Configuration Section */
+.instanceConfigContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 24px;
+    gap: 1.5rem;
+    height: min-content;
+
+    background-color: var(--colour-text-tertiary);
+    border-radius: 10px;
+}
+
+.instanceConfigHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.25rem;
+
+    width: 100%;
+}
+
+.instanceConfigHeader > p {
+    opacity: 0.6;
+    z-index: 0;
+}
+
+
+.statsContainer {
+    padding-top: var(--margin-el-nm);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+
+    width: 100%;
+}
+
+
+
+
+.statsControl {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+
+    background-color: var(--colour-text-tertiary);
+    border-radius: 50px;
+
+    width: min-content;
+    white-space: nowrap;
+}
+
+.statsControl > a {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50px;
+    border: none;
+    padding: 0.5rem 2.5rem;
+
+}
+
+.statsControl > a:active {
+    background: var(--colour-text-primary);
+    color: var(--colour-text-tertiary);
+}
+
+.statsOutput {
+    width: 100%;
+    min-height: 50px;
+    height: 250px;
+
+    border-radius: 10px;
+    background: var(--colour-text-tertiary);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    justify-items: center;
+    align-items: center;
+}
+
+.statsOutput > p {
+    opacity: 0.6;
+}

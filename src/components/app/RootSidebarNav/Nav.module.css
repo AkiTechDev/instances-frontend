@@ -1,0 +1,53 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    gap: 1rem;
+}
+
+.logoIcon {
+    width: 50%;
+    margin-top: 2rem;
+    margin-bottom: 3.5rem;
+}
+
+.menuItem {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    width: 75%;
+    aspect-ratio: 8/7;
+    position: relative;
+
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.menuItem::before {
+    content: "";
+    width: 100%;
+    height: 100%;
+
+    background-color: var(--colour-text-tertiary);
+    -webkit-mask: var(--gamesIconUrl) no-repeat center;
+    mask: var(--gamesIconUrl) no-repeat center;
+}
+
+.menuItem:hover {
+    background: rgba(197, 137, 244, 0.1);
+}
+
+.menuItem:hover::before {
+    background: #C589F4;
+}
+
+.menuItem.menuItemActive::before {
+    background: #EBA439;
+}
+
+.menuItemActive {
+    background: rgba(147, 107, 52, 0.2);
+}

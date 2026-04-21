@@ -1,0 +1,103 @@
+.backdrop {
+  position: fixed;
+  inset: 0;                        /* covers full viewport */
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 50;
+  width: 100%;
+  height: 100%;
+
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 2.5rem 2rem 2rem;
+    gap: 1.5rem;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    background: var(--colour-text-tertiary);
+    border-radius: 10px;
+
+    color: var(--colour-text-primary);
+
+    max-width: 548px;
+
+    z-index: 51;
+}
+
+.container > img {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    width: 100%;
+    aspect-ratio: 4 / 1;
+}
+
+.gameField {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.header {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.header > p {
+    opacity: 0.6;
+}
+
+.form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 1rem;
+    width: 100%;
+}
+
+.exit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem 0;
+
+    background: #FFFFFF;
+    box-shadow: 1px 2px 22px rgba(187, 187, 187, 0.25);
+    border-radius: 24px;
+    border: 0;
+
+    max-width: 40px;
+    width: 100%;
+    aspect-ratio: 1/1;
+
+    position: absolute;
+    transform: translateX(50%) translateY(-50%);
+
+    transition: all 0.3s;
+}
+
+.exit::after {
+    content: "";
+    width: 18px;
+    height: 18px;
+
+    background-color: var(--colour-text-primary);
+    mask: var(--icon) no-repeat center;
+    -webkit-mask: var(--icon) no-repeat center;
+}
+
+.exit:hover::after {
+    background-color: var(--colour-text-secondary);
+}
+
+.exit:active {
+    box-shadow: 1px 2px 22px rgba(187, 187, 187, 0.50);
+}

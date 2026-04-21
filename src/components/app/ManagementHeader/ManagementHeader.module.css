@@ -1,0 +1,23 @@
+.header {
+    box-sizing: border-box;
+    grid-area: header;
+
+    display: flex;
+    justify-content: space-between;
+    flex-direction: row;
+    align-items: center;
+
+    padding-left: var(--margin-el-md);
+    padding-right: var(--margin-el-sm);
+    border-bottom: 1px solid #F3F4F4;
+
+    overflow: visible;
+    
+}
+
+.header > p::after {
+    content: var(--gameName);
+    color: #95979F;
+    font-weight: 400;
+    font-style: normal;
+}

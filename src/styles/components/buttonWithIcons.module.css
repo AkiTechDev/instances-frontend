@@ -29,3 +29,12 @@
     background-color: #C589F4;
     border-color: #C589F4;
 }
+
+.buttonBig {
+    padding: 1rem 1.5rem;
+}
+
+.buttonBig::before {
+    width: 20px;
+    height: 20px;
+}
