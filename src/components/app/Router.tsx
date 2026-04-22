@@ -22,12 +22,12 @@ const AppRouter = () => {
     return (
             <MsalProvider>
                 <Router root={RootLayout}>
-                    <Route path="/instances-frontend/dashboard" component={Dashboard} preload={async () => {
+                    <Route path="/dashboard" component={Dashboard} preload={async () => {
                         const instances = await getInstances();
 
                         instances.forEach((instance: Instance) => getInstanceEndpoint(instance));
                     }} />
-                    <Route path="/instances-frontend/:game/:name" component={Management} preload={async (p) => {
+                    <Route path="/:game/:name" component={Management} preload={async (p) => {
                         const { account} = useMsal();
                         const endpoint = getInstanceEndpoint({ game: p.params.game, name: p.params.name, user_id: account()!.homeAccountId} as Instance)
                         endpoint.then(endpoint => {
@@ -35,8 +35,8 @@ const AppRouter = () => {
                             getInstanceStatus(endpoint)
                         })
                     }} />
-                    <Route path="/instances-frontend/explore" component={Explore} />
-                    <Route path="/instances-frontend/extra" component={Extra} />
+                    <Route path="/explore" component={Explore} />
+                    <Route path="/extra" component={Extra} />
                 </Router>
             </MsalProvider>
     )

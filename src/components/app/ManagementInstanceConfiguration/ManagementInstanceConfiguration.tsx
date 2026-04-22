@@ -7,7 +7,6 @@ import games, { fgCalc } from "../../../lib/games";
 import instance_tiers from "../../../lib/instance_tiers";
 
 import styles from "./ManagementInstanceConfiguration.module.css";
-import typo from "../../../styles/typography.module.css";
 
 import selectStyles from "../FormModules/FormSelect.module.css";
 import submitBtnStyle from "../../../styles/components/formSubmitButton.module.css";
@@ -78,16 +77,16 @@ const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance
         </Field>
 
         <div class={selectStyles.instanceConfigSettingsContainer}>
-            <label class={typo.bodyTextSmall}>Region </label>
-            <select value={regions["us-east-1"]} class={`${selectStyles.select} ${typo.bodyText}`} disabled>
-              <option class={typo.bodyText} value={regions["us-east-1"]} selected>{regions["us-east-1"]}</option>
+            <label class="bodyTextSmall">Region </label>
+            <select value={regions["us-east-1"]} class={`${selectStyles.select} bodyText`} disabled>
+              <option class="bodyText" value={regions["us-east-1"]} selected>{regions["us-east-1"]}</option>
             </select>
         </div>
 
         <div class={selectStyles.instanceConfigSettingsContainer}>
-            <label class={typo.bodyTextSmall}>Cost </label>
-            <select value="Cost" class={`${selectStyles.select} ${typo.bodyText}`} disabled>
-              <option class={typo.bodyText} value="$00/hour" selected>${fgCalc("us-east-1", profiles[formProfile.input || ""].memory, profiles[formProfile.input || ""].cpu, formTier.input || "")}/hour</option>
+            <label class="bodyTextSmall">Cost </label>
+            <select value="Cost" class={`${selectStyles.select} bodyText`} disabled>
+              <option class="bodyText" value="$00/hour" selected>${fgCalc("us-east-1", profiles[formProfile.input || ""].memory, profiles[formProfile.input || ""].cpu, formTier.input || "")}/hour</option>
             </select>
         </div>
         
@@ -101,7 +100,7 @@ const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance
           )}
         </Field> */}
         <div></div>
-        <button class={`${submitBtnStyle.button} ${typo.buttonTextSmall}`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={!instanceForm.isDirty || instanceForm.isSubmitting}>
+        <button class={`${submitBtnStyle.button} buttonTextSmall`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={!instanceForm.isDirty || instanceForm.isSubmitting}>
           {instanceForm.isSubmitting ? "Saving Settings" : instanceForm.isSubmitted ? "Settings Saved" : "Save Settings"}
         </button>
       </Form>

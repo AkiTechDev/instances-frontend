@@ -3,11 +3,12 @@ import { defineConfig } from "astro/config";
 import solidJs from "@astrojs/solid-js";
 import mkcert from 'vite-plugin-mkcert';
 
+import sitemap from '@astrojs/sitemap';
+
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://AkiTechDev.github.io',
-  base: '/instances-frontend/',
-  integrations: [solidJs()],
+  site: 'https://instances.aki-labs.com',
+  integrations: [solidJs(), sitemap()],
 
   prefetch: true,
 

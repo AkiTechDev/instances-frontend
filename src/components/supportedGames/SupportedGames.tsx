@@ -1,7 +1,6 @@
 import { createSignal, createResource, Show, For } from "solid-js";
 
 import styles from "./supportedGames.module.css";
-import typo from "../../styles/typography.module.css";
 import buttonBig from "../../styles/components/buttonBig.module.css";
 
 interface Game {
@@ -78,8 +77,8 @@ const SupportedGameCard = () => {
                     <For each={showAll() ? games() : games()?.slice(0, 4)}>
                         {(game) => (
                             <div class={styles.card}>
-                                <img src={'/instances-frontend/imgs/' + game + '/banner.avif'} />
-                                <p class={typo.subTitle}>{supportedGames[game].name}</p>
+                                <img src={'/imgs/' + game + '/banner.avif'} />
+                                <p class="subTitle">{supportedGames[game].name}</p>
                             </div>
                         )}
                     </For>
@@ -91,7 +90,7 @@ const SupportedGameCard = () => {
             class={`${buttonBig.buttonBig} ${buttonBig.transparentVibrantStyle}`}
             onClick={() => setShowAll(prev => !prev)}
         >
-            <p class={typo.buttonText}>{showAll() ? 'Show Less Games' : 'Show More Games'}</p>
+            <p class="buttonText">{showAll() ? 'Show Less Games' : 'Show More Games'}</p>
         </button>
         </>
     )

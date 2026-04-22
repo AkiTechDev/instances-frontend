@@ -1,7 +1,6 @@
 import { createEffect, createSignal, type Setter } from "solid-js"
 
 import styles from "../Dashboard/Dashboard.module.css";
-import typo from "../../../styles/typography.module.css"
 
 import btnWithIcon from '../../../styles/components/buttonWithIcons.module.css';
 
@@ -28,8 +27,8 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
                 setCollapsed(!collapsed())
             }}></a>
             <div class={styles.sidebarHeader}>
-                <p class={typo.subtitleSemi}>My Games</p>
-                <button class={btnWithIcon.buttonSlim} style={`--icon: url(${iconPlus.src})`} onClick={() => props.openCreateIntanceModal({game_id: null, allow_game_change: true})}><p class={typo.buttonTextSmall}>Create new Game</p></button>
+                <p class="subtitleSemi">My Games</p>
+                <button class={btnWithIcon.buttonSlim} style={`--icon: url(${iconPlus.src})`} onClick={() => props.openCreateIntanceModal({game_id: null, allow_game_change: true})}><p class="buttonTextSmall">Create new Game</p></button>
                 <label class={styles.searchableContainer}>
                     <div class={styles.searchIcon} style={`--icon: url("${searchIcon.src}")`}></div>
                     <input
@@ -50,7 +49,7 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
                         type="radio"
                         checked={props.filter() === "all"}
                     />
-                    <label class={typo.statsTitle} style={`--icon: url("${allGamesIcon.src}")`} for="all"><span>All</span></label>
+                    <label class="statsTitle" style={`--icon: url("${allGamesIcon.src}")`} for="all"><span>All</span></label>
                 </div>
 
                 <For each={Object.entries(games)
@@ -68,7 +67,7 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
                                 type="radio"
                                 checked={props.filter() === game_id}
                             />
-                            <label class={typo.statsTitle} style={`--icon: url("${games[game_id].icon}")`} for={game_id}><span>{games[game_id].name}</span></label>
+                            <label class="statsTitle" style={`--icon: url("${games[game_id].icon}")`} for={game_id}><span>{games[game_id].name}</span></label>
                         </div>
                     )}
                 </For>

@@ -4,7 +4,6 @@ import { Portal } from "solid-js/web"
 import * as v from 'valibot';
 
 import styles from "./CreateInstanceModal.module.css";
-import typo from "../../../styles/typography.module.css";
 import games, { fgCalc } from "../../../lib/games";
 import instance_tiers from "../../../lib/instance_tiers";
 
@@ -132,21 +131,21 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                     }}
                 ></button>
                 <Show when={gameId()}>
-                    <img src={`/instances-frontend/imgs/${gameId()}/banner.avif`}></img>
+                    <img src={`/imgs/${gameId()}/banner.avif`}></img>
                 </Show>
                 <div class={styles.header}>
-                    <h6 class={typo.h5}>Create a {gameId() ? games[gameId()!].name : null} Instance</h6>
-                    <p class={typo.statsTitle}>Here by adding some information you can create a {gameId() ? games[gameId()!].name : null} new instance.</p>
+                    <h6 class="h5">Create a {gameId() ? games[gameId()!].name : null} Instance</h6>
+                    <p class="statsTitle">Here by adding some information you can create a {gameId() ? games[gameId()!].name : null} new instance.</p>
                 </div>
 
                 <Show when={props.allow_game_change || gameId() === null}>
                     <div class={`${selectStyles.instanceConfigSettingsContainer} ${styles.gameField}`}>
-                        <label class={typo.bodyTextSmall}>What game do you want to play? </label>
-                        <select value="game_id" class={`${selectStyles.select} ${typo.bodyText}`} onChange={(e) => setGameId(e.target.value)}>
-                            <option class={typo.bodyText} value="Select Game">Select Game</option>
+                        <label class="bodyTextSmall">What game do you want to play? </label>
+                        <select value="game_id" class={`${selectStyles.select} bodyText`} onChange={(e) => setGameId(e.target.value)}>
+                            <option class="bodyText" value="Select Game">Select Game</option>
                             <For each={Object.keys(games)}>
                                 { (option, i) => (
-                                    <option class={typo.bodyText} value={option}>{games[option].name}</option>
+                                    <option class="bodyText" value={option}>{games[option].name}</option>
                                 )}
                             </For>
                         </select>
@@ -205,15 +204,15 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                             </Field>
 
                             <div class={selectStyles.instanceConfigSettingsContainer}>
-                                <label class={typo.bodyTextSmall}>Cost </label>
-                                <select value="Cost" class={`${selectStyles.select} ${typo.bodyText}`} disabled>
-                                    <option class={typo.bodyText} value="$00/hour" selected>
+                                <label class="bodyTextSmall">Cost </label>
+                                <select value="Cost" class={`${selectStyles.select} bodyText`} disabled>
+                                    <option class="bodyText" value="$00/hour" selected>
                                             ${fgCalc(formRegion()?.input || "", profiles()![formProfile()!.input || ""].memory, profiles()![formProfile()!.input || ""].cpu, formTier()?.input || "")}/hour
                                     </option>
                                 </select>
                             </div>
 
-                            <button class={`${submitBtnStyle.button} ${typo.buttonTextSmall}`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={form()!.isSubmitting}>
+                            <button class={`${submitBtnStyle.button} buttonTextSmall`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={form()!.isSubmitting}>
                                 {form()!.isSubmitting ? "Creating Instance" : form()!.isSubmitted ? "Creating Instance" : "Create Instance"}
                             </button>
                         </Show>

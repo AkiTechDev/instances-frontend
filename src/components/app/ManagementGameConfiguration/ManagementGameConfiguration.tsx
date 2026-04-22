@@ -1,12 +1,10 @@
 import { createForm, Field, Form, type FormStore, type SubmitHandler } from "@formisch/solid";
 import { type Component, For } from "solid-js"
-import * as v from 'valibot';
 import FormSelect from "../FormModules/FormSelect";
 import { MinecraftJavaConfigurationSchema, type MinecraftJavaConfiguration } from "../../../lib/games/MinecraftJava";
 
 import styles from "../ManagementInstanceConfiguration/ManagementInstanceConfiguration.module.css"
 import gameStyles from "./ManagementGameConfiguration.module.css";
-import typo from "../../../styles/typography.module.css";
 import submitBtnStyle from "../../../styles/components/formSubmitButton.module.css";
 import iconTick from "../../../assets/iconTick.svg";
 
@@ -71,7 +69,7 @@ const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> 
                                 } else if (schema.schema.type === 'boolean') {
                                     return (
                                         <div class={gameStyles.toggleContainer}>
-                                        <p class={typo.bodyTextSmall}>{name}</p>
+                                        <p class="bodyTextSmall">{name}</p>
                                         <FormCheckbox
                                             field={field}
                                             field_id={name}
@@ -88,7 +86,7 @@ const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> 
                     )
                 }}
             </For>
-            <button class={`${submitBtnStyle.button} ${typo.buttonTextSmall}`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={!gameForm.isDirty || gameForm.isSubmitting}>
+            <button class={`${submitBtnStyle.button}buttonTextSmall`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={!gameForm.isDirty || gameForm.isSubmitting}>
                 {gameForm.isSubmitting ? "Saving Settings" : gameForm.isSubmitted ? "Settings Saved" : "Save Settings"}
             </button>
         </Form>

@@ -5,7 +5,6 @@ import DashboardSidebarNav from "../DashboardSidebarNav/DashboardSidebarNav";
 
 // Dashboard Imports
 import styles from "./Dashboard.module.css";
-import typo from "../../../styles/typography.module.css"
 
 import buttonBig from "../../../styles/components/buttonBig.module.css";
 import btnWithIcon from "../../../styles/components/buttonWithIcons.module.css";
@@ -69,20 +68,20 @@ const Dashboard = () => {
                 <div class={styles.noInstancesContainer}>
                     <img src={mouseImage} />
                     <div class={styles.noContent}>
-                        <h6 class={typo.h6}>No Games Added Yet!</h6>
-                        <p class={typo.statsTitle}>All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
+                        <h6 class="h6">No Games Added Yet!</h6>
+                        <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
                     </div>
-                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle}`} style={`--icon: url(${buttonIcon.src})`}><p class={typo.buttonText}>Create new Game</p></button>
+                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle}`} style={`--icon: url(${buttonIcon.src})`}><p class="buttonText">Create new Game</p></button>
                 </div>
             }>
             {instances().length === 0 && (
                 <div class={styles.noInstancesContainer}>
                     <img src={mouseImage} />
                     <div class={styles.noContent}>
-                        <h6 class={typo.h6}>No Games Added Yet!</h6>
-                        <p class={typo.statsTitle}>All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
+                        <h6 class="h6">No Games Added Yet!</h6>
+                        <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
                     </div>
-                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle}`} style={`--icon: url(${buttonIcon.src})`}><p class={typo.buttonText}>Create new Game</p></button>
+                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle}`} style={`--icon: url(${buttonIcon.src})`}><p class="buttonText">Create new Game</p></button>
                 </div>
             )}
             { instances().length > 0 && (
@@ -90,17 +89,17 @@ const Dashboard = () => {
                 <DashboardSidebarNav filter={gameFilter} setFilter={setGameFilter} openCreateIntanceModal={OpenCreateInstanceModal}/>
                 <div class={styles.gamesContainer}>
                     <div class={styles.gamesListHeader}>
-                        <h4 class={typo.h4}>{(gameFilter() === "all") ? "All Instances" : games[gameFilter()].name}</h4>
-                        <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.buttonBig}`} style={`--icon: url(${instanceIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}><p class={typo.buttonText}>Add new Instance</p></button>
+                        <h4 class="h4">{(gameFilter() === "all") ? "All Instances" : games[gameFilter()].name}</h4>
+                        <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.buttonBig}`} style={`--icon: url(${instanceIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}><p class="buttonText">Add new Instance</p></button>
                     </div>
                     <div class={styles.gameFiltersContainer}>
                         <label class={styles.searchableContainer}>
                             <div class={styles.searchIcon} style={`--icon: url("${searchIcon.src}")`}></div>
                             <input id="instanceSearch" type="search" placeholder="Search your instances" value={instanceSearchText()} onInput={(e) => setInstanceSearchText(e.currentTarget.value)}></input>
                             <button onClick={() => (setInstanceSearchText(""))} class={`${styles.inputClearBtn} ${instanceSearchText() ? styles.visible : styles.hidden}`} style={`--icon: url("${crossIcon.src}")`}></button>
-                            <button class={`${typo.bodyTextMedium} ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Active Instances</button>
+                            <button class={`bodyTextMedium ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Active Instances</button>
                         </label>
-                        <button class={`${typo.bodyTextMedium} ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Date Created</button>
+                        <button class={`bodyTextMedium ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Date Created</button>
                         <div class={styles.toggleView}>
                             <input
                                 id="viewToggle"
@@ -117,9 +116,9 @@ const Dashboard = () => {
                     <div class={ isListView() ?  styles.gamesListContainer : styles.gamesGridContainer}>
                         { isListView() && (
                             <div class={styles.gamesListViewHeader}>
-                                <p class={typo.bodyTextSmall}>Instance</p>
-                                <p class={typo.bodyTextSmall}>Status</p>
-                                <p class={typo.bodyTextSmall}>Activity</p>
+                                <p class="bodyTextSmall">Instance</p>
+                                <p class="bodyTextSmall">Status</p>
+                                <p class="bodyTextSmall">Activity</p>
                                 <p></p>
                                 <p></p>
                             </div>

@@ -62,7 +62,7 @@ export const getInstanceEndpoint = query(async (instance: Instance): Promise<str
     });
 
     if (!resp.ok) {
-        throw redirect("/instances-frontend/dashboard");
+        throw redirect("/dashboard");
     }
     
     return (await resp.json() as InstanceEndpoint).endpoint;
