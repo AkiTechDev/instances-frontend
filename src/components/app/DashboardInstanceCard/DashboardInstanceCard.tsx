@@ -1,13 +1,12 @@
 
 import { createEffect, createSignal, createUniqueId, Suspense } from "solid-js";
-import { A, createAsync, query } from "@solidjs/router";
+import { A, createAsync } from "@solidjs/router";
 import { getInstanceEndpoint, getInstanceStatus, toggleInstance, type Instance } from "../../../lib/apis";
 
 import styles from "./DashboardInstanceCard.module.css";
 
 import games from "../../../lib/games";
 import statusIndicator from "./assets/statusIndicator.svg";
-import cardOptionsIcon from "./assets/cardIcon.svg";
 import InstanceOptions from "../InstanceOptions/InstanceOptions";
 
 const DashboardInstanceCard = (props: { instance: Instance, listView: boolean, idx: number}) => {

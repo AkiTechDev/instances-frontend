@@ -1,9 +1,8 @@
-import { createForm, Field, Form, type FormStore, type SubmitHandler } from "@formisch/solid";
+import { createForm, Field, Form, type Schema, type SubmitHandler } from "@formisch/solid";
 import { type Component, For } from "solid-js"
 import FormSelect from "../FormModules/FormSelect";
-import { MinecraftJavaConfigurationSchema, type MinecraftJavaConfiguration } from "../../../lib/games/MinecraftJava";
+import { MinecraftJavaConfigurationSchema } from "../../../lib/games/MinecraftJava";
 
-import styles from "../ManagementInstanceConfiguration/ManagementInstanceConfiguration.module.css"
 import gameStyles from "./ManagementGameConfiguration.module.css";
 import submitBtnStyle from "../../../styles/components/formSubmitButton.module.css";
 import iconTick from "../../../assets/iconTick.svg";
@@ -12,6 +11,7 @@ import FormTextInput from "../FormModules/FormTextInput";
 import FormNumberInput from "../FormModules/FormNumberInput";
 import FormCheckbox from "../FormModules/FormCheckbox";
 import { postGameConfig } from "../../../lib/apis";
+import type { PicklistSchema } from "valibot";
 
 
 const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> = (props) => {
@@ -32,19 +32,20 @@ const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> 
         <Form of={gameForm} onSubmit={submitForm} class={gameStyles.instanceConfigSettings}>
             <For each={Object.entries(gameForm["~internal"].children)}>
                 {([name, schema]) => {
+                    console.log("SCHEMA", gameForm["~internal"].children)
                     const id = name as ConfigKey
                     return (
                         <Field of={gameForm} path={[id]}>
                             {(field) => {
                                 if (schema.schema.type === 'picklist') {
-                                    console.log("true")
                                     return (
                                         <FormSelect
                                             field={field}
                                             field_id={name}
                                             field_label={name}
                                             field_placeholder={props.config[name]}
-                                            field_options={schema.schema.options}
+                                            // Can as any, as already checking for type above, verifying the options property
+                                            field_options={(schema.schema as any).options}
                                         />
                                     )
                                 } else if (schema.schema.type === 'string') {
@@ -54,7 +55,8 @@ const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> 
                                             field_id={name}
                                             field_label={name}
                                             field_placeholder={props.config[name]}
-                                            field_maxlength={schema.schema.pipe.find((p: any) => p.type === "max_length").requirement}
+                                            // Can as any, as already checking for type above, verifying the options property
+                                            field_maxlength={(schema.schema as any).pipe.find((p: any) => p.type === "max_length").requirement}
                                         />
                                     )
                                 } else if (schema.schema.type === 'number') {
@@ -78,9 +80,7 @@ const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> 
                                         />
                                         </div>
                                     )
-                                } else {
-                                    console.log("For Each ", name, schema);
-                                }
+                                };
                             }}
                         </Field>
                     )

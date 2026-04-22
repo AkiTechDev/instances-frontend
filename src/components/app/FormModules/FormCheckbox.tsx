@@ -1,11 +1,9 @@
-import { createUniqueId, type Component } from 'solid-js';
+import { type Component } from 'solid-js';
 
 import toggleSwitch from "../../../styles/components/toggleSwitch.module.css";
 import styles from "./FormSelect.module.css";
 
 const FormCheckbox: Component<{ field: any, field_id: string, field_label: string, field_placeholder: boolean }> = (props) => {
-    const id = createUniqueId();
-
     return (
         <div class={`${toggleSwitch.container} ${styles.fieldSM}`}>
             <input {...props.field.props} id={props.field_id} type="checkbox" checked={props.field.value} />

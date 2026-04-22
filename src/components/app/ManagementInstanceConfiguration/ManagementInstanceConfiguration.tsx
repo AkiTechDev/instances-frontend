@@ -46,7 +46,6 @@ const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance
                 plan: values["plan"],
                 auto_start: values["auto_start"]
               };
-              console.log("ONST : ", values)
               setCurrentProfile(values["profile"])
               await postInstanceConfig(props.endpoint, new_config)
           }

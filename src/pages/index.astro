@@ -1,8 +1,6 @@
 ---
 // Welcome to Astro! Everything between these triple-dash code fences
 // is your "component frontmatter". It never runs in the browser.
-console.log('This runs in your terminal, not the browser!');
-
 import "../styles/normalise.css"
 import "../styles/global.css"
 import "../styles/variables.css"
@@ -868,10 +866,8 @@ import Footer from "../components/footer/Footer.astro";
 
 <script>
   import { getMsal, login, signUp } from "../lib/auth";
-      
 
-
-  const msalInstance = await getMsal();
+  await getMsal();
 
   document.querySelectorAll('[data-login]').forEach(btn => {
     btn.addEventListener('click', login);

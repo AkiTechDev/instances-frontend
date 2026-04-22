@@ -1,15 +1,15 @@
 import { defineConfig } from "astro/config";
 
 import solidJs from "@astrojs/solid-js";
-import mkcert from 'vite-plugin-mkcert';
-
 import sitemap from '@astrojs/sitemap';
+
+import cloudflare from '@astrojs/cloudflare';
+import basicSsl from '@vitejs/plugin-basic-ssl';
 
 // https://astro.build/config
 export default defineConfig({
   site: 'https://instances.aki-labs.com',
   integrations: [solidJs(), sitemap()],
-
   prefetch: true,
 
   server: {
@@ -17,10 +17,16 @@ export default defineConfig({
     https: true,
     host: 'instances.aki-labs.com',
   },
+
   vite: {
+    server: {
+      https: true
+    },
     ssr: {
       external: ['@azure/msal-browser'],
     },
-    plugins: [mkcert()]
-  }
+    plugins: [basicSsl()]
+  },
+
+  adapter: cloudflare()
 });

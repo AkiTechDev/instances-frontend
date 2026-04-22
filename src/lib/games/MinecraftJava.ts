@@ -48,8 +48,3 @@ export interface MinecraftJavaConfiguration {
     pvp: boolean,
     eula: boolean
 }
-
-const MinecraftJavaConfigurationFieldHints = {
-  DIFFICULTY: { widget: 'textarea' },
-  VERSION:      { widget: 'rating' },
-}

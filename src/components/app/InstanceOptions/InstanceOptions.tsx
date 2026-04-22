@@ -1,5 +1,4 @@
-import { createMemo, createSignal, createUniqueId, onCleanup, type Component } from "solid-js";
-import { useMsal } from "../Auth/MsalProvider";
+import { createUniqueId, onCleanup, type Component } from "solid-js";
 
 import styles from "./InstanceOptions.module.css";
 import { useNavigate } from "@solidjs/router";

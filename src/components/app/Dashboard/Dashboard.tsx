@@ -1,5 +1,5 @@
-import { createSignal, Match, Switch, For, createEffect, Show, Suspense } from "solid-js";
-import { createAsync, query } from "@solidjs/router";
+import { createSignal, For, createEffect, Show, Suspense } from "solid-js";
+import { createAsync } from "@solidjs/router";
 import DashboardHeader from "../DashboardHeader/DashboardHeader";
 import DashboardSidebarNav from "../DashboardSidebarNav/DashboardSidebarNav";
 

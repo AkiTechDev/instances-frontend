@@ -1,5 +1,4 @@
 import { pricing } from "./pricing";
-import { regions } from "./regions";
 
 export interface Game {
     name: string

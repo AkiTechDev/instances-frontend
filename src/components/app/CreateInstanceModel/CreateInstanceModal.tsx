@@ -31,7 +31,6 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
     let mainBodyRef: HTMLDivElement | undefined;
 
     const handleBodyClick = (e: MouseEvent) => {
-        console.log(e);
         if (!mainBodyRef?.contains(e.target as Node)) {
             props.setIsOpen(false);
         }
@@ -144,7 +143,7 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                         <select value="game_id" class={`${selectStyles.select} bodyText`} onChange={(e) => setGameId(e.target.value)}>
                             <option class="bodyText" value="Select Game">Select Game</option>
                             <For each={Object.keys(games)}>
-                                { (option, i) => (
+                                { (option, ) => (
                                     <option class="bodyText" value={option}>{games[option].name}</option>
                                 )}
                             </For>

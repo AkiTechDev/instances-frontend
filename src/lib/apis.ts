@@ -1,6 +1,10 @@
 import { query, redirect } from "@solidjs/router";
 import { msalInstance } from "../components/app/Auth/MsalProvider";
 
+interface GenericResonse {
+    message: string
+}
+
 const getToken = async (scopes: string[]) => {
     const account = msalInstance.getActiveAccount();
     if (!account) throw new Error("No active account");
@@ -18,7 +22,6 @@ export interface Instance {
 }
 
 export const getInstances = query(async (): Promise<Instance[]> => {
-    console.log("GETTING INSTANCES");
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch("https://api.instances.aki-labs.com/instances/list", {
         method: "GET",
@@ -29,7 +32,7 @@ export const getInstances = query(async (): Promise<Instance[]> => {
 
     if (!resp.ok) throw new Error("Failed to fetch list of Instances");
 
-    return (await resp.json()).map((instance: string) => {
+    return (await resp.json() as string[]).map((instance: string) => {
         const parts = instance.split("/");
         return {
             user_id: parts[0],
@@ -52,7 +55,6 @@ export interface InstanceEndpoint {
 }
 
 export const getInstanceEndpoint = query(async (instance: Instance): Promise<string> => {
-    console.log("GETTING INSTANCE ENDPOINT", instance);
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch(`https://api.instances.aki-labs.com/${instance.game}/${instance.name}`, {
         method: "GET",
@@ -85,9 +87,8 @@ export const getInstanceConfig = query(async (endpoint: string): Promise<Instanc
     if (!resp.ok) throw new Error("Failed to fetch Instance configuration");
 
     const data = await resp.json();
-    console.log("Config", data);
 
-    return data
+    return data as InstanceConfig
 }, "instanceConfig")
 
 export interface InstanceStatus {
@@ -103,7 +104,6 @@ export interface InstanceStatusBadRequest {
 }
 
 export const getInstanceStatus = async (endpoint: string): Promise<InstanceStatus> => {
-    console.log("GETTING INSTANCE STATUS")
     const token = await getToken(["api://Instances/access"]);
 
     if (endpoint === undefined) {
@@ -124,7 +124,7 @@ export const getInstanceStatus = async (endpoint: string): Promise<InstanceStatu
     return data as InstanceStatus
 };
 
-export const toggleInstance = async (endpoint: string, isRunning: boolean): Promise<string> => {
+export const toggleInstance = async (endpoint: string, isRunning: boolean): Promise<GenericResonse> => {
     const token = await getToken(["api://Instances/access"]);
     const uri = isRunning ? "stop" : "start";
 
@@ -134,8 +134,7 @@ export const toggleInstance = async (endpoint: string, isRunning: boolean): Prom
             "Authorization": `Bearer ${token.accessToken}`
         }
     });
-    const data = await resp.json();
-    return data
+    return await resp.json() as GenericResonse;
 };
 
 
@@ -146,7 +145,7 @@ export interface PostInstanceConfig {
     auto_start: boolean    
 }
 
-export const postInstanceConfig = async (endpoint: string, config: PostInstanceConfig): Promise<string> => {
+export const postInstanceConfig = async (endpoint: string, config: PostInstanceConfig): Promise<GenericResonse> => {
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch(`${endpoint}/config/instance`, {
         method: "POST",
@@ -159,14 +158,12 @@ export const postInstanceConfig = async (endpoint: string, config: PostInstanceC
 
     if (!resp.ok) throw new Error("Failed to fetch Instance configuration");
 
-    const data = await resp.json();
-    console.log("Instance Config Update", data);
+    return await resp.json();
 
-    return data["message"]
 };
 
 
-export const postGameConfig = async (endpoint: string, config: any): Promise<string> => {
+export const postGameConfig = async (endpoint: string, config: any): Promise<GenericResonse> => {
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch(`${endpoint}/config/game`, {
         method: "POST",
@@ -179,14 +176,11 @@ export const postGameConfig = async (endpoint: string, config: any): Promise<str
 
     if (!resp.ok) throw new Error("Failed to upload Game configuration");
 
-    const data = await resp.json();
-    console.log("Game Config Update", data);
-
-    return data["message"]
+    return await resp.json();
 };
 
 
-export const postDownloadGameData = async (endpoint: string): Promise<string> => {
+export const postDownloadGameData = async (endpoint: string): Promise<GenericResonse> => {
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch(`${endpoint}/download`, {
         method: "POST",
@@ -197,13 +191,10 @@ export const postDownloadGameData = async (endpoint: string): Promise<string> =>
 
     if (!resp.ok) throw new Error("Failed to request game data download");
 
-    const data = await resp.json();
-    console.log("Requested to Download Game data", data);
-
-    return data["message"]
+    return await resp.json();
 };
 
-export const deleteInstance = async (instance: Instance): Promise<string> => {
+export const deleteInstance = async (instance: Instance): Promise<GenericResonse> => {
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch(`https://api.instances.aki-labs.com/${instance.game}/${instance.name}`, {
         method: "DELETE",
@@ -214,10 +205,8 @@ export const deleteInstance = async (instance: Instance): Promise<string> => {
 
     if (!resp.ok) throw new Error("Failed to delete instance");
 
-    const data = await resp.json();
-    console.log("Deleted Instance", data);
+    return await resp.json();
 
-    return data["message"]
 };
 
 
@@ -229,7 +218,7 @@ export interface PutCreateInstance {
     region: string
 };
 
-export const putCreateInstance = async (game_id: string, instance_name: string, config: any): Promise<string> => {
+export const putCreateInstance = async (game_id: string, instance_name: string, config: any): Promise<GenericResonse> => {
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch(`https://api.instances.aki-labs.com/${game_id}/${instance_name}`, {
         method: "PUT",
@@ -242,8 +231,5 @@ export const putCreateInstance = async (game_id: string, instance_name: string, 
 
     if (!resp.ok) throw new Error("Failed to create Instance");
 
-    const data = await resp.json();
-    console.log("Instance Created", data);
-
-    return data["message"]
+    return await resp.json();
 };

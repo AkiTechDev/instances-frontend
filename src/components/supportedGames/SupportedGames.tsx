@@ -57,13 +57,11 @@ const SupportedGameCard = () => {
             }
 
             const json = await resp.json();
-            console.log("Got: ", JSON.stringify(json));
 
-            shuffleArray(json);
+            shuffleArray(json as string[]);
 
-            return shuffleArray(json) as string[];
+            return shuffleArray(json as string[]) as string[];
         } catch (error) {
-            console.log(error);
             return [] as string[];
         }
 

@@ -7,7 +7,6 @@ import profileIcon from "../../../assets/profileIcon.svg";
 import helpIcon from "../../../assets/helpIcon.svg";
 import logoutIcon from "../../../assets/logoutIcon.svg";
 import { useMsal } from "../Auth/MsalProvider";
-import { A } from "@solidjs/router";
 
 const Profile: Component<{}> = () => {
     const { logout, account } = useMsal();

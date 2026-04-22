@@ -3,14 +3,13 @@ import { Router, Route } from "@solidjs/router"
 import RootLayout from "./RootLayout/RootLayout";
 import Dashboard from "./Dashboard/Dashboard";
 import { msalInstance, MsalProvider, useMsal } from "./Auth/MsalProvider";
-import { createSignal, Show, useContext } from "solid-js";
 import Explore from "./Explore/Explore";
 import Extra from "./Extra/Extra";
 import Management from "./Management/Management";
 
 import { type Instance, getInstanceConfig, getInstanceEndpoint, getInstanceStatus, getInstances } from "../../lib/apis";
 
-const msalBootstrap = msalInstance.handleRedirectPromise().then((response) => {
+msalInstance.handleRedirectPromise().then((response) => {
     if (response?.account) {
         msalInstance.setActiveAccount(response.account)
     }

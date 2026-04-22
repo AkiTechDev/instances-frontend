@@ -1,4 +1,4 @@
-import { EventType, LogLevel, PublicClientApplication, type AccountInfo } from "@azure/msal-browser";
+import { LogLevel, PublicClientApplication, type AccountInfo } from "@azure/msal-browser";
 
 export const msalConfig = {
     auth: {
@@ -29,10 +29,10 @@ export const msalConfig = {
                         console.error(message);
                         return;
                     case LogLevel.Info:
-                        console.info(message);
+                        //console.info(message);
                         return;
                     case LogLevel.Verbose:
-                        console.debug(message);
+                        //console.debug(message);
                         return;
                     case LogLevel.Warning:
                         console.warn(message);
@@ -46,20 +46,6 @@ export const msalConfig = {
         loadFrameTimeout: 0,
     },
 }
-
-/*
-
-export const msalInstance = new PublicClientApplication(msalConfig);
-
-await msalInstance.initialize();
-
-msalInstance.addEventCallback((event) => {
-    if (event.eventType === EventType.LOGIN_SUCCESS && event.payload) {
-        console.log("SIGNED IN");
-    }
-});
-
-*/
 
 let msalInstance: PublicClientApplication;
 

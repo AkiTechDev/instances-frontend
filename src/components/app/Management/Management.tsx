@@ -1,4 +1,4 @@
-import { action, createAsync, revalidate, useAction, useNavigate, useParams } from "@solidjs/router"
+import { createAsync, useNavigate, useParams } from "@solidjs/router"
 
 import styles from "./Management.module.css";
 
@@ -16,7 +16,7 @@ import Tooltip from "../Test/Test";
 
 import { getInstanceConfig, getInstanceEndpoint, getInstanceStatus, toggleInstance, type Instance } from "../../../lib/apis";
 import { useMsal } from "../Auth/MsalProvider";
-import { createEffect, createSignal, Show, Suspense } from "solid-js";
+import { createEffect, createSignal, Show } from "solid-js";
 import ManagementInstanceConfigForm from "../ManagementInstanceConfiguration/ManagementInstanceConfiguration";
 import { regions } from "../../../lib/regions";
 import ManagementGameConfiguration from "../ManagementGameConfiguration/ManagementGameConfiguration";
@@ -69,7 +69,6 @@ const Management = () => {
                     status = createAsync(() => getInstanceStatus(endpoint()!))
                     await sleep(5000);
 
-                    console.log("REVALIDATING", status())
                     if (status() && "ipv6" in status()!) {
                         break
                     };

@@ -12,14 +12,14 @@ const FormSelect: Component<{ field: any, field_id: string, field_label: string,
             <Switch>
                 <Match when={props.field_options != undefined && props.field_options.constructor === Array}>
                     <For each={props.field_options as string[]}>
-                        { (option, i) => (
+                        { (option, ) => (
                             <option class="bodyText" value={option} selected={option == props.field_placeholder}>{option}</option>
                         )}
                     </For>
                 </Match>
                 <Match when={1==1}>
                     <For each={props.field_options != undefined && Object.entries(props.field_options)}>
-                        { (item: [string, string], i) => (
+                        { (item: [string, string], ) => (
                             <option class="bodyText" value={item[0]} selected={item[0] == props.field_placeholder}>{item[1]}</option>
                         )}
                     </For>

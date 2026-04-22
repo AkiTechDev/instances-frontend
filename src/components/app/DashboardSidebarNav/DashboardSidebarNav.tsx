@@ -1,4 +1,4 @@
-import { createEffect, createSignal, type Setter } from "solid-js"
+import { createSignal} from "solid-js"
 
 import styles from "../Dashboard/Dashboard.module.css";
 
@@ -36,7 +36,7 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
                         id="gameSearch"
                         placeholder="Find your game"
                         value={searchText()}
-                        onClick={(e) => setCollapsed(false)}
+                        onClick={() => setCollapsed(false)}
                         onInput={(e) => setSearchText(e.currentTarget.value)}></input>
                 </label>
             </div>
