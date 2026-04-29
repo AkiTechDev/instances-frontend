@@ -70,7 +70,7 @@ const Dashboard = () => {
                         <h6 class="h6">No Games Added Yet!</h6>
                         <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
                     </div>
-                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle} ${btnWithIcon.rotate45}`} style={`--icon: url(${crossIcon.src})`}><p class="buttonText">Create new Game</p></button>
+                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle} ${btnWithIcon.rotate45}`} style={`--icon: url(${crossIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: null, allow_game_change: true})}><p class="buttonText">Create new Game</p></button>
                 </div>
             }>
             {instances().length === 0 && (
@@ -80,7 +80,7 @@ const Dashboard = () => {
                         <h6 class="h6">No Games Added Yet!</h6>
                         <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
                     </div>
-                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle} ${btnWithIcon.rotate45}`} style={`--icon: url(${crossIcon.src})`}><p class="buttonText">Create new Game</p></button>
+                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle} ${btnWithIcon.rotate45}`} style={`--icon: url(${crossIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: null, allow_game_change: true})}><p class="buttonText">Create new Game</p></button>
                 </div>
             )}
             { instances().length > 0 && (
