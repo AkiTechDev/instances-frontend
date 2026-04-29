@@ -1,0 +1,12 @@
+<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- background ring -->
+  <circle cx="10" cy="10" r="5.5" stroke="currentColor" stroke-width="4" opacity="0.35"/>
+  <!-- top bar -->
+  <rect x="8.33325" y="1.66797" width="3.33333" height="5.83333" rx="1.2" fill="currentColor"/>
+  <!-- bottom bar -->
+  <rect x="8.33325" y="12.5" width="3.33333" height="5.83333" rx="1.2" fill="currentColor"/>
+  <!-- left bar -->
+  <rect x="1.66675" y="8.33203" width="5.83333" height="3.33333" rx="1.2" fill="currentColor"/>
+  <!-- right bar -->
+  <rect x="12.5" y="8.33203" width="5.83333" height="3.33333" rx="1.2" fill="currentColor"/>
+</svg>

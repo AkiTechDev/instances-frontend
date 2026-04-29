@@ -15,8 +15,8 @@ import { fullSeverName, generateRandomName } from "../../../lib/name_generator";
 
 import selectStyles from "../FormModules/FormSelect.module.css";
 import submitBtnStyle from "../../../styles/components/formSubmitButton.module.css";
-import iconTick from "../../../assets/iconTick.svg";
-import iconCross from "../../../assets/crossIcon.svg";
+import iconTick from "../../../assets/icons/tick.svg";
+import iconCross from "../../../assets/icons/cross.svg";
 import { putCreateInstance, type PutCreateInstance } from "../../../lib/apis";
 
 export interface ModalOptions {

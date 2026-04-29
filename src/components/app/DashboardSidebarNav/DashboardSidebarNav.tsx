@@ -7,10 +7,10 @@ import btnWithIcon from '../../../styles/components/buttonWithIcons.module.css';
 import games from "../../../lib/games";
 import { For } from "solid-js";
 
-import iconPlus from "../../../assets/iconPlus.svg";
-import sidebarIcon from "./assets/sidebarIcon.svg";
-import searchIcon from "./assets/searchIcon.svg";
-import allGamesIcon from "./assets/allGamesIcon.svg";
+import iconCross from "../../../assets/icons/cross.svg";
+import sidebarIcon from "../../../assets/icons/sidebar.svg";
+import searchIcon from "../../../assets/icons/search.svg"
+import allGamesIcon from "../../../assets/icons/allGames.svg";
 import type { ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
 
 const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateIntanceModal: (options: ModalOptions) => void}) => {
@@ -28,7 +28,7 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
             }}></a>
             <div class={styles.sidebarHeader}>
                 <p class="subtitleSemi">My Games</p>
-                <button class={btnWithIcon.buttonSlim} style={`--icon: url(${iconPlus.src})`} onClick={() => props.openCreateIntanceModal({game_id: null, allow_game_change: true})}><p class="buttonTextSmall">Create new Game</p></button>
+                <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.rotate45}`} style={`--icon: url(${iconCross.src})`} onClick={() => props.openCreateIntanceModal({game_id: null, allow_game_change: true})}><p class="buttonTextSmall">Create new Game</p></button>
                 <label class={styles.searchableContainer}>
                     <div class={styles.searchIcon} style={`--icon: url("${searchIcon.src}")`}></div>
                     <input

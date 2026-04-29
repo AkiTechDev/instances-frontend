@@ -13,48 +13,80 @@ import colourStyles from "../styles/theme/colours.module.css"
 import buttonBig from "../styles/components/buttonBig.module.css"
 
 import headerLogo from "../assets/headerLogo.svg?url"
-import iconDiamond from "../assets/iconDiamond.svg?url"
+
+import LogoIcon from "../assets/icons/logos/icon.svg";
+
+const LogoIconUrl = `url(${LogoIcon.src})`;
 
 import sectionOneBackground from "../assets/landingIcon.svg"
 const sectionOneBackgroundUrl = `url(${sectionOneBackground.src})`;
 
 import promoBackgroundImage from "../assets/promoBackground.svg?url";
 
-import instanceIcon from "../assets/instanceIcon.svg"
-const instanceIconUrl = `url(${instanceIcon.src})`
-
 import processStep1 from "../assets/processStep1.svg?url";
 import processStep2 from "../assets/processStep2.svg?url";
 import processStep3 from "../assets/processStep3.svg?url";
 
-import shapeOne from "../assets/shapeOne.svg?url";
-import shapeTwo from "../assets/shapeTwo.svg?url";
+import Squarcle from "../components/squarcle/Squarcle.astro";
+
 import messageIcon from "../assets/messageIcon.svg?url";
 import backgroundGlow from "../assets/backgroundGlow.svg?url";
-import iconExpanded from "../assets/iconExpanded.svg";
-const iconExpandedUrl = `url(${iconExpanded.src})` 
-import iconClosed from "../assets/iconClosed.svg";
-const iconClosedUrl = `url(${iconClosed.src})` 
-import iconArrow from "../assets/iconArrow.svg?url";
+
+import squarcleIcon from "../assets/icons/squarcle.svg";
+const squarcleIconUrl = `url(${squarcleIcon.src})`;
+
+import iconArrow from "../assets/icons/chevron.svg?url";
 
 import SupportedGames from "../components/supportedGames/SupportedGames.astro";
 
 import Newsletter from "../components/newsletter/Newsletter.astro";
 import Footer from "../components/footer/Footer.astro";
 
+const seo_des = "Host Minecraft, sandboxed games, and more with Instances. No contracts, no setup headaches. Switch games instantly, keep your world, and only pay for what you play.";
+const domain = "instances.aki-labs.com"
+
 ---
 <!-- Below is your "component template." It's just HTML, but with
     some magic sprinkled in to help you build great templates. -->
 <!doctype html>
-<html lang="en">
+<html lang="en" class="en" prefix="og: http://ogp.me/ns#">
 	<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta name="description" content="Qwik + Astro integration" />
+    <meta name="author" content="Aki Laboratories Limited">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
+
+    <!-- SEO -->
+    <title>Instances - Game Servers Made Easy, Pay As You Play</title>
+		<meta name="description" content={seo_des}>
+    <meta itemprop="description" content={seo_des}> <!-- Google / Schema.org (used in Google Search & Google Assistant) -->
+    <meta name="robots" content="all" />
+    <link rel="canonical" href={`https://${domain}`}>
     <link rel="sitemap" href="/sitemap-index.xml" />
-		<title>Instances - Powered by Aki Labs</title>
+
+
+    <!-- Twitter/X specific -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Instances - Game Servers Made Easy, Pay As You Play">
+    <meta name="twitter:description" content={seo_des}>
+    <meta name="twitter:image" content={`https://${domain}/og-image.jpg`}>
+    <meta name="twitter:site" content="@aki_labs">
+
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Instances - Game Servers Made Easy, Pay As You Play">
+    <meta property="og:description" content={seo_des}>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content=`https://${domain}`>
+    <meta property="og:image" content=`https://${domain}/og-image.jpg`>
+    <meta property="og:site_name" content="Instances">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Mobile / Browser theming -->
+    <meta name="theme-color" content="#YOUR_BRAND_COLOR">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 	</head>
 	<body>
     <div id="heroBanner">
@@ -69,7 +101,7 @@ import Footer from "../components/footer/Footer.astro";
           </div>
           <div class="getStarted">
             <button data-login class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class="buttonText">Log In</p></button>
-            <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, "h1"]}><img src={iconDiamond} /><p class="buttonText">Get Started</p></button>
+            <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, "h1"]}><LogoIcon style={"--path1: var(--colour-text-primary); --path2: var(--colour-text-primary); --path3: var(--colour-text-primary); transform: rotate(45deg);"} /><p class="buttonText">Get Started</p></button>
           </div>
         </header>
 
@@ -146,10 +178,10 @@ import Footer from "../components/footer/Footer.astro";
     <section class="servicePropsSection">
       <div class="propsContainer">
         <div class="propsBackgroundContainer">
-          <img src={shapeOne} style="transform: rotate(270deg)" />
-          <img src={shapeOne} />
-          <img src={shapeTwo} />
-          <img src={shapeOne} style="transform: rotate(90deg)"/>
+          <Squarcle id="grad1" gradientStart="#c589f4" gradientEnd="#532b56" rotation=270 />
+          <Squarcle id="grad1" />
+          <Squarcle id="grad2" gradientStart="#EBA439" gradientEnd="#442904" rotation=180 />
+          <Squarcle id="grad1" rotation=90 />
         </div>
 
         <div class="serviceCardContainer">
@@ -289,7 +321,7 @@ import Footer from "../components/footer/Footer.astro";
 
 
 
-<style define:vars={{sectionOneBackgroundUrl, instanceIconUrl}}>
+<style define:vars={{sectionOneBackgroundUrl, LogoIconUrl}}>
   #heroBanner {
     background-image: var(--sectionOneBackgroundUrl);
     background-repeat: no-repeat;
@@ -427,7 +459,7 @@ import Footer from "../components/footer/Footer.astro";
     inset: 0;
     background-color: #ffffff;
 
-    mask: var(--instanceIconUrl) repeat 50% 50%;
+    mask: var(--LogoIconUrl) repeat 50% 50%;
     opacity: 0.02;
 
   }
@@ -565,8 +597,8 @@ import Footer from "../components/footer/Footer.astro";
     width: 20px;
     height: 20px;
     background-color: #C589F4;
-    -webkit-mask: var(--instanceIconUrl) no-repeat center;
-    mask: var(--instanceIconUrl) no-repeat center;
+    -webkit-mask: var(--LogoIconUrl) no-repeat center / contain;
+    mask: var(--LogoIconUrl) no-repeat center / contain;
   }
 </style>
 
@@ -710,7 +742,7 @@ import Footer from "../components/footer/Footer.astro";
   }
 </style>
 
-<style define:vars={{iconExpandedUrl, iconClosedUrl}}>
+<style define:vars={{squarcleIconUrl}}>
   .faqContainer {
     max-width: 1440px;
     margin-left: auto;
@@ -843,7 +875,12 @@ import Footer from "../components/footer/Footer.astro";
 
 
   .faqIcon {
-    background-image: var(--iconClosedUrl);
+    /* background-image: var(--squarcleIconUrl);*/
+
+    background-color: #C589F4;
+    mask: var(--squarcleIconUrl) no-repeat center;
+    -webkit-mask: var(--squarcleIconUrl) no-repeat center;
+
     width: 36px;
     height: 36px;
 
@@ -859,7 +896,7 @@ import Footer from "../components/footer/Footer.astro";
 
   .faqCard input:checked ~ .faqCardLabel > .faqIcon {
     transform: rotate(180deg);
-    background-image: var(--iconExpandedUrl);
+    background-color: #EBA439;
   }
 
 </style>

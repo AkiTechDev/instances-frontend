@@ -2,10 +2,10 @@ import type { Component } from "solid-js"
 
 import styles from "./Profile.module.css";
 
-import iconArrow from "../../../assets/iconArrow.svg";
-import profileIcon from "../../../assets/profileIcon.svg";
-import helpIcon from "../../../assets/helpIcon.svg";
-import logoutIcon from "../../../assets/logoutIcon.svg";
+import iconArrow from "../../../assets/icons/chevron.svg";
+import profileIcon from "../../../assets/icons/profile.svg";
+import helpIcon from "../../../assets/icons/help.svg";
+import logoutIcon from "../../../assets/icons/logout.svg";
 import { useMsal } from "../Auth/MsalProvider";
 
 const Profile: Component<{}> = () => {

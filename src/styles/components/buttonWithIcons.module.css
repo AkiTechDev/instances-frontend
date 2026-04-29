@@ -21,8 +21,9 @@
     display: block;
 
     background-color: var(--colour-text-primary);
-    mask: var(--icon) no-repeat center;
-    -webkit-mask: var(--icon) no-repeat center;
+    background-size:contain;
+    mask: var(--icon) no-repeat center / contain;
+    -webkit-mask: var(--icon) no-repeat center / contain;
 }
 
 .buttonSlim:hover {
@@ -33,6 +34,11 @@
 .buttonBig {
     padding: 1rem 1.5rem;
 }
+
+.rotate45::before {
+    transform: rotate(45deg);
+}
+
 
 .buttonBig::before {
     width: 20px;

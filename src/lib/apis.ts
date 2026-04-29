@@ -233,3 +233,13 @@ export const putCreateInstance = async (game_id: string, instance_name: string, 
 
     return await resp.json();
 };
+
+export const getGames = query(async (): Promise<string[]> => {
+    const resp = await fetch("https://api.instances.aki-labs.com/instances/types", {
+        method: "GET",
+    });
+
+    if (!resp.ok) throw new Error("Failed to get supported Games");
+    
+    return await resp.json()
+}, "supportedGames")

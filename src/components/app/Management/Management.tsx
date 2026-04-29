@@ -3,13 +3,13 @@ import { createAsync, useNavigate, useParams } from "@solidjs/router"
 import styles from "./Management.module.css";
 
 import ManagementHeader from "../ManagementHeader/ManagementHeader";
-import iconArrow from "../../../assets/iconArrow.svg";
+import iconArrow from "../../../assets/icons/chevron.svg";
 
 import btnWithIcon from "../../../styles/components/buttonWithIcons.module.css";
 import btn from "../../../styles/components/buttonBig.module.css";
-import stopIcon from "./assets/stopIcon.svg";
-import playIcon from "./assets/playIcon.svg";
-import clipboardIcon from "./assets/clipboardIcon.svg";
+import stopIcon from "../../../assets/icons/stop.svg";
+import playIcon from "../../../assets/icons/play.svg";
+import clipboardIcon from "../../../assets/icons/clipboard.svg"
 
 import games from "../../../lib/games";
 import Tooltip from "../Test/Test";

@@ -1,15 +1,15 @@
 import styles from './Nav.module.css';
 
-import iconLight from "../../../assets/iconLight.svg?url";
-import gamesIcon from "./assets/gameMenuIcon.svg";
-import socialIcon from "./assets/socialIcon.svg";
-import exploreIcon from "./assets/exploreIcon.svg";
-import extraIcon from "./assets/extraIcon.svg";
+import LogoIcon from "../../../assets/icons/logos/icon.svg?solid";
+import gamesIcon from "../../../assets/icons/menu/games.svg";
+import socialIcon from "../../../assets/icons/menu/social.svg";
+import exploreIcon from "../../../assets/icons/menu/explore.svg";
+import extraIcon from "../../../assets/icons/menu/extra.svg";
 import { A } from '@solidjs/router';
 
 const RootSidebarNav = () => (
     <section class={styles.container}>
-        <img class={styles.logoIcon} src={iconLight} />
+        <LogoIcon width={50} height={50} style={"--path2: white"} class={styles.logoIcon} />
 
         <A href="/dashboard" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${gamesIcon.src})`}>
         </A>

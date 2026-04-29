@@ -2,10 +2,10 @@
 ---
 import styles from './footer.module.css';
 
-import footerIcon from "./assets/footerIcon.svg?url";
-import facebookIcon from "./assets/facebookIcon.svg";
-import instagramIcon from "./assets/instagramIcon.svg";
-import discordIcon from "./assets/discordIcon.svg";
+import LogoIcon from "../../assets/icons/logos/icon.svg";
+import facebookIcon from "../../assets/icons/socials/facebook.svg";
+import instagramIcon from "../../assets/icons/socials/instragram.svg";
+import discordIcon from "../../assets/icons/socials/discord.svg";
 ---
 
 <section class={styles.section}>
@@ -18,7 +18,10 @@ import discordIcon from "./assets/discordIcon.svg";
         </div>
 
         <div class={styles.banner}>
-            <img src={footerIcon} />
+            <div class={styles.squareLogo}>
+                <LogoIcon width={104} height={104} style={`--path2: white`} />
+                <p>instances</p>
+            </div>
             <div class={styles.socialMedia}>
                 <a href="https://www.facebook.com/profile.php?id=61567620143464" target="_blank">
                     <div class:list={[styles.facebookContact, styles.bannerContactIcon]} style={`--facebookIconUrl: url(${facebookIcon.src})`}></div>

@@ -10,7 +10,7 @@ import styles from "./ManagementInstanceConfiguration.module.css";
 
 import selectStyles from "../FormModules/FormSelect.module.css";
 import submitBtnStyle from "../../../styles/components/formSubmitButton.module.css";
-import iconTick from "../../../assets/iconTick.svg";
+import iconTick from "../../../assets/icons/tick.svg";
 import { regions } from "../../../lib/regions";
 import { postInstanceConfig, type Instance, type InstanceConfig, type PostInstanceConfig } from "../../../lib/apis";
 

@@ -6,7 +6,6 @@ import { getInstanceEndpoint, getInstanceStatus, toggleInstance, type Instance }
 import styles from "./DashboardInstanceCard.module.css";
 
 import games from "../../../lib/games";
-import statusIndicator from "./assets/statusIndicator.svg";
 import InstanceOptions from "../InstanceOptions/InstanceOptions";
 
 const DashboardInstanceCard = (props: { instance: Instance, listView: boolean, idx: number}) => {
@@ -36,7 +35,8 @@ const DashboardInstanceCard = (props: { instance: Instance, listView: boolean, i
             { props.listView === false && (
                 <A href={`/${props.instance.game}/${props.instance.name}`} class={styles.gameCard}>
                     <div class={styles.imageWrapper} style={`--backgroundImg: url("/imgs/${props.instance.game}/banner.avif")`}>
-                        <div class={`${styles.statusContainer} ${isRunning() ? "" : styles.stopped}`} style={`--statusIndicator: url(${statusIndicator.src})`}>
+                        <div class={`${styles.statusContainer} ${isRunning() ? styles.active : ""}`}>
+                            <div class={`${styles.statusIndicator} ${isRunning() ? styles.active : ""}`}></div>
                             <p class="smallestLabel">{isRunning() ? "RUNNING" : "STOPPED"}</p>
                         </div>
                         <div class={styles.toggleContainer}>

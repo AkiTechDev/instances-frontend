@@ -15,7 +15,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@astrojs/check": "^0.9.8",
+    "@astrojs/check": "^0.9.2",
     "@astrojs/cloudflare": "^13.1.10",
     "@astrojs/sitemap": "^3.7.2",
     "@astrojs/solid-js": "^6.0.1",
@@ -32,6 +32,7 @@
     "vite": "^7.3.1"
   },
   "devDependencies": {
-    "@vitejs/plugin-basic-ssl": "^2.3.0"
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "vite-solid-svg": "^0.0.7"
   }
 }

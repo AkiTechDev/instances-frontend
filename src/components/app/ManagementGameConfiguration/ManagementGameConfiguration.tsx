@@ -5,7 +5,7 @@ import { MinecraftJavaConfigurationSchema } from "../../../lib/games/MinecraftJa
 
 import gameStyles from "./ManagementGameConfiguration.module.css";
 import submitBtnStyle from "../../../styles/components/formSubmitButton.module.css";
-import iconTick from "../../../assets/iconTick.svg";
+import iconTick from "../../../assets/icons/tick.svg";
 
 import FormTextInput from "../FormModules/FormTextInput";
 import FormNumberInput from "../FormModules/FormNumberInput";

@@ -3,6 +3,8 @@ import { defineConfig } from "astro/config";
 import solidJs from "@astrojs/solid-js";
 import sitemap from '@astrojs/sitemap';
 
+import solidSVG from 'vite-solid-svg';
+
 import cloudflare from '@astrojs/cloudflare';
 import basicSsl from '@vitejs/plugin-basic-ssl';
 
@@ -25,7 +27,7 @@ export default defineConfig({
     ssr: {
       external: ['@azure/msal-browser'],
     },
-    plugins: [basicSsl()]
+    plugins: [basicSsl(), solidSVG()]
   },
 
   adapter: cloudflare()

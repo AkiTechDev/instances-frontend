@@ -10,18 +10,17 @@ import buttonBig from "../../../styles/components/buttonBig.module.css";
 import btnWithIcon from "../../../styles/components/buttonWithIcons.module.css";
 
 // No Instances Imports
-import mouseImage from "./assets/mouse.png?url";
-import buttonIcon from "../../../assets/iconPlus.svg";
+import mouseImage from "../../../assets/mouse.png?url";
 
 import games from "../../../lib/games";
 
 import filterBtn from '../../../styles/components/filterButton.module.css';
-import gridViewIcon from "./assets/gridViewIcon.svg";
-import listViewIcon from "./assets/listViewIcon.svg";
-import iconArrow from "../../../assets/iconArrow.svg";
-import searchIcon from "./assets/searchIcon.svg";
-import crossIcon from "../../../assets/crossIcon.svg";
-import instanceIcon from "../../../assets/instanceIcon.svg";
+import gridViewIcon from "../../../assets/icons/grid.svg";
+import listViewIcon from "../../../assets/icons/list.svg";;
+import iconArrow from "../../../assets/icons/chevron.svg";
+import searchIcon from "../../../assets/icons/search.svg";;
+import crossIcon from "../../../assets/icons/cross.svg";
+import LogoIcon from "../../../assets/icons/logos/icon.svg";
 import DashboardInstanceCard from "../DashboardInstanceCard/DashboardInstanceCard";
 import CreateInstanceModal, { type ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
 
@@ -71,7 +70,7 @@ const Dashboard = () => {
                         <h6 class="h6">No Games Added Yet!</h6>
                         <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
                     </div>
-                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle}`} style={`--icon: url(${buttonIcon.src})`}><p class="buttonText">Create new Game</p></button>
+                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle} ${btnWithIcon.rotate45}`} style={`--icon: url(${crossIcon.src})`}><p class="buttonText">Create new Game</p></button>
                 </div>
             }>
             {instances().length === 0 && (
@@ -81,7 +80,7 @@ const Dashboard = () => {
                         <h6 class="h6">No Games Added Yet!</h6>
                         <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
                     </div>
-                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle}`} style={`--icon: url(${buttonIcon.src})`}><p class="buttonText">Create new Game</p></button>
+                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle} ${btnWithIcon.rotate45}`} style={`--icon: url(${crossIcon.src})`}><p class="buttonText">Create new Game</p></button>
                 </div>
             )}
             { instances().length > 0 && (
@@ -90,7 +89,7 @@ const Dashboard = () => {
                 <div class={styles.gamesContainer}>
                     <div class={styles.gamesListHeader}>
                         <h4 class="h4">{(gameFilter() === "all") ? "All Instances" : games[gameFilter()].name}</h4>
-                        <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.buttonBig}`} style={`--icon: url(${instanceIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}><p class="buttonText">Add new Instance</p></button>
+                        <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.buttonBig}`} style={`--icon: url(${LogoIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}><p class="buttonText">Add new Instance</p></button>
                     </div>
                     <div class={styles.gameFiltersContainer}>
                         <label class={styles.searchableContainer}>
