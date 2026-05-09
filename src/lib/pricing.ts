@@ -3,6 +3,16 @@ interface Pricing {
   memoryGbPerHour: number
 }
 
+export const fgCalc = (region: string, memory: number, cpu: number, tier: string) => {
+    const costs = pricing[region];
+    const commission = tier === "Premium" ? 1.3 : 1.2;
+ 
+    const vcpu_cost = (cpu / 1024) * costs.vCpuPerHour;
+    const memory_cost = (memory / 1024) * costs.memoryGbPerHour;
+
+    return ((vcpu_cost + memory_cost) * commission).toFixed(2);
+}; 
+
 export const pricing: {[id: string]: Pricing} = {
   'us-east-1': {
     vCpuPerHour: 0.04048,

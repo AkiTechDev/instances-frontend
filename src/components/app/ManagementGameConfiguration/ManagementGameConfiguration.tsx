@@ -1,7 +1,6 @@
-import { createForm, Field, Form, type Schema, type SubmitHandler } from "@formisch/solid";
+import { createForm, Field, Form, type SubmitHandler } from "@formisch/solid";
 import { type Component, For } from "solid-js"
 import FormSelect from "../FormModules/FormSelect";
-import { MinecraftJavaConfigurationSchema } from "../../../lib/games/MinecraftJava";
 
 import gameStyles from "./ManagementGameConfiguration.module.css";
 import submitBtnStyle from "../../../styles/components/formSubmitButton.module.css";
@@ -11,18 +10,24 @@ import FormTextInput from "../FormModules/FormTextInput";
 import FormNumberInput from "../FormModules/FormNumberInput";
 import FormCheckbox from "../FormModules/FormCheckbox";
 import { postGameConfig } from "../../../lib/apis";
-import type { PicklistSchema } from "valibot";
 
+import * as v from "valibot";
 
-const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> = (props) => {
+/*
+1. Should we really be passing config as a prop, instead use createAsync to query the catch +
+2. Schema schema schema
+*/
+
+const ManagementGameConfiguration: Component<{ schema: v.ObjectSchema<any, undefined>, config: any, endpoint: string }> = (props) => {
+    console.log("GAME CONFIG", props.config);
     const gameForm = createForm({
-        schema: MinecraftJavaConfigurationSchema,
+        schema: props.schema,
         initialInput: props.config
     })
 
-    type ConfigKey = keyof typeof MinecraftJavaConfigurationSchema.entries;
+    //type ConfigKey = keyof typeof props.schema.entries;
 
-    const submitForm: SubmitHandler<typeof MinecraftJavaConfigurationSchema> = async (values) => {
+    const submitForm: SubmitHandler<typeof props.schema> = async (values) => {
         if (gameForm.isValid) {
             await postGameConfig(props.endpoint, values)
         }
@@ -32,10 +37,8 @@ const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> 
         <Form of={gameForm} onSubmit={submitForm} class={gameStyles.instanceConfigSettings}>
             <For each={Object.entries(gameForm["~internal"].children)}>
                 {([name, schema]) => {
-                    console.log("SCHEMA", gameForm["~internal"].children)
-                    const id = name as ConfigKey
                     return (
-                        <Field of={gameForm} path={[id]}>
+                        <Field of={gameForm} path={[name]}>
                             {(field) => {
                                 if (schema.schema.type === 'picklist') {
                                     return (
@@ -86,7 +89,7 @@ const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> 
                     )
                 }}
             </For>
-            <button class={`${submitBtnStyle.button}buttonTextSmall`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={!gameForm.isDirty || gameForm.isSubmitting}>
+            <button class={`${submitBtnStyle.button} buttonTextSmall`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={!gameForm.isDirty || gameForm.isSubmitting}>
                 {gameForm.isSubmitting ? "Saving Settings" : gameForm.isSubmitted ? "Settings Saved" : "Save Settings"}
             </button>
         </Form>

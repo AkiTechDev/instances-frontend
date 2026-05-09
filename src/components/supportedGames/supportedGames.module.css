@@ -13,46 +13,6 @@
     text-align: center;
     align-items: center;
 }
-/*
-.gamesContainer {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: flex-start;
-    align-items: flex-start;
-    gap: 2.5rem 1.625rem; 
-
-    justify-content: center;
-} 
-
-.card {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-    gap: 1.5rem;
-
-    transition: transform 0.5 ease;
-}
-
-.card:hover {
-    transform: scale(1.13);
-    color: var(--text-colour-vibrant);
-  }
-
-.card:hover > img {
-    border: 3px solid var(--text-colour-light);
-}
-
-
-.card > img {
-    max-width: 300px;
-    height: 10.68rem;
-    border-radius: 0.625rem;
-}
-
-*/
 
 .gamesContainer {
     display: grid;
@@ -60,55 +20,6 @@
     gap: 2.5rem 1.625rem;
 
 }
-
-.card {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-    gap: 1.5rem;
-
-    animation: fadeIn 0.4s ease forwards;
-}
-
-.card > img {
-    width: 100%;
-    height: 10.68rem;
-    border-radius: 0.625rem;
-
-    align-items: center;
-    transition: transform 0.5 ease;
-}
-
-.card:hover > img {
-    transform: scale(1.13);
-    color: var(--text-colour-vibrant);
-    border: 3px solid var(--text-colour-light);
-}
-
-.card:hover > p {
-    color: var(--text-colour-vibrant);
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.card > p {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 90%;
-}
-
 
 @media screen and (max-width: 770px) {
     .gamesContainer {

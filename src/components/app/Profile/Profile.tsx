@@ -7,6 +7,8 @@ import profileIcon from "../../../assets/icons/profile.svg";
 import helpIcon from "../../../assets/icons/help.svg";
 import logoutIcon from "../../../assets/icons/logout.svg";
 import { useMsal } from "../Auth/MsalProvider";
+import { ResponsiveImage } from "@responsive-image/solid";
+import ProfileJPG from "../../../assets/images/profile.jpg?responsive";
 
 const Profile: Component<{}> = () => {
     const { logout, account } = useMsal();
@@ -20,7 +22,7 @@ const Profile: Component<{}> = () => {
             onMouseLeave={() => document.getElementById("profile")?.hidePopover()}
         >
             <button popoverTarget="profile" aria-haspopup="true" style={`--icon: url("${iconArrow.src}")`}>
-                <img class={styles.profileImg} src="/imgs/profile.jpg" />
+                <ResponsiveImage src={ProfileJPG} alt="Default profile picture of a crab" />
             </button>
 
             <ul id="profile" popover role="menu">

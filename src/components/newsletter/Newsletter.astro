@@ -2,10 +2,13 @@
 ---
 import styles from './newsletter.module.css';
 import buttonBig from "../../styles/components/buttonBig.module.css";
+
+import CoffeePNG from '../../assets/images/coffee.png';
+import { Picture } from 'astro:assets';
 ---
 
 <section class={styles.section}>
-    <img class={styles.coffee} src="/imgs/coffee.png" />
+    <Picture src={CoffeePNG} formats={['avif', 'webp']} alt="Unrelated graphic of a take-away coffee cup" />
     <div class={styles.card}>
         <div class={styles.cardContent}>
             <h4 class="h4">Stay in the Loop</h4>

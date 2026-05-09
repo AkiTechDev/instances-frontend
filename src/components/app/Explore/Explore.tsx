@@ -2,10 +2,11 @@ import { createSignal, For, Show } from "solid-js";
 import DashboardHeader from "../DashboardHeader/DashboardHeader";
 
 import styles from "./Explore.module.css";
-import games from "../../../lib/games";
 import CreateInstanceModal, { type ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
 import { getBestRegion, regions } from "../../../lib/regions";
 import { createAsync } from "@solidjs/router";
+import { gameRegistry } from "../../../lib/games/index";
+import GameCard from "../GameCard/GameCard";
 
 const Explore = () => {
     const [openModal, setOpenModal] = createSignal(false)
@@ -32,12 +33,9 @@ const Explore = () => {
                     <h4 class="h4">Games to Try</h4>
                 </div>
                 <div class={styles.gamesContainer}>
-                    <For each={Object.entries(games)}>
-                        {([id, game]) => (
-                            <div class={styles.gameCard} onclick={() => OpenCreateInstanceModal({game_id: id, allow_game_change: false})}>
-                                <img src={`/imgs/${id}/banner.avif`} />
-                                <p>{game.name}</p>
-                            </div>
+                    <For each={Object.entries(gameRegistry)}>
+                        {([id, ]) => (
+                            <GameCard game_id={id} OpenCreateInstanceModal={OpenCreateInstanceModal} />
                         )}
                     </For>
                 </div>

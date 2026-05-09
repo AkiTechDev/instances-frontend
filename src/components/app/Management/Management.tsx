@@ -11,7 +11,6 @@ import stopIcon from "../../../assets/icons/stop.svg";
 import playIcon from "../../../assets/icons/play.svg";
 import clipboardIcon from "../../../assets/icons/clipboard.svg"
 
-import games from "../../../lib/games";
 import Tooltip from "../Test/Test";
 
 import { getInstanceConfig, getInstanceEndpoint, getInstanceStatus, toggleInstance, type Instance } from "../../../lib/apis";
@@ -21,6 +20,8 @@ import ManagementInstanceConfigForm from "../ManagementInstanceConfiguration/Man
 import { regions } from "../../../lib/regions";
 import ManagementGameConfiguration from "../ManagementGameConfiguration/ManagementGameConfiguration";
 import InstanceOptions from "../InstanceOptions/InstanceOptions";
+import { gameRegistry } from "../../../lib/games/index";
+import { ResponsiveImage } from "@responsive-image/solid";
 
 const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -28,12 +29,34 @@ const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 const Management = () => {
     const params = useParams();
     const navigate = useNavigate();
+
+    const game = createAsync(async () => {
+        if (params.game && params.game in gameRegistry) {
+            const entry = gameRegistry[params.game];
+
+            if (!entry) throw Error("Error retrieving game");
+
+            const mod = await entry.load();
+            return mod.default;
+        }
+
+        return navigate("/dashboard?no-such-game", { replace: true });
+    })
+
     const [isRunning, setIsRunning] = createSignal(false);
 
     const { account } = useMsal();
-    const instance: Instance = { game: params?.game || "", name: params?.name || "", user_id: account()!.homeAccountId};
+    const instance: Instance = { game: params.game || "", name: params.name || "", user_id: account()!.homeAccountId};
 
-    const endpoint = createAsync(async () => getInstanceEndpoint(instance));
+    const endpoint = createAsync(async () => {
+        const endpoint = await getInstanceEndpoint(instance);
+    
+        if (!endpoint) {
+            return navigate("/dashboard?no-such-instance");
+        };
+    
+        return endpoint;
+    });
     const config = createAsync(async () => {
         if (endpoint()) {
             return getInstanceConfig(endpoint()!)
@@ -42,6 +65,18 @@ const Management = () => {
     let status = createAsync(async () => {
         if (endpoint()) {
             return getInstanceStatus(endpoint()!)
+        }
+    });
+
+    const banner = createAsync(async () => {
+        if (game()) {
+            return game()!.getBanner()
+        }
+    });
+
+    const schema = createAsync(async() => {
+        if (game()) {
+            return game()!.getSchema()
         }
     });
 
@@ -83,16 +118,20 @@ const Management = () => {
     }
 
     return (
+        <Show when={game()}>
         <div class={styles.gridContainer}>
-            <ManagementHeader game={games[params.game || ""].name} name={params.name || ""} />
+            <ManagementHeader game={game()!.name} name={params.name || ""} />
             <div class={styles.instanceContainer}>
                 <p class="buttonText" style={`--icon: url("${iconArrow.src}")`} onClick={() => navigate(-1)}>Back</p>
                 <div class={styles.controlsContainer}>
                     <div class={styles.panel}>
-                        <div class={styles.bannerWrapper} style={`--backgroundImg: url("/imgs/${params.game}/banner.avif")`}>
+                        <div class={styles.bannerWrapper}>
+                        <Show when={banner()}>
+                            <ResponsiveImage src={banner()!} />
+                        </Show>
                             <div class={styles.bannerHeader}>
                                 <p class="h4">{params.name}</p>
-                                <p class="subTitle">{games[params.game || ""].name}</p>
+                                <p class="subTitle">{gameRegistry[params.game || ""].name}</p>
                             </div>
                         </div>
 
@@ -136,18 +175,18 @@ const Management = () => {
                             <p class="bodyText">You can edit the Instance to your preference at any time.</p>
                         </div>
                         <Show when={config()}>
-                            <ManagementInstanceConfigForm config={config()!} instance={instance} endpoint={endpoint()!} />
+                            <ManagementInstanceConfigForm config={config()!} instance={instance} endpoint={endpoint()!} profiles={game()!.profiles} />
                         </Show>
 
                     </div>
                     <div class={styles.instanceConfigContainer}>
                         <div class={styles.instanceConfigHeader}>
-                            <h6 class="h6">{games[params?.game || ""].name} Settings</h6>
+                            <h6 class="h6">{game()!.name} Settings</h6>
                             <p class="bodyText">Adjust how the game feels.</p>
                         </div>
 
                         <Show when={config()}>
-                            <ManagementGameConfiguration config={config()!.game} endpoint={endpoint()!} />
+                            <ManagementGameConfiguration schema={schema()!} config={config()!.game} endpoint={endpoint()!} />
                         </Show>
 
                     </div>
@@ -171,6 +210,7 @@ const Management = () => {
                 </div>
             </div>
         </div>
+        </Show>
     )
 }
 

@@ -4,6 +4,7 @@ import solidJs from "@astrojs/solid-js";
 import sitemap from '@astrojs/sitemap';
 
 import solidSVG from 'vite-solid-svg';
+import { responsiveImage } from '@responsive-image/vite-plugin';
 
 import cloudflare from '@astrojs/cloudflare';
 import basicSsl from '@vitejs/plugin-basic-ssl';
@@ -27,7 +28,7 @@ export default defineConfig({
     ssr: {
       external: ['@azure/msal-browser'],
     },
-    plugins: [basicSsl(), solidSVG()]
+    plugins: [basicSsl(), solidSVG(), responsiveImage()]
   },
 
   adapter: cloudflare()

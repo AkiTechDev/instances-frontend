@@ -1,4 +1,4 @@
-import { Router, Route } from "@solidjs/router"
+import { Router, Route, redirect } from "@solidjs/router"
 
 import RootLayout from "./RootLayout/RootLayout";
 import Dashboard from "./Dashboard/Dashboard";
@@ -15,12 +15,11 @@ msalInstance.handleRedirectPromise().then((response) => {
     }
 });
 
-
 const AppRouter = () => {
 
     return (
             <MsalProvider>
-                <Router root={RootLayout}>
+                <Router root={RootLayout} >
                     <Route path="/dashboard" component={Dashboard} preload={async () => {
                         const instances = await getInstances();
 
@@ -30,10 +29,13 @@ const AppRouter = () => {
                         const { account} = useMsal();
                         const endpoint = getInstanceEndpoint({ game: p.params.game, name: p.params.name, user_id: account()!.homeAccountId} as Instance)
                         endpoint.then(endpoint => {
+                            if (!endpoint) {
+                                return redirect("/dashboard?no-such-instance");
+                            }
                             getInstanceConfig(endpoint)
                             getInstanceStatus(endpoint)
                         })
-                    }} />
+                    }}  />
                     <Route path="/explore" component={Explore} />
                     <Route path="/extra" component={Extra} />
                 </Router>

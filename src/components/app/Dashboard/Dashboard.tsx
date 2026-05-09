@@ -1,4 +1,4 @@
-import { createSignal, For, createEffect, Show, Suspense } from "solid-js";
+import { createSignal, For, createEffect, Show } from "solid-js";
 import { createAsync } from "@solidjs/router";
 import DashboardHeader from "../DashboardHeader/DashboardHeader";
 import DashboardSidebarNav from "../DashboardSidebarNav/DashboardSidebarNav";
@@ -10,9 +10,7 @@ import buttonBig from "../../../styles/components/buttonBig.module.css";
 import btnWithIcon from "../../../styles/components/buttonWithIcons.module.css";
 
 // No Instances Imports
-import mouseImage from "../../../assets/mouse.png?url";
-
-import games from "../../../lib/games";
+import mouseImage from "../../../assets/images/mouse.png?format=avif;webp&responsive";
 
 import filterBtn from '../../../styles/components/filterButton.module.css';
 import gridViewIcon from "../../../assets/icons/grid.svg";
@@ -26,6 +24,8 @@ import CreateInstanceModal, { type ModalOptions } from "../CreateInstanceModel/C
 
 import { getBestRegion, regions } from "../../../lib/regions";
 import { getInstances, type Instance } from "../../../lib/apis";
+import { gameRegistry } from "../../../lib/games/index";
+import { ResponsiveImage } from "@responsive-image/solid";
 
 
 const Dashboard = () => {
@@ -63,19 +63,9 @@ const Dashboard = () => {
                 <CreateInstanceModal setIsOpen={setOpenModal} game_id={modalOptions()["game_id"]} allow_game_change={modalOptions()["allow_game_change"]} regions={regionsByLatency()} />
             </Show>
             <DashboardHeader />
-            <Suspense fallback={
-                <div class={styles.noInstancesContainer}>
-                    <img src={mouseImage} />
-                    <div class={styles.noContent}>
-                        <h6 class="h6">No Games Added Yet!</h6>
-                        <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
-                    </div>
-                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle} ${btnWithIcon.rotate45}`} style={`--icon: url(${crossIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: null, allow_game_change: true})}><p class="buttonText">Create new Game</p></button>
-                </div>
-            }>
             {instances().length === 0 && (
                 <div class={styles.noInstancesContainer}>
-                    <img src={mouseImage} />
+                    <ResponsiveImage src={mouseImage} width={144} />
                     <div class={styles.noContent}>
                         <h6 class="h6">No Games Added Yet!</h6>
                         <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
@@ -88,7 +78,7 @@ const Dashboard = () => {
                 <DashboardSidebarNav filter={gameFilter} setFilter={setGameFilter} openCreateIntanceModal={OpenCreateInstanceModal}/>
                 <div class={styles.gamesContainer}>
                     <div class={styles.gamesListHeader}>
-                        <h4 class="h4">{(gameFilter() === "all") ? "All Instances" : games[gameFilter()].name}</h4>
+                        <h4 class="h4">{(gameFilter() === "all") ? "All Instances" : gameRegistry[gameFilter()].name}</h4>
                         <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.buttonBig}`} style={`--icon: url(${LogoIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}><p class="buttonText">Add new Instance</p></button>
                     </div>
                     <div class={styles.gameFiltersContainer}>
@@ -147,7 +137,6 @@ const Dashboard = () => {
                 </div>
                 </>
             )}
-            </Suspense>
         </section>
     );
 }

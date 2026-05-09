@@ -4,7 +4,7 @@ import { Portal } from "solid-js/web"
 import * as v from 'valibot';
 
 import styles from "./CreateInstanceModal.module.css";
-import games, { fgCalc } from "../../../lib/games";
+import { fgCalc } from "../../../lib/pricing";
 import instance_tiers from "../../../lib/instance_tiers";
 
 import { regions } from "../../../lib/regions";
@@ -18,6 +18,9 @@ import submitBtnStyle from "../../../styles/components/formSubmitButton.module.c
 import iconTick from "../../../assets/icons/tick.svg";
 import iconCross from "../../../assets/icons/cross.svg";
 import { putCreateInstance, type PutCreateInstance } from "../../../lib/apis";
+import { createAsync } from "@solidjs/router";
+import { gameRegistry } from "../../../lib/games/index";
+import { ResponsiveImage } from "@responsive-image/solid";
 
 export interface ModalOptions {
     game_id: string | null,
@@ -36,6 +39,26 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
         }
     };
 
+    const game = createAsync(async () => {
+        if (gameId()) {
+            const entry = gameRegistry[gameId()!];
+
+            if (entry) {
+                const mod = await entry.load();
+                return mod.default;
+            }
+
+            console.error(`Unknown game: ${game}`);
+            return undefined
+        }
+    })
+
+    const banner = createAsync(async () => {
+        if (game()) {
+            return await game()!.getBanner()
+        }
+    });
+
     document.body.addEventListener("click", handleBodyClick);
 
     createEffect(() => {
@@ -45,8 +68,8 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
     });
 
     const profiles = createMemo(() => {
-        if (gameId()) {
-            return games[gameId()!].profiles
+        if (game()) {
+            return game()!.profiles
         }
     })
 
@@ -108,7 +131,6 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                         region: formData["region"]
                     };
 
-                    console.log(`Creating Instance: ${gameId()}/${formData["instance_name"].replaceAll(" ", "")}`, new_config);
                     await putCreateInstance(gameId()!, formData["instance_name"].replaceAll(' ', ''), new_config)
                     props.setIsOpen(false);
                 }
@@ -129,12 +151,12 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                     props.setIsOpen(false);
                     }}
                 ></button>
-                <Show when={gameId()}>
-                    <img src={`/imgs/${gameId()}/banner.avif`}></img>
+                <Show when={banner()}>
+                    <ResponsiveImage src={banner()!} width={548} height={137} />
                 </Show>
                 <div class={styles.header}>
-                    <h6 class="h5">Create a {gameId() ? games[gameId()!].name : null} Instance</h6>
-                    <p class="statsTitle">Here by adding some information you can create a {gameId() ? games[gameId()!].name : null} new instance.</p>
+                    <h6 class="h5">Create a {game() ? game()!.name : null} Instance</h6>
+                    <p class="statsTitle">Here by adding some information you can create a {game() ? game()?.name : null} new instance.</p>
                 </div>
 
                 <Show when={props.allow_game_change || gameId() === null}>
@@ -142,9 +164,9 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                         <label class="bodyTextSmall">What game do you want to play? </label>
                         <select value="game_id" class={`${selectStyles.select} bodyText`} onChange={(e) => setGameId(e.target.value)}>
                             <option class="bodyText" value="Select Game">Select Game</option>
-                            <For each={Object.keys(games)}>
+                            <For each={Object.keys(gameRegistry)}>
                                 { (option, ) => (
-                                    <option class="bodyText" value={option}>{games[option].name}</option>
+                                    <option class="bodyText" value={option}>{gameRegistry[option].name}</option>
                                 )}
                             </For>
                         </select>

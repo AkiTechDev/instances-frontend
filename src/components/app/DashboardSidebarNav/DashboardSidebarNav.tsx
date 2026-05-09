@@ -4,7 +4,6 @@ import styles from "../Dashboard/Dashboard.module.css";
 
 import btnWithIcon from '../../../styles/components/buttonWithIcons.module.css';
 
-import games from "../../../lib/games";
 import { For } from "solid-js";
 
 import iconCross from "../../../assets/icons/cross.svg";
@@ -12,6 +11,7 @@ import sidebarIcon from "../../../assets/icons/sidebar.svg";
 import searchIcon from "../../../assets/icons/search.svg"
 import allGamesIcon from "../../../assets/icons/allGames.svg";
 import type { ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
+import { gameRegistry } from "../../../lib/games/index";
 
 const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateIntanceModal: (options: ModalOptions) => void}) => {
     const [searchText, setSearchText] = createSignal("");
@@ -52,9 +52,9 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
                     <label class="statsTitle" style={`--icon: url("${allGamesIcon.src}")`} for="all"><span>All</span></label>
                 </div>
 
-                <For each={Object.entries(games)
-                    .filter(([, game]) => {
-                        if (searchText() === "") { return true } else { return game.name.toLowerCase().includes(searchText().toLowerCase()) }
+                <For each={Object.entries(gameRegistry)
+                    .filter(([game,]) => {
+                        if (searchText() === "") { return true } else { return gameRegistry[game].name.toLowerCase().includes(searchText().toLowerCase()) }
                     })
                     .map(([game_id, ]) => game_id)
                 }>
@@ -67,7 +67,7 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
                                 type="radio"
                                 checked={props.filter() === game_id}
                             />
-                            <label class="statsTitle" style={`--icon: url("${games[game_id].icon}")`} for={game_id}><span>{games[game_id].name}</span></label>
+                            <label class="statsTitle" style={`--icon: url("${gameRegistry[game_id].icon.src}")`} for={game_id}><span>{gameRegistry[game_id].name}</span></label>
                         </div>
                     )}
                 </For>

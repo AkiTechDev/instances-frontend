@@ -1,4 +1,4 @@
-import { query, redirect } from "@solidjs/router";
+import { query } from "@solidjs/router";
 import { msalInstance } from "../components/app/Auth/MsalProvider";
 
 interface GenericResonse {
@@ -62,10 +62,6 @@ export const getInstanceEndpoint = query(async (instance: Instance): Promise<str
             "Authorization": `Bearer ${token.accessToken}`
         }
     });
-
-    if (!resp.ok) {
-        throw redirect("/dashboard");
-    }
     
     return (await resp.json() as InstanceEndpoint).endpoint;
 }, "endpoint");
@@ -117,10 +113,7 @@ export const getInstanceStatus = async (endpoint: string): Promise<InstanceStatu
         }
     });
 
-    if (!resp.ok) throw new Error("Instance not running", await resp.json());
-
     const data = await resp.json();
-
     return data as InstanceStatus
 };
 
