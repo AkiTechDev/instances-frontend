@@ -5,10 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "wrangler types && astro dev",
-    "build": "wrangler types && astro check && astro build",
-    "preview": "wrangler types && astro preview",
-    "generate-types": "wrangler types"
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview"
   },
   "keywords": [],
   "author": "",
