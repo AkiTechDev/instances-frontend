@@ -6,8 +6,9 @@ import sitemap from '@astrojs/sitemap';
 import solidSVG from 'vite-solid-svg';
 import { responsiveImage } from '@responsive-image/vite-plugin';
 
-import cloudflare from '@astrojs/cloudflare';
 import basicSsl from '@vitejs/plugin-basic-ssl';
+
+import vercel from '@astrojs/vercel';
 
 // https://astro.build/config
 export default defineConfig({
@@ -31,5 +32,5 @@ export default defineConfig({
     plugins: [basicSsl(), solidSVG(), responsiveImage()]
   },
 
-  adapter: cloudflare()
+  adapter: vercel()
 });
