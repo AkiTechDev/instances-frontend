@@ -1,8 +1,6 @@
-import { createMemo, createSignal, createUniqueId, onCleanup, type Component } from "solid-js";
-import { useMsal } from "../Auth/MsalProvider";
+import { createUniqueId, onCleanup, type Component } from "solid-js";
 
 import styles from "./InstanceOptions.module.css";
-import typo from "../../../styles/typography.module.css";
 import { useNavigate } from "@solidjs/router";
 import { deleteInstance, postDownloadGameData, type Instance } from "../../../lib/apis";
 
@@ -40,10 +38,10 @@ const InstanceOptions: Component<{ endpoint: string, instance: Instance }> = (pr
                 <span class={styles.dot}></span>
             </summary>
             <div class={styles.options}>
-                <button class={typo.bodyTextMedium} onclick={async () => {await postDownloadGameData(props.endpoint); sleep(1); closeMenu() }}>Download Game Data</button>
-                <button class={typo.bodyTextMedium} disabled>Transfer Ownership</button>
-                <button class={typo.bodyTextMedium} disabled>Change Instance Location</button>
-                <button class={typo.bodyTextMedium} onclick={async () => {await deleteInstance(props.instance); navigate("/instances-frontend/dashboard", { replace: true }) }}>Delete Instance</button>
+                <button class="bodyTextMedium" onclick={async () => {await postDownloadGameData(props.endpoint); sleep(1); closeMenu() }}>Download Game Data</button>
+                <button class="bodyTextMedium" disabled>Transfer Ownership</button>
+                <button class="bodyTextMedium" disabled>Change Instance Location</button>
+                <button class="bodyTextMedium" onclick={async () => {await deleteInstance(props.instance); navigate("/dashboard", { replace: true }) }}>Delete Instance</button>
             </div>
         </details>
     )

@@ -1,24 +1,22 @@
 <!-- NewsletterSection.astro -->
 ---
-import { NewsletterForm } from './NewsletterForm';
 import styles from './newsletter.module.css';
-import typo from "../../styles/typography.module.css";
-
 import buttonBig from "../../styles/components/buttonBig.module.css";
 
-import grainMask from "../../assets/grainMask.svg?url";
+import CoffeePNG from '../../assets/images/coffee.png';
+import { Picture } from 'astro:assets';
 ---
 
 <section class={styles.section}>
-    <img class={styles.coffee} src="/instances-frontend/imgs/coffee.png" />
+    <Picture src={CoffeePNG} formats={['avif', 'webp']} alt="Unrelated graphic of a take-away coffee cup" />
     <div class={styles.card}>
         <div class={styles.cardContent}>
-            <h4 class={typo.h4}>Stay in the Loop</h4>
-            <p class={typo.subTitle}>Be the first to know about new games, platform updates, and special offers.</p>
+            <h4 class="h4">Stay in the Loop</h4>
+            <p class="subTitle">Be the first to know about new games, platform updates, and special offers.</p>
         </div>
         <form class={styles.form} id="newsletterForm">
             <input type="email" id="email" name="email" placeholder="Enter Your email" />
-            <button class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle]}><p class={typo.buttonText}>Submit</p></button>
+            <button class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle]}><p class="buttonText">Submit</p></button>
         </form>
     </div>
 </section>

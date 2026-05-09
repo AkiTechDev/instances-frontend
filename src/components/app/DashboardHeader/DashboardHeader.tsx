@@ -1,5 +1,4 @@
 import styles from './DashboardHeader.module.css';
-import typo from '../../../styles/typography.module.css';
 
 import { useMsal } from '../Auth/MsalProvider';
 import Profile from '../Profile/Profile';
@@ -9,7 +8,7 @@ const DashboardHeader = () => {
     
     return (
     <header class={styles.header}>
-        <h2 class={typo.statsText}>Welcome back, {account()!.name}. Ready to play?</h2>
+        <h2 class="statsText">Welcome back, {account()!.name}. Ready to play?</h2>
         <Profile />
     </header>
 )};

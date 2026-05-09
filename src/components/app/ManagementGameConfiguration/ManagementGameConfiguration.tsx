@@ -1,30 +1,33 @@
-import { createForm, Field, Form, type FormStore, type SubmitHandler } from "@formisch/solid";
+import { createForm, Field, Form, type SubmitHandler } from "@formisch/solid";
 import { type Component, For } from "solid-js"
-import * as v from 'valibot';
 import FormSelect from "../FormModules/FormSelect";
-import { MinecraftJavaConfigurationSchema, type MinecraftJavaConfiguration } from "../../../lib/games/MinecraftJava";
 
-import styles from "../ManagementInstanceConfiguration/ManagementInstanceConfiguration.module.css"
 import gameStyles from "./ManagementGameConfiguration.module.css";
-import typo from "../../../styles/typography.module.css";
 import submitBtnStyle from "../../../styles/components/formSubmitButton.module.css";
-import iconTick from "../../../assets/iconTick.svg";
+import iconTick from "../../../assets/icons/tick.svg";
 
 import FormTextInput from "../FormModules/FormTextInput";
 import FormNumberInput from "../FormModules/FormNumberInput";
 import FormCheckbox from "../FormModules/FormCheckbox";
 import { postGameConfig } from "../../../lib/apis";
 
+import * as v from "valibot";
 
-const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> = (props) => {
+/*
+1. Should we really be passing config as a prop, instead use createAsync to query the catch +
+2. Schema schema schema
+*/
+
+const ManagementGameConfiguration: Component<{ schema: v.ObjectSchema<any, undefined>, config: any, endpoint: string }> = (props) => {
+    console.log("GAME CONFIG", props.config);
     const gameForm = createForm({
-        schema: MinecraftJavaConfigurationSchema,
+        schema: props.schema,
         initialInput: props.config
     })
 
-    type ConfigKey = keyof typeof MinecraftJavaConfigurationSchema.entries;
+    //type ConfigKey = keyof typeof props.schema.entries;
 
-    const submitForm: SubmitHandler<typeof MinecraftJavaConfigurationSchema> = async (values) => {
+    const submitForm: SubmitHandler<typeof props.schema> = async (values) => {
         if (gameForm.isValid) {
             await postGameConfig(props.endpoint, values)
         }
@@ -34,19 +37,18 @@ const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> 
         <Form of={gameForm} onSubmit={submitForm} class={gameStyles.instanceConfigSettings}>
             <For each={Object.entries(gameForm["~internal"].children)}>
                 {([name, schema]) => {
-                    const id = name as ConfigKey
                     return (
-                        <Field of={gameForm} path={[id]}>
+                        <Field of={gameForm} path={[name]}>
                             {(field) => {
                                 if (schema.schema.type === 'picklist') {
-                                    console.log("true")
                                     return (
                                         <FormSelect
                                             field={field}
                                             field_id={name}
                                             field_label={name}
                                             field_placeholder={props.config[name]}
-                                            field_options={schema.schema.options}
+                                            // Can as any, as already checking for type above, verifying the options property
+                                            field_options={(schema.schema as any).options}
                                         />
                                     )
                                 } else if (schema.schema.type === 'string') {
@@ -56,7 +58,8 @@ const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> 
                                             field_id={name}
                                             field_label={name}
                                             field_placeholder={props.config[name]}
-                                            field_maxlength={schema.schema.pipe.find((p: any) => p.type === "max_length").requirement}
+                                            // Can as any, as already checking for type above, verifying the options property
+                                            field_maxlength={(schema.schema as any).pipe.find((p: any) => p.type === "max_length").requirement}
                                         />
                                     )
                                 } else if (schema.schema.type === 'number') {
@@ -71,7 +74,7 @@ const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> 
                                 } else if (schema.schema.type === 'boolean') {
                                     return (
                                         <div class={gameStyles.toggleContainer}>
-                                        <p class={typo.bodyTextSmall}>{name}</p>
+                                        <p class="bodyTextSmall">{name}</p>
                                         <FormCheckbox
                                             field={field}
                                             field_id={name}
@@ -80,15 +83,13 @@ const ManagementGameConfiguration: Component<{ config: any, endpoint: string }> 
                                         />
                                         </div>
                                     )
-                                } else {
-                                    console.log("For Each ", name, schema);
-                                }
+                                };
                             }}
                         </Field>
                     )
                 }}
             </For>
-            <button class={`${submitBtnStyle.button} ${typo.buttonTextSmall}`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={!gameForm.isDirty || gameForm.isSubmitting}>
+            <button class={`${submitBtnStyle.button} buttonTextSmall`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={!gameForm.isDirty || gameForm.isSubmitting}>
                 {gameForm.isSubmitting ? "Saving Settings" : gameForm.isSubmitted ? "Settings Saved" : "Save Settings"}
             </button>
         </Form>

@@ -1,33 +1,31 @@
-import { createSignal, Match, Switch, For, createEffect, Show, Suspense } from "solid-js";
-import { createAsync, query } from "@solidjs/router";
+import { createSignal, For, createEffect, Show } from "solid-js";
+import { createAsync } from "@solidjs/router";
 import DashboardHeader from "../DashboardHeader/DashboardHeader";
 import DashboardSidebarNav from "../DashboardSidebarNav/DashboardSidebarNav";
 
 // Dashboard Imports
 import styles from "./Dashboard.module.css";
-import typo from "../../../styles/typography.module.css"
 
 import buttonBig from "../../../styles/components/buttonBig.module.css";
 import btnWithIcon from "../../../styles/components/buttonWithIcons.module.css";
 
 // No Instances Imports
-import mouseImage from "./assets/mouse.png?url";
-import buttonIcon from "../../../assets/iconPlus.svg";
-
-import games from "../../../lib/games";
+import mouseImage from "../../../assets/images/mouse.png?format=avif;webp&responsive";
 
 import filterBtn from '../../../styles/components/filterButton.module.css';
-import gridViewIcon from "./assets/gridViewIcon.svg";
-import listViewIcon from "./assets/listViewIcon.svg";
-import iconArrow from "../../../assets/iconArrow.svg";
-import searchIcon from "./assets/searchIcon.svg";
-import crossIcon from "../../../assets/crossIcon.svg";
-import instanceIcon from "../../../assets/instanceIcon.svg";
+import gridViewIcon from "../../../assets/icons/grid.svg";
+import listViewIcon from "../../../assets/icons/list.svg";;
+import iconArrow from "../../../assets/icons/chevron.svg";
+import searchIcon from "../../../assets/icons/search.svg";;
+import crossIcon from "../../../assets/icons/cross.svg";
+import LogoIcon from "../../../assets/icons/logos/icon.svg";
 import DashboardInstanceCard from "../DashboardInstanceCard/DashboardInstanceCard";
 import CreateInstanceModal, { type ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
 
 import { getBestRegion, regions } from "../../../lib/regions";
 import { getInstances, type Instance } from "../../../lib/apis";
+import { gameRegistry } from "../../../lib/games/index";
+import { ResponsiveImage } from "@responsive-image/solid";
 
 
 const Dashboard = () => {
@@ -65,24 +63,14 @@ const Dashboard = () => {
                 <CreateInstanceModal setIsOpen={setOpenModal} game_id={modalOptions()["game_id"]} allow_game_change={modalOptions()["allow_game_change"]} regions={regionsByLatency()} />
             </Show>
             <DashboardHeader />
-            <Suspense fallback={
-                <div class={styles.noInstancesContainer}>
-                    <img src={mouseImage} />
-                    <div class={styles.noContent}>
-                        <h6 class={typo.h6}>No Games Added Yet!</h6>
-                        <p class={typo.statsTitle}>All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
-                    </div>
-                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle}`} style={`--icon: url(${buttonIcon.src})`}><p class={typo.buttonText}>Create new Game</p></button>
-                </div>
-            }>
             {instances().length === 0 && (
                 <div class={styles.noInstancesContainer}>
-                    <img src={mouseImage} />
+                    <ResponsiveImage src={mouseImage} width={144} />
                     <div class={styles.noContent}>
-                        <h6 class={typo.h6}>No Games Added Yet!</h6>
-                        <p class={typo.statsTitle}>All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
+                        <h6 class="h6">No Games Added Yet!</h6>
+                        <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
                     </div>
-                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle}`} style={`--icon: url(${buttonIcon.src})`}><p class={typo.buttonText}>Create new Game</p></button>
+                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle} ${btnWithIcon.rotate45}`} style={`--icon: url(${crossIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: null, allow_game_change: true})}><p class="buttonText">Create new Game</p></button>
                 </div>
             )}
             { instances().length > 0 && (
@@ -90,17 +78,17 @@ const Dashboard = () => {
                 <DashboardSidebarNav filter={gameFilter} setFilter={setGameFilter} openCreateIntanceModal={OpenCreateInstanceModal}/>
                 <div class={styles.gamesContainer}>
                     <div class={styles.gamesListHeader}>
-                        <h4 class={typo.h4}>{(gameFilter() === "all") ? "All Instances" : games[gameFilter()].name}</h4>
-                        <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.buttonBig}`} style={`--icon: url(${instanceIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}><p class={typo.buttonText}>Add new Instance</p></button>
+                        <h4 class="h4">{(gameFilter() === "all") ? "All Instances" : gameRegistry[gameFilter()].name}</h4>
+                        <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.buttonBig}`} style={`--icon: url(${LogoIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}><p class="buttonText">Add new Instance</p></button>
                     </div>
                     <div class={styles.gameFiltersContainer}>
                         <label class={styles.searchableContainer}>
                             <div class={styles.searchIcon} style={`--icon: url("${searchIcon.src}")`}></div>
                             <input id="instanceSearch" type="search" placeholder="Search your instances" value={instanceSearchText()} onInput={(e) => setInstanceSearchText(e.currentTarget.value)}></input>
                             <button onClick={() => (setInstanceSearchText(""))} class={`${styles.inputClearBtn} ${instanceSearchText() ? styles.visible : styles.hidden}`} style={`--icon: url("${crossIcon.src}")`}></button>
-                            <button class={`${typo.bodyTextMedium} ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Active Instances</button>
+                            <button class={`bodyTextMedium ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Active Instances</button>
                         </label>
-                        <button class={`${typo.bodyTextMedium} ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Date Created</button>
+                        <button class={`bodyTextMedium ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Date Created</button>
                         <div class={styles.toggleView}>
                             <input
                                 id="viewToggle"
@@ -117,9 +105,9 @@ const Dashboard = () => {
                     <div class={ isListView() ?  styles.gamesListContainer : styles.gamesGridContainer}>
                         { isListView() && (
                             <div class={styles.gamesListViewHeader}>
-                                <p class={typo.bodyTextSmall}>Instance</p>
-                                <p class={typo.bodyTextSmall}>Status</p>
-                                <p class={typo.bodyTextSmall}>Activity</p>
+                                <p class="bodyTextSmall">Instance</p>
+                                <p class="bodyTextSmall">Status</p>
+                                <p class="bodyTextSmall">Activity</p>
                                 <p></p>
                                 <p></p>
                             </div>
@@ -149,7 +137,6 @@ const Dashboard = () => {
                 </div>
                 </>
             )}
-            </Suspense>
         </section>
     );
 }

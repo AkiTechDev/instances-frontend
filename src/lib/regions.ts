@@ -1,9 +1,3 @@
-interface Region {
-  value: string,
-  label: string
-};
-
-
 export const regions: {[id: string]: string} = {
   'sa-east-1': 'Sao Paulo',
   'us-east-1': 'N. Virginia',

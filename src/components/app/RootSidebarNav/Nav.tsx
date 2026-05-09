@@ -1,25 +1,25 @@
 import styles from './Nav.module.css';
 
-import iconLight from "../../../assets/iconLight.svg?url";
-import gamesIcon from "./assets/gameMenuIcon.svg";
-import socialIcon from "./assets/socialIcon.svg";
-import exploreIcon from "./assets/exploreIcon.svg";
-import extraIcon from "./assets/extraIcon.svg";
+import LogoIcon from "../../../assets/icons/logos/icon.svg?solid";
+import gamesIcon from "../../../assets/icons/menu/games.svg";
+import socialIcon from "../../../assets/icons/menu/social.svg";
+import exploreIcon from "../../../assets/icons/menu/explore.svg";
+import extraIcon from "../../../assets/icons/menu/extra.svg";
 import { A } from '@solidjs/router';
 
 const RootSidebarNav = () => (
     <section class={styles.container}>
-        <img class={styles.logoIcon} src={iconLight} />
+        <LogoIcon width={50} height={50} style={"--path2: white"} class={styles.logoIcon} />
 
-        <A href="/instances-frontend/dashboard" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${gamesIcon.src})`}>
+        <A href="/dashboard" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${gamesIcon.src})`}>
         </A>
-        <A href="/instances-frontend/explore" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${exploreIcon.src})`}>
+        <A href="/explore" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${exploreIcon.src})`}>
             
         </A>
         <A href="https://discord.gg/nhCEXaZVMX" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${socialIcon.src})`}>
             
         </A>
-        <A href="/instances-frontend/extra" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${extraIcon.src})`}>
+        <A href="/extra" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${extraIcon.src})`}>
             
         </A>
     </section>

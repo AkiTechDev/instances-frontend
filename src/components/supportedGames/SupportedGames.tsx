@@ -1,39 +1,9 @@
 import { createSignal, createResource, Show, For } from "solid-js";
 
 import styles from "./supportedGames.module.css";
-import typo from "../../styles/typography.module.css";
 import buttonBig from "../../styles/components/buttonBig.module.css";
+import GameCard from "../app/GameCard/GameCard";
 
-interface Game {
-    name: string
-};
-
-const supportedGames: {[id: string]: Game} = {
-    "MinecraftJava": {
-        name: "Minecraft Java"
-    },
-    "MinecraftAllTheMods10": {
-        name: "Minecraft ATM10"
-    },
-    "MinecraftBetterMC4": {
-        name: "Minecraft BetterMC 4"
-    },
-    "MinecraftRLCraft": {
-        name: "Minecraft RLCraft"
-    },
-    "MinecraftProminence2": {
-        name: "Minecraft Prominence 2"
-    },
-    "MinecraftCursedWalking": {
-        name: "Minecraft Cursed Walking"
-    },
-    "MinecraftBedrock": {
-        name: "Minecraft Bedrock"
-    },
-    "Valheim": {
-        name: "Valheim"
-    },
-};
 
 function shuffleArray(array: string[]) {
     for (let i = array.length - 1; i > 0; i--) {
@@ -58,13 +28,11 @@ const SupportedGameCard = () => {
             }
 
             const json = await resp.json();
-            console.log("Got: ", JSON.stringify(json));
 
-            shuffleArray(json);
+            shuffleArray(json as string[]);
 
-            return shuffleArray(json) as string[];
+            return shuffleArray(json as string[]) as string[];
         } catch (error) {
-            console.log(error);
             return [] as string[];
         }
 
@@ -77,10 +45,7 @@ const SupportedGameCard = () => {
                 <div class={styles.gamesContainer}>
                     <For each={showAll() ? games() : games()?.slice(0, 4)}>
                         {(game) => (
-                            <div class={styles.card}>
-                                <img src={'/instances-frontend/imgs/' + game + '/banner.avif'} />
-                                <p class={typo.subTitle}>{supportedGames[game].name}</p>
-                            </div>
+                            <GameCard game_id={game} OpenCreateInstanceModal={undefined} />
                         )}
                     </For>
                 </div>
@@ -91,7 +56,7 @@ const SupportedGameCard = () => {
             class={`${buttonBig.buttonBig} ${buttonBig.transparentVibrantStyle}`}
             onClick={() => setShowAll(prev => !prev)}
         >
-            <p class={typo.buttonText}>{showAll() ? 'Show Less Games' : 'Show More Games'}</p>
+            <p class="buttonText">{showAll() ? 'Show Less Games' : 'Show More Games'}</p>
         </button>
         </>
     )

@@ -1,63 +1,95 @@
 ---
 // Welcome to Astro! Everything between these triple-dash code fences
 // is your "component frontmatter". It never runs in the browser.
-console.log('This runs in your terminal, not the browser!');
-
 import "../styles/normalise.css"
 import "../styles/global.css"
-import "../styles/variables.module.css"
+import "../styles/variables.css"
+import "../styles/typography.css"
 
 import "../styles/theme/default.css"
 import colourStyles from "../styles/theme/colours.module.css"
 
-import typo from "../styles/typography.module.css"
 
 import buttonBig from "../styles/components/buttonBig.module.css"
 
 import headerLogo from "../assets/headerLogo.svg?url"
-import iconDiamond from "../assets/iconDiamond.svg?url"
+
+import LogoIcon from "../assets/icons/logos/icon.svg";
+
+const LogoIconUrl = `url(${LogoIcon.src})`;
 
 import sectionOneBackground from "../assets/landingIcon.svg"
 const sectionOneBackgroundUrl = `url(${sectionOneBackground.src})`;
 
 import promoBackgroundImage from "../assets/promoBackground.svg?url";
 
-import instanceIcon from "../assets/instanceIcon.svg"
-const instanceIconUrl = `url(${instanceIcon.src})`
-
 import processStep1 from "../assets/processStep1.svg?url";
 import processStep2 from "../assets/processStep2.svg?url";
 import processStep3 from "../assets/processStep3.svg?url";
 
-import shapeOne from "../assets/shapeOne.svg?url";
-import shapeTwo from "../assets/shapeTwo.svg?url";
+import Squarcle from "../components/squarcle/Squarcle.astro";
+
 import messageIcon from "../assets/messageIcon.svg?url";
-import backgroundGlow from "../assets/backgroundGlow.svg?url";
-import iconExpanded from "../assets/iconExpanded.svg";
-const iconExpandedUrl = `url(${iconExpanded.src})` 
-import iconClosed from "../assets/iconClosed.svg";
-const iconClosedUrl = `url(${iconClosed.src})` 
-import iconArrow from "../assets/iconArrow.svg?url";
+
+import squarcleIcon from "../assets/icons/squarcle.svg";
+const squarcleIconUrl = `url(${squarcleIcon.src})`;
+
+import iconArrow from "../assets/icons/chevron.svg?url";
 
 import SupportedGames from "../components/supportedGames/SupportedGames.astro";
 
 import Newsletter from "../components/newsletter/Newsletter.astro";
 import Footer from "../components/footer/Footer.astro";
 
-import AuthJS from "../components/auth/auth.astro";
+import { Picture } from 'astro:assets';
+import PreviewPNG from "../assets/images/preview_c.png";
+import StaticPNG from "../assets/images/static1.png";
+
+const seo_des = "Host Minecraft, sandboxed games, and more with Instances. No contracts, no setup headaches. Switch games instantly, keep your world, and only pay for what you play.";
+const domain = "instances.aki-labs.com"
 
 ---
 <!-- Below is your "component template." It's just HTML, but with
     some magic sprinkled in to help you build great templates. -->
 <!doctype html>
-<html lang="en">
+<html lang="en" class="en" prefix="og: http://ogp.me/ns#">
 	<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta name="description" content="Qwik + Astro integration" />
+    <meta name="author" content="Aki Laboratories Limited">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<meta name="generator" content={Astro.generator} />
-		<title>Instances - Powered by Aki Labs</title>
+
+    <!-- SEO -->
+    <title>Instances - Game Servers Made Easy, Pay As You Play</title>
+		<meta name="description" content={seo_des}>
+    <meta itemprop="description" content={seo_des}> <!-- Google / Schema.org (used in Google Search & Google Assistant) -->
+    <meta name="robots" content="all" />
+    <link rel="canonical" href={`https://${domain}`}>
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+
+    <!-- Twitter/X specific -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Instances - Game Servers Made Easy, Pay As You Play">
+    <meta name="twitter:description" content={seo_des}>
+    <meta name="twitter:image" content={`https://${domain}/og-image.jpg`}>
+    <meta name="twitter:site" content="@aki_labs">
+
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Instances - Game Servers Made Easy, Pay As You Play">
+    <meta property="og:description" content={seo_des}>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content=`https://${domain}`>
+    <meta property="og:image" content=`https://${domain}/og-image.jpg`>
+    <meta property="og:site_name" content="Instances">
+    <meta property="og:locale" content="en_US">
+
+    <!-- Mobile / Browser theming -->
+    <meta name="theme-color" content="#YOUR_BRAND_COLOR">
+    <meta name="apple-mobile-web-app-capable" content="yes">
 	</head>
 	<body>
     <div id="heroBanner">
@@ -65,23 +97,23 @@ import AuthJS from "../components/auth/auth.astro";
         <header class="header">
           <img src={headerLogo} />
           <div class="nav">
-            <a class={typo.bodyText} href="#whywe">Why We</a>
-            <a class={typo.bodyText} href="#process">Process</a>
-            <a class={typo.bodyText} href="#faqs">FAQs</a>
-            <a class={typo.bodyText} href="#privacy-policy">Privacy Policy</a>
+            <a class="bodyText" href="#whywe">Why We</a>
+            <a class="bodyText" href="#process">Process</a>
+            <a class="bodyText" href="#faqs">FAQs</a>
+            <a class="bodyText" href="#privacy-policy">Privacy Policy</a>
           </div>
           <div class="getStarted">
-            <button data-login class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class={typo.buttonText}>Log In</p></button>
-            <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, typo.h1]}><img src={iconDiamond} /><p class={typo.buttonText}>Get Started</p></button>
+            <button data-login class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class="buttonText">Log In</p></button>
+            <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, "h1"]}><LogoIcon style={"--path1: var(--colour-text-primary); --path2: var(--colour-text-primary); --path3: var(--colour-text-primary); transform: rotate(45deg);"} /><p class="buttonText">Get Started</p></button>
           </div>
         </header>
 
         <div class="sectionOneInner">
-          <h1 class={typo.h1}>We handle the servers. You handle the fun.</h1>
-          <p class={typo.subText}>Play instantly with friends, no setup, no subscriptions, just pay when you play.</p>
+          <h1 class="h1">We handle the servers. You handle the fun.</h1>
+          <p class="subText">Play instantly with friends, no setup, no subscriptions, just pay when you play.</p>
           <div class="cta">
-            <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, typo.h1]}><p class={typo.buttonText}>Start Playing Now</p></button>
-            <button class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class={typo.buttonText}>Learn More</p></button>
+            <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, "h1"]}><p class="buttonText">Start Playing Now</p></button>
+            <button class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class="buttonText">Learn More</p></button>
           </div>
         </div>
       </div>
@@ -96,7 +128,7 @@ import AuthJS from "../components/auth/auth.astro";
             <h1 class="promoHeader">Get Your First Server Hour Free - <span class="textHiglight">No Credit Card</span> Required!</h1>
             <p class="promoText">Spin up your first game instance today and see how easy multiplayer hosting can be.</p>
           </div>
-          <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, typo.h1]}><p class={typo.buttonText} style="z-index:2">Start Playing Now</p></button>
+          <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, "h1"]}><p class="buttonText" style="z-index:2">Start Playing Now</p></button>
         </div>
       </div>
     </section>
@@ -108,80 +140,80 @@ import AuthJS from "../components/auth/auth.astro";
         <div class="processCard">
           <img src={processStep1} />
           <div class="processCardContent">
-            <h6 class:list={[typo.h6, colourStyles.gradientOne]}>Select Your Game</h6>
-            <p class={typo.subTitle}>Pick from a list of support open world co-op games.</p>
+            <h6 class:list={["h6", colourStyles.gradientOne]}>Select Your Game</h6>
+            <p class="subTitle">Pick from a list of support open world co-op games.</p>
           </div>
         </div>
 
         <div class="processCard">
           <img src={processStep2} />
           <div class="processCardContent">
-            <h6 class:list={[typo.h6, colourStyles.gradientOne]}>Customize Your Instance</h6>
-            <p class={typo.subTitle}>Name it, pick your region, subscription type, and expected players.</p>
+            <h6 class:list={["h6", colourStyles.gradientOne]}>Customize Your Instance</h6>
+            <p class="subTitle">Name it, pick your region, subscription type, and expected players.</p>
           </div>
         </div>
 
         <div class="processCard">
           <img src={processStep3} />
           <div class="processCardContent">
-            <h6 class:list={[typo.h6, colourStyles.gradientOne]}>Start Playing</h6>
-            <p class={typo.subTitle}>Launch instantly and invite friends and enjoy your favourite games.</p>
+            <h6 class:list={["h6", colourStyles.gradientOne]}>Start Playing</h6>
+            <p class="subTitle">Launch instantly and invite friends and enjoy your favourite games.</p>
           </div>
         </div>
       </div>
 
       <div class="processContentContainer">
         <div class="processContent">
-          <h2 class={typo.h2}>Start Playing in 3 Steps</h2>
+          <h2 class="h2">Start Playing in 3 Steps</h2>
           <div class="processBenefit">
             <div class="purpleLogo"></div>
-            <p class={typo.subTitle}>No tech skills needed.</p>
+            <p class="subTitle">No tech skills needed.</p>
           </div>
           <div class="processBenefit">
             <div class="purpleLogo"></div>
-            <p class={typo.subTitle}>Pay-as-you-go!</p>
+            <p class="subTitle">Pay-as-you-go!</p>
           </div>
         </div>
-        <img src="/instances-frontend/imgs/static1.png" style="max-width:100%;height:auto;"/>
+        <Picture src={StaticPNG} formats={['avif', 'webp']} alt="Design graphic" />
       </div>
     </section>
 
     <section class="servicePropsSection">
       <div class="propsContainer">
         <div class="propsBackgroundContainer">
-          <img src={shapeOne} style="transform: rotate(270deg)" />
-          <img src={shapeOne} />
-          <img src={shapeTwo} />
-          <img src={shapeOne} style="transform: rotate(90deg)"/>
+          <Squarcle id="grad1" gradientStart="#c589f4" gradientEnd="#532b56" rotation=270 />
+          <Squarcle id="grad1" />
+          <Squarcle id="grad2" gradientStart="#EBA439" gradientEnd="#442904" rotation=180 />
+          <Squarcle id="grad1" rotation=90 />
         </div>
 
         <div class="serviceCardContainer">
           <div class="serviceCard">
-            <h5 class={typo.h5} style="color: #85B6FF; text-shadow: 0px 0px 4px #2D9CC4;">No setup,<br />no stress</h5>
-            <p class={typo.subTitle}>Launch your own game world in seconds, no port forwarding, no config files, no downtime.</p>
+            <h5 class="h5" style="color: #85B6FF; text-shadow: 0px 0px 4px #2D9CC4;">No setup,<br />no stress</h5>
+            <p class="subTitle">Launch your own game world in seconds, no port forwarding, no config files, no downtime.</p>
           </div>
 
           <div class="serviceCard">
-            <h5 class={typo.h5} style="color: #C589F4; text-shadow: 0px 0px 4px #C353FF;">Fair, flexible</br />pricing</h5>
-            <p class={typo.subTitle}>Only pay for the hours you play. No monthly lock-ins or hidden fees.</p>
+            <h5 class="h5" style="color: #C589F4; text-shadow: 0px 0px 4px #C353FF;">Fair, flexible</br />pricing</h5>
+            <p class="subTitle">Only pay for the hours you play. No monthly lock-ins or hidden fees.</p>
           </div>
 
           <div class="serviceCard">
-            <h5 class={typo.h5} style="color: #EBA439; text-shadow: 0px 0px 4px #FF9D00;">Always<br />online</h5>
-            <p class={typo.subTitle}>Your world lives in the cloud, so friends can join anytime, even when you're offline.</p>
+            <h5 class="h5" style="color: #EBA439; text-shadow: 0px 0px 4px #FF9D00;">Always<br />online</h5>
+            <p class="subTitle">Your world lives in the cloud, so friends can join anytime, even when you're offline.</p>
           </div>
 
           <div class="serviceCard">
-            <h5 class={typo.h5} style="color: #85B6FF; text-shadow: 0px 0px 4px #2D9CC4;">Switch games,<br />not just servers</h5>
-            <p class={typo.subTitle}>Play Minecraft today, Terraria tomorrow, your setup follows you.</p>
+            <h5 class="h5" style="color: #85B6FF; text-shadow: 0px 0px 4px #2D9CC4;">Switch games,<br />not just servers</h5>
+            <p class="subTitle">Play Minecraft today, Terraria tomorrow, your setup follows you.</p>
           </div>
 
         </div>
       </div>
       <div class="propsHeadingContainer">
         <div class="propsHeadingContent">
-          <h2 class={typo.h2}>Host Your Own Game Server Instantly!</h2>
-          <p class={typo.subTitle}>Instances take care of the servers, so you can focus on gaming with friends – anytime, anywhere.</p>
+          <h2 class="h2">Host Your Own Game Server Instantly!</h2>
+          <p class="subTitle">Instances take care of the servers, so you can focus on gaming with friends – anytime, anywhere.</p>
         </div>
         <img src={messageIcon} />
       </div>
@@ -190,24 +222,22 @@ import AuthJS from "../components/auth/auth.astro";
     <section class="previewContainer">
       <div class="ctaContainer">
         <div class="ctaContent">
-          <h2 class={typo.h2}>How It Looks</h2>
-          <p class={typo.subTitle}>Manage your active instances, switch between games, and invite friends – all in one place.</p>
+          <h2 class="h2">How It Looks</h2>
+          <p class="subTitle">Manage your active instances, switch between games, and invite friends – all in one place.</p>
         </div>
         <div class="ctaButtons">
-          <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle]}><p class={typo.buttonText}>Start Playing Now</p></button>
-          <button class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class={typo.buttonText}>Learn More</p></button>
+          <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle]}><p class="buttonText">Start Playing Now</p></button>
+          <button class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class="buttonText">Learn More</p></button>
         </div>
       </div>
 
-      <img class="backgroundGlow" src={backgroundGlow} />
-
-      <img src="/instances-frontend/imgs/preview.png" style="margin-top: -6rem; margin-left:-2rem; max-width: 100%; height: auto; z-index:2;" />
+      <Picture src={PreviewPNG} formats={["avif", "webp"]} width={1240} alt="A preview look of the service" />
     </section>
 
     <section class="faqContainer">
       <div class="faqHeaderContainer">
-        <h3 class={typo.h3}>Frequently Asked Questions</h3>
-        <p class={typo.subTitle}>No tech skills needed. Pay-as-you-go!</p>
+        <h3 class="h3">Frequently Asked Questions</h3>
+        <p class="subTitle">No tech skills needed. Pay-as-you-go!</p>
       </div>
 
       <div class="commonQuestionsContainer">
@@ -215,13 +245,13 @@ import AuthJS from "../components/auth/auth.astro";
           <input id="faqCard1" type="checkbox" />
           <div class="faqCardBackground"></div>
           <label for="faqCard1" class="faqCardLabel">
-            <p class={typo.subTitle}>Do I need to install anything to use this platform?</p>
+            <p class="subTitle">Do I need to install anything to use this platform?</p>
             <div class="faqIcon">
               <img src={iconArrow} />
             </div>
           </label>
           <div class="faqCardContent">
-            <p class={typo.bodyText} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+            <p class="bodyText" style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
           </div>
         </div>
 
@@ -229,13 +259,13 @@ import AuthJS from "../components/auth/auth.astro";
           <input id="faqCard2" type="checkbox" />
           <div class="faqCardBackground"></div>
           <label for="faqCard2" class="faqCardLabel">
-            <p class={typo.subTitle}>Which Games are supported?</p>
+            <p class="subTitle">Which Games are supported?</p>
             <div class="faqIcon">
               <img src={iconArrow} />
             </div>
           </label>
           <div class="faqCardContent">
-            <p class={typo.bodyText} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+            <p class="bodyText" style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
           </div>
         </div>
 
@@ -243,13 +273,13 @@ import AuthJS from "../components/auth/auth.astro";
           <input id="faqCard3" type="checkbox" />
           <div class="faqCardBackground"></div>
           <label for="faqCard3" class="faqCardLabel">
-            <p class={typo.subTitle}>How does billing works?</p>
+            <p class="subTitle">How does billing works?</p>
             <div class="faqIcon">
               <img src={iconArrow} />
             </div>
           </label>
           <div class="faqCardContent">
-            <p class={typo.bodyText} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+            <p class="bodyText" style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
           </div>
         </div>
 
@@ -257,13 +287,13 @@ import AuthJS from "../components/auth/auth.astro";
           <input id="faqCard4" type="checkbox" />
           <div class="faqCardBackground"></div>
           <label for="faqCard4" class="faqCardLabel">
-            <p class={typo.subTitle}>Can I upgrade or downgrade my server later?</p>
+            <p class="subTitle">Can I upgrade or downgrade my server later?</p>
             <div class="faqIcon">
               <img src={iconArrow} />
             </div>
           </label>
           <div class="faqCardContent">
-            <p class={typo.bodyText} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+            <p class="bodyText" style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
           </div>
         </div>
 
@@ -271,13 +301,13 @@ import AuthJS from "../components/auth/auth.astro";
           <input id="faqCard5" type="checkbox" />
           <div class="faqCardBackground"></div>
           <label for="faqCard5" class="faqCardLabel">
-            <p class={typo.subTitle}>Is there customer support available?</p>
+            <p class="subTitle">Is there customer support available?</p>
             <div class="faqIcon">
               <img src={iconArrow} />
             </div>
           </label>
           <div class="faqCardContent">
-            <p class={typo.bodyText} style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
+            <p class="bodyText" style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
           </div>
         </div>
 
@@ -292,7 +322,7 @@ import AuthJS from "../components/auth/auth.astro";
 
 
 
-<style define:vars={{sectionOneBackgroundUrl, instanceIconUrl}}>
+<style define:vars={{sectionOneBackgroundUrl, LogoIconUrl}}>
   #heroBanner {
     background-image: var(--sectionOneBackgroundUrl);
     background-repeat: no-repeat;
@@ -430,7 +460,7 @@ import AuthJS from "../components/auth/auth.astro";
     inset: 0;
     background-color: #ffffff;
 
-    mask: var(--instanceIconUrl) repeat 50% 50%;
+    mask: var(--LogoIconUrl) repeat 50% 50%;
     opacity: 0.02;
 
   }
@@ -568,8 +598,8 @@ import AuthJS from "../components/auth/auth.astro";
     width: 20px;
     height: 20px;
     background-color: #C589F4;
-    -webkit-mask: var(--instanceIconUrl) no-repeat center;
-    mask: var(--instanceIconUrl) no-repeat center;
+    -webkit-mask: var(--LogoIconUrl) no-repeat center / contain;
+    mask: var(--LogoIconUrl) no-repeat center / contain;
   }
 </style>
 
@@ -669,9 +699,11 @@ import AuthJS from "../components/auth/auth.astro";
     display: flex;
     flex-direction: column;
     align-items: center;
-
-    padding-bottom: 100px;
     
+  }
+  
+  .previewContainer :last-child() {
+    transform: translateY(-5%);
   }
 
   .ctaContainer {
@@ -704,16 +736,9 @@ import AuthJS from "../components/auth/auth.astro";
 
     z-index: inherit;
   }
-
-  .backgroundGlow {
-    position: absolute;
-    margin-top: -24.5rem;
-    max-width: 100%;
-    height: auto;
-  }
 </style>
 
-<style define:vars={{iconExpandedUrl, iconClosedUrl}}>
+<style define:vars={{squarcleIconUrl}}>
   .faqContainer {
     max-width: 1440px;
     margin-left: auto;
@@ -846,7 +871,12 @@ import AuthJS from "../components/auth/auth.astro";
 
 
   .faqIcon {
-    background-image: var(--iconClosedUrl);
+    /* background-image: var(--squarcleIconUrl);*/
+
+    background-color: #C589F4;
+    mask: var(--squarcleIconUrl) no-repeat center;
+    -webkit-mask: var(--squarcleIconUrl) no-repeat center;
+
     width: 36px;
     height: 36px;
 
@@ -862,17 +892,15 @@ import AuthJS from "../components/auth/auth.astro";
 
   .faqCard input:checked ~ .faqCardLabel > .faqIcon {
     transform: rotate(180deg);
-    background-image: var(--iconExpandedUrl);
+    background-color: #EBA439;
   }
 
 </style>
 
 <script>
   import { getMsal, login, signUp } from "../lib/auth";
-      
 
-
-  const msalInstance = await getMsal();
+  await getMsal();
 
   document.querySelectorAll('[data-login]').forEach(btn => {
     btn.addEventListener('click', login);

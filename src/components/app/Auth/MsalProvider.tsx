@@ -60,7 +60,6 @@ export function MsalProvider(props: { children?: any }) {
 export const useMsal = () => {
     const ctx = useContext(MsalContext);
     if (!ctx) {
-        console.log("CTX", ctx);
         throw new Error("useMsal must be used inside MsalProvider")
     };
     return ctx;

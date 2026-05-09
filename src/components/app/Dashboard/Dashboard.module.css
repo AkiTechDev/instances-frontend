@@ -394,6 +394,9 @@
     .sidebarHeader button {
         width: 100%;
     }
+    .sidebarHeader .buttonSlim::before {
+        transform: rotate(45);
+    }
 
     .sidebarHeader label {
         width: 100%;

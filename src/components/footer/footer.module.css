@@ -94,3 +94,17 @@
     -webkit-mask: var(--discordIconUrl) no-repeat center;
     mask: var(--discordIconUrl) no-repeat center;
 }
+
+.squareLogo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+
+    font-family: 'Lexend';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 17.6957px;
+    line-height: 130%;
+    color: #FFFFFF;
+}
