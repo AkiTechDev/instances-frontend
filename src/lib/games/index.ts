@@ -2,6 +2,8 @@ import type { Game } from './types';
 
 import MinecraftIcon from '../../assets/games/MinecraftJava/icon.svg';
 import ValheimIcon from '../../assets/games/Valheim/icon.svg';
+import HytaleIcon from '../../assets/games/Hytale/icon.svg';
+import ProjectZomboidIcon from '../../assets/games/ProjectZomboid/icon.svg';
 import type { SvgComponent } from 'astro/types';
 import type { ImageMetadata } from 'astro';
 
@@ -54,4 +56,16 @@ export const gameRegistry: Record<string, {
         icon: ValheimIcon,
         load: () => import('./supported/Valheim'),
     },
+
+    'Hytale': {
+        name: 'Hytale',
+        icon: HytaleIcon,
+        load: () => import('./supported/Hytale')
+    },
+
+    'ProjectZomboid': {
+        name: 'Project Zomboid',
+        icon: ProjectZomboidIcon,
+        load: () => import('./supported/ProjectZomboid')
+    }
 };
