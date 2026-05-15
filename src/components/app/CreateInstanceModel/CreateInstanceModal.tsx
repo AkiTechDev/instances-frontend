@@ -17,8 +17,8 @@ import selectStyles from "../FormModules/FormSelect.module.css";
 import submitBtnStyle from "../../../styles/components/formSubmitButton.module.css";
 import iconTick from "../../../assets/icons/tick.svg";
 import iconCross from "../../../assets/icons/cross.svg";
-import { putCreateInstance, type PutCreateInstance } from "../../../lib/apis";
-import { createAsync } from "@solidjs/router";
+import { getInstances, putCreateInstance, type PutCreateInstance } from "../../../lib/apis";
+import { createAsync, revalidate } from "@solidjs/router";
 import { gameRegistry } from "../../../lib/games/index";
 import { ResponsiveImage } from "@responsive-image/solid";
 
@@ -131,8 +131,12 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                         region: formData["region"]
                     };
 
-                    await putCreateInstance(gameId()!, formData["instance_name"].replaceAll(' ', ''), new_config)
+
+                    putCreateInstance(gameId()!, formData["instance_name"].replaceAll(' ', ''), new_config)
+                    setTimeout(() => revalidate(getInstances.key, true), 5500)
+                    console.log("SETTING CLOSED")
                     props.setIsOpen(false);
+
                 }
             }
 

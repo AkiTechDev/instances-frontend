@@ -13,7 +13,7 @@ import clipboardIcon from "../../../assets/icons/clipboard.svg"
 
 import Tooltip from "../Test/Test";
 
-import { getInstanceConfig, getInstanceEndpoint, getInstanceStatus, toggleInstance, type Instance } from "../../../lib/apis";
+import { getInstanceConfig, getInstanceEndpoint, getInstanceStatus, sleep, toggleInstance, type Instance } from "../../../lib/apis";
 import { useMsal } from "../Auth/MsalProvider";
 import { createEffect, createSignal, Show } from "solid-js";
 import ManagementInstanceConfigForm from "../ManagementInstanceConfiguration/ManagementInstanceConfiguration";
@@ -22,8 +22,6 @@ import ManagementGameConfiguration from "../ManagementGameConfiguration/Manageme
 import InstanceOptions from "../InstanceOptions/InstanceOptions";
 import { gameRegistry } from "../../../lib/games/index";
 import { ResponsiveImage } from "@responsive-image/solid";
-
-const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 
 const Management = () => {
@@ -131,7 +129,9 @@ const Management = () => {
                         </Show>
                             <div class={styles.bannerHeader}>
                                 <p class="h4">{params.name}</p>
-                                <p class="subTitle">{gameRegistry[params.game || ""].name}</p>
+                                <Show when={config()}>
+                                    <p class="subTitle">{regions[config()!["region"]]}</p>
+                                </Show>
                             </div>
                         </div>
 
@@ -161,11 +161,6 @@ const Management = () => {
                                 <Tooltip tooltipContent="Copied!"  tooltipContentStyle="bodyTextSmallest" enableTimeout={true} timeoutDuration={1000}>
                                     <p class={`statsText ${ status()?.ipv6 ? styles.copy : ""}`} style={`--icon: url(${clipboardIcon.src})`} onClick={(e) => copyText(e.target.textContent)}>{status()?.ipv6 ? status()?.ipv6 : "The game is has not started :)"} </p>
                                 </Tooltip>
-                            </div>
-
-                            <div class={styles.connectivityInfo}>
-                                <p class="statsTitle">Region</p>
-                                <p class="statsText">{regions["us-east-1"]} </p>
                             </div>
                         </div>
                     </div>

@@ -77,8 +77,8 @@ const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance
 
         <div class={selectStyles.instanceConfigSettingsContainer}>
             <label class="bodyTextSmall">Region </label>
-            <select value={regions["us-east-1"]} class={`${selectStyles.select} bodyText`} disabled>
-              <option class="bodyText" value={regions["us-east-1"]} selected>{regions["us-east-1"]}</option>
+            <select value={regions[props.config["region"]]} class={`${selectStyles.select} bodyText`} disabled>
+              <option class="bodyText" value={regions[props.config["region"]]} selected>{regions[props.config["region"]]}</option>
             </select>
         </div>
 

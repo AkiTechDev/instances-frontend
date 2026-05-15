@@ -2,9 +2,7 @@ import { createUniqueId, onCleanup, type Component } from "solid-js";
 
 import styles from "./InstanceOptions.module.css";
 import { useNavigate } from "@solidjs/router";
-import { deleteInstance, postDownloadGameData, type Instance } from "../../../lib/apis";
-
-const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+import { deleteInstance, postDownloadGameData, sleep, type Instance } from "../../../lib/apis";
 
 const InstanceOptions: Component<{ endpoint: string, instance: Instance }> = (props) => {
     const navigate = useNavigate();
@@ -38,7 +36,7 @@ const InstanceOptions: Component<{ endpoint: string, instance: Instance }> = (pr
                 <span class={styles.dot}></span>
             </summary>
             <div class={styles.options}>
-                <button class="bodyTextMedium" onclick={async () => {await postDownloadGameData(props.endpoint); sleep(1); closeMenu() }}>Download Game Data</button>
+                <button class="bodyTextMedium" onclick={async () => {await postDownloadGameData(props.endpoint); await sleep(1000); closeMenu() }}>Download Game Data</button>
                 <button class="bodyTextMedium" disabled>Transfer Ownership</button>
                 <button class="bodyTextMedium" disabled>Change Instance Location</button>
                 <button class="bodyTextMedium" onclick={async () => {await deleteInstance(props.instance); navigate("/dashboard", { replace: true }) }}>Delete Instance</button>

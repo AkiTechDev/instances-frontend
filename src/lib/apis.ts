@@ -1,6 +1,8 @@
 import { query } from "@solidjs/router";
 import { msalInstance } from "../components/app/Auth/MsalProvider";
 
+export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
 interface GenericResonse {
     message: string
 }
@@ -47,6 +49,7 @@ export interface InstanceConfig {
     cpu: number,
     plan: string
     domain: string,
+    region: string,
     game: any
 }
 
