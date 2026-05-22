@@ -70,7 +70,7 @@ const Dashboard = () => {
                         <h6 class="h6">No Games Added Yet!</h6>
                         <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
                     </div>
-                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle} ${btnWithIcon.rotate45}`} style={`--icon: url(${crossIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: null, allow_game_change: true})}><p class="buttonText">Create new Game</p></button>
+                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle} ${btnWithIcon.rotate45}`} style={`--icon: url(${crossIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: null, allow_game_change: true})}><p class="buttonText">Create New Game</p></button>
                 </div>
             )}
             { instances().length > 0 && (
@@ -79,7 +79,7 @@ const Dashboard = () => {
                 <div class={styles.gamesContainer}>
                     <div class={styles.gamesListHeader}>
                         <h4 class="h4">{(gameFilter() === "all") ? "All Instances" : gameRegistry[gameFilter()].name}</h4>
-                        <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.buttonBig}`} style={`--icon: url(${LogoIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}><p class="buttonText">Add new Instance</p></button>
+                        <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.buttonBig}`} style={`--icon: url(${LogoIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}><p class="buttonText">Add New Instance</p></button>
                     </div>
                     <div class={styles.gameFiltersContainer}>
                         <label class={styles.searchableContainer}>

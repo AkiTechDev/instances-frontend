@@ -1,39 +1,61 @@
-
 .container {
+    container-type: inline-size;
+    container-name: card;
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 0;
-    gap: 1.5rem;
+    min-width: 0;                       /* critical: prevents overflow in grid */
+    overflow: hidden;                   /* clips image to rounded corners */
+    border-radius: clamp(8px, 1.2cqi, 16px);
+    padding: clamp(1rem, 4cqi, 1.5rem);
+    gap: clamp(0.5rem, 1.5cqi, 1rem);
 
-    animation: fadeIn 0.4s ease forwards;
+    text-align: center;
+    animation: fadeIn 0.5s ease forwards;
 }
 
-.container img {
+.banner {
+    aspect-ratio: 16 / 9;   /* or 4/3, 3/2, 1/1 depending on design */
     width: 100%;
-    height: 10.68rem;
+    overflow: hidden;
+    border-radius: 15px;
+    border: 3px solid transparent;
+}
+
+.banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;        /* fills without distortion */
+    object-position: center;  /* controls crop focal point */
+    display: block;
     border-radius: 10px;
 
-    align-items: center;
-    transition: transform 0.5 ease;
-}
-
-.container:hover img {
-    transform: scale(1.13);
-    color: var(--text-colour-vibrant);
-    border: 3px solid var(--text-colour-light);
+    transition: transform 0.5s ease;
 }
 
 .container p {
+    font-size: clamp(1rem, 0.85rem + 0.6vw, 1.25rem);
+    text-wrap: balance;
+
     white-space: nowrap;
-    overflow: hidden;
     text-overflow: ellipsis;
-    width: 90%;
+}
+
+.container:hover .banner {
+    border: 3px solid var(--hover-colour-frame);
+}
+
+.container:hover .banner img {
+    transform: scale(1.13);
 }
 
 .container:hover p {
-    color: var(--text-colour-vibrant);
+    color: var(--hover-colour);
+}
+
+@container card (min-width: 520px) {
+    .card { flex-direction: row; }
+    .banner { aspect-ratio: 1 / 1; width: 40%; }
+    .content { flex: 1; }
 }
 
 @keyframes fadeIn {

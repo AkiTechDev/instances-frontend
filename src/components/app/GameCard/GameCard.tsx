@@ -29,7 +29,9 @@ const GameCard: Component<{game_id: string, OpenCreateInstanceModal: ((options: 
             <div class={styles.container} onclick={() => {
                 if (props.OpenCreateInstanceModal) { props.OpenCreateInstanceModal({game_id: props.game_id, allow_game_change: false}) }
             }}>
-                <ResponsiveImage src={banner()!}/>
+                <div class={styles.banner}>
+                    <ResponsiveImage src={banner()!} width={1200} height={675} />
+                </div>
                 <p class="subTitle">{game()!.name}</p>
             </div>
         </Show>

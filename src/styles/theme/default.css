@@ -4,6 +4,64 @@
     --text-colour-vibrant: #EBA439;
     --text-colour-light: #ffffff;
 
+    /* Core ink — used for body copy, dark backgrounds, sidebar nav */
+    --c-ink:            #191C2E;   /* primary dark / "navy ink" */
+    --c-ink-grad-top:   #22263E;   /* paired with --c-ink for the body gradient */
+
+    /* Hero accent — Instances orange. The dominant CTA + brand color. */
+    --c-orange:         #EBA439;
+    --c-orange-deep:    #C68E32;   /* pressed/disabled-adjacent shade */
+
+    /* Secondary accent — purple. The "hover" state for most orange surfaces. */
+    --c-purple:         #C589F4;
+    --c-purple-deep:    #5E0097;
+    --c-purple-soft:    #BB6DF8;   /* used inside the hero gradient orb */
+
+    /* Tertiary brand colors — used in shapes/illustration + status pills */
+    --c-green-bright:   #80F733;   /* "running" / focus indicator */
+    --c-green-deep:     #6FDD00;
+    --c-green-21:       #21B80B;   /* "running" badge on landing page */
+    --c-blue-sky:       #85B6FF;   /* typography swatch in the brand book */
+    --c-yellow:         #F9CE62;   /* used inside the hero gradient orb */
+
+    /* Light surfaces */
+    --c-white:          #FFFFFF;
+    --c-cream-grey:     #F3F4F4;   /* default filter button background */
+    --c-cream-list:     #F9F9F9;   /* zebra-stripe row in list view */
+    --c-grey-100:       #F5F5F5;   /* management page canvas */
+    --c-grey-200:       #E2E3EB;   /* default border colour */
+    --c-grey-300:       #DADADA;   /* sidebar hover */
+    --c-grey-400:       #D0D0D0;   /* disabled button bg */
+    --c-grey-500:       #D1D5DB;   /* toggle off state */
+    --c-grey-600:       #898989;   /* "stopped" indicator dot */
+    --c-grey-700:       #757575;   /* secondary text (timestamps) */
+
+    /* Status backgrounds */
+    --c-status-stopped-bg:  rgba(25, 28, 46, 0.75);
+    --c-status-running-bg:  #80F733;
+    --c-status-glow:        rgba(128, 247, 51, 0.5);
+
+    /* -------- Semantic text colors -------- */
+    --text-colour-dark:     var(--c-ink);
+    --text-colour-vibrant:  var(--c-orange);
+    --text-colour-light:    var(--c-white);
+
+    /* -------- Semantic surface colors -------- */
+    --colour-text-primary:    var(--c-ink);
+    --colour-text-secondary:  var(--c-orange);
+    --colour-text-tertiary:   var(--c-white);
+
+    --colour-filterBtn:         var(--c-cream-grey);
+    --colour-filterBtn-border:  var(--c-grey-200);
+
+    /* -------- Body gradient (the global background) -------- */
+    --bg-body: linear-gradient(180deg, #22263E 0%, #191C2E 100%);
+
+    /* -------- Brand gradients -------- */
+    --gradient-brand:        linear-gradient(90deg, #EBA439 0%, #C589F4 100%);
+    --gradient-brand-orb:    linear-gradient(180deg, #BB6DF8 0%, #F9CE62 100%);
+    --gradient-card-fade:    linear-gradient(180deg, rgba(255,255,255,0) 0%, #1F1E1E 100%);
+
     
     /* Typography */
 

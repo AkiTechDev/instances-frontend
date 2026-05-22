@@ -36,48 +36,14 @@
 }
 
 .gamesContainer {
+    --hover-colour: var(--c-purple);
+    --hover-colour-frame: var(--c-purple);
     display: grid;
-
-    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-    gap: 2rem;
-
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, 300px), 1fr)
+    );
+    gap: clamp(1rem, 2vw, 1.5rem);
     width: 100%;
-}
-
-
-.gameCard {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 0 0 12px;
-    gap: 12px;
-
-}
-
-.gameCard > img {
-    width: 100%;
-    aspect-ratio: 37/25;
-
-    border-radius: 8px;
-}
-
-.gameCard > p {
-    font-family: 'Lexend';
-    font-style: normal;
-    font-weight: 500;
-    font-size: 20px;
-    line-height: 120%;
-    /* identical to box height, or 24px */
-    display: flex;
-    align-items: center;
-    text-align: center;
-    text-transform: capitalize;
-
-    color: var(--colour-text-primary);
-}
-
-.gameCard:hover {
-    transform: scale(1.15);
-    cursor: pointer;
 }
 

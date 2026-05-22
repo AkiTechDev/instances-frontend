@@ -108,3 +108,7 @@
     line-height: 130%;
     color: #FFFFFF;
 }
+
+.squareLogo a {
+    line-height: 0;
+}
