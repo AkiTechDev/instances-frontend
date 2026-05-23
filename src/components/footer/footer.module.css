@@ -30,7 +30,11 @@
 
 .nav a {
     text-decoration: none;
-    color: var(--colour-text-tertiary);
+    color: var(--text-colour-light);
+}
+
+.nav a:hover {
+    color: var(--text-colour-vibrant);
 }
 
 .banner {
@@ -52,10 +56,6 @@
     gap: 1.5rem;
 }
 
-.socialMedia > a:active > .bannerContactIcon {
-    background-color: var(--colour-text-secondary)
-}
-
 .contact {
     display: flex;
     flex-direction: column;
@@ -71,28 +71,23 @@
 }
 
 .contactBlock :nth-child(2) {
-    color: var(--colour-text-secondary);
+    color: var(--text-colour-vibrant);
 }
 
-.bannerContactIcon {
-    background: var(--colour-text-tertiary);
+.contactBlock :nth-child(2):hover {
+    color: var(--c-purple);
+}
+
+.icon {
+    background: var(--text-colour-light);
+    -webkit-mask: var(--icon) no-repeat center;
+    mask: var(--icon) no-repeat center;
     width: 40px;
     height: 40px;
 }
 
-.facebookContact {
-    -webkit-mask: var(--facebookIconUrl) no-repeat center;
-    mask: var(--facebookIconUrl) no-repeat center;
-}
-
-.instagramIcon {
-    -webkit-mask: var(--instagramIconUrl) no-repeat center;
-    mask: var(--instagramIconUrl) no-repeat center;
-}
-
-.discordIcon {
-    -webkit-mask: var(--discordIconUrl) no-repeat center;
-    mask: var(--discordIconUrl) no-repeat center;
+.icon:hover {
+    background-color: var(--text-colour-vibrant);
 }
 
 .squareLogo {

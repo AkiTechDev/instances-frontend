@@ -12,8 +12,6 @@ import colourStyles from "../styles/theme/colours.module.css"
 
 import buttonBig from "../styles/components/buttonBig.module.css"
 
-import headerLogo from "../assets/headerLogo.svg?url"
-
 import LogoIcon from "../assets/icons/logos/icon.svg";
 
 const LogoIconUrl = `url(${LogoIcon.src})`;
@@ -44,6 +42,9 @@ import Footer from "../components/footer/Footer.astro";
 import { Picture } from 'astro:assets';
 import PreviewPNG from "../assets/images/preview_c.png";
 import StaticPNG from "../assets/images/static1.png";
+
+import Header from "../components/astrojs/header/Header.astro";
+import Hero from "../components/astrojs/hero/Hero.astro";
 
 const seo_des = "Host Minecraft, sandboxed games, and more with Instances. No contracts, no setup headaches. Switch games instantly, keep your world, and only pay for what you play.";
 const domain = "instances.aki-labs.com"
@@ -92,32 +93,8 @@ const domain = "instances.aki-labs.com"
     <meta name="apple-mobile-web-app-capable" content="yes">
 	</head>
 	<body>
-    <div id="heroBanner">
-      <div class="sectionOneContainer">
-        <header class="header">
-          <img src={headerLogo} />
-          <div class="nav">
-            <a class="bodyText" href="#whywe">Why We</a>
-            <a class="bodyText" href="#process">Process</a>
-            <a class="bodyText" href="#faqs">FAQs</a>
-            <a class="bodyText" href="#privacy-policy">Privacy Policy</a>
-          </div>
-          <div class="getStarted">
-            <button data-login class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class="buttonText">Log In</p></button>
-            <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, "h1"]}><LogoIcon style={"--path1: var(--colour-text-primary); --path2: var(--colour-text-primary); --path3: var(--colour-text-primary); transform: rotate(45deg);"} /><p class="buttonText">Get Started</p></button>
-          </div>
-        </header>
-
-        <div class="sectionOneInner">
-          <h1 class="h1">We handle the servers. You handle the fun.</h1>
-          <p class="subText">Play instantly with friends, no setup, no subscriptions, just pay when you play.</p>
-          <div class="cta">
-            <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, "h1"]}><p class="buttonText">Start Playing Now</p></button>
-            <button class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class="buttonText">Learn More</p></button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <Header />
+    <Hero />
     
     <section>
       <div class="promoContainer">
@@ -164,7 +141,7 @@ const domain = "instances.aki-labs.com"
 
       <div class="processContentContainer">
         <div class="processContent">
-          <h2 class="h2">Start Playing in 3 Steps</h2>
+          <h2 class="h2">Start Playing in <br />3 Steps</h2>
           <div class="processBenefit">
             <div class="purpleLogo"></div>
             <p class="subTitle">No tech skills needed.</p>
@@ -174,7 +151,7 @@ const domain = "instances.aki-labs.com"
             <p class="subTitle">Pay-as-you-go!</p>
           </div>
         </div>
-        <Picture src={StaticPNG} formats={['avif', 'webp']} alt="Design graphic" />
+        <Picture src={StaticPNG} formats={['avif', 'webp']} alt="Design graphic" width={450} />
       </div>
     </section>
 
@@ -323,42 +300,6 @@ const domain = "instances.aki-labs.com"
 
 
 <style define:vars={{sectionOneBackgroundUrl, LogoIconUrl}}>
-  #heroBanner {
-    background-image: var(--sectionOneBackgroundUrl);
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-  }
-
-  .sectionOneContainer {
-    max-width: 1440px;
-    padding-left: 120px;
-    padding-right: 120px;
-    padding-bottom: 82px;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .header {
-    padding-top: 28px;
-    padding-bottom: 28px;
-  }
-
-  .nav {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    gap: var(--space-md);
-  }
-
-  .getStarted {
-    display: flex;
-    gap: var(--space-sm);
-    flex-shrink: 0;
-
-    align-items: stretch;
-  }
-
   header {
     background-color: transparent;
 
@@ -379,40 +320,6 @@ const domain = "instances.aki-labs.com"
 
   button {
       font: inherit
-  }
-
-  .sectionOneInner {
-    padding: 5.625rem 0rem 3.25rem;
-    margin: 0;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
-    max-width: 36.875rem;
-  }
-
-  .sectionOneInner > h1 {
-    margin-bottom: var(--margin-text-sm);
-  }
-
-  .sectionOneInner > p {
-    margin-bottom: var(--margin-el-md);
-  }
-
-  .sectionOneText {
-    align-items: center;
-    margin: 0;
-
-    max-width: 34.125rem;
-  }
-
-  .cta {
-    display: flex;
-    gap: 1.25rem;
-    padding: 0%;
-    align-items: flex-start;
-
   }
 
   .promoBackground {
@@ -573,6 +480,8 @@ const domain = "instances.aki-labs.com"
     align-items: flex-end;
     gap: 0.625rem;
 
+    max-width: 450px;
+
     padding-left: 7.5rem;
   }
 
@@ -580,6 +489,7 @@ const domain = "instances.aki-labs.com"
     display: flex;
     flex-direction: column;
     align-items: flex-start;
+    width: 100%;
   }
 
   .processContent > h2 {

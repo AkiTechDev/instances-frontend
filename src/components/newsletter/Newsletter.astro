@@ -20,3 +20,17 @@ import { Picture } from 'astro:assets';
         </form>
     </div>
 </section>
+
+<script>
+    import { emailautocomplete } from './email_autocomplete';
+    document.addEventListener("DOMContentLoaded", function(e) {
+        emailautocomplete("#email");
+    });
+</script>
+
+<style is:global >
+    .emailAutocomplete {
+        color: var(--color-text-dark);
+        opacity: 0.8;
+    }
+</style>

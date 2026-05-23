@@ -20,16 +20,20 @@
 
     .gridContainer:has(.sidebar) {
         grid-template-columns: minmax(0, 290px) 1fr;
+        grid-template-rows: minmax(0px, 79px) auto 5rem;
         grid-template-areas:
             "sidebar header"
+            "sidebar content"
             "sidebar content";
     }
 
 
     .gridContainer:has(.sidebar.collapsed) {
         grid-template-columns: minmax(0, 88px) 1fr;
+        grid-template-rows: minmax(0px, 79px) auto 5rem;
         grid-template-areas:
             "sidebar header"
+            "sidebar content"
             "sidebar content";
     }
 

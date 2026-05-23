@@ -62,6 +62,19 @@
     --gradient-brand-orb:    linear-gradient(180deg, #BB6DF8 0%, #F9CE62 100%);
     --gradient-card-fade:    linear-gradient(180deg, rgba(255,255,255,0) 0%, #1F1E1E 100%);
 
+    /* Edge padding */
+    --padding-sm: 5rem;
+    --padding-md: 7.5rem;
+    --padding-lg: 10rem;
+    --padding-outer-sides: 7.5rem;
+    --padding-outer-tops: 1.75rem;
+
+    /* Radii */
+    --r-pill:   44px;   /* primary buttons */
+    --r-card:   10px;   /* cards, modals, banners */
+    --r-chip:   24px;   /* search input, filter pills */
+    --r-sm:     8px;    /* sidebar games, list rows */
+
     
     /* Typography */
 

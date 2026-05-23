@@ -1,0 +1,49 @@
+.container {
+    width: 100%;
+
+    background-image: var(--icon);
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    padding: 3.5rem 0;
+
+    margin-top: -94px;
+}
+
+.content {
+    /* Move back to container */
+    width: min(100% - 2rem, 96rem); /* 1536px */
+    margin-inline: auto;
+
+    aspect-ratio: 16 / 9;
+    /* End */
+
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    padding: 0 3.5rem; /* 28px 120px */
+    /* width: 40%; < Uncomment */
+    gap: 2.5rem;
+}
+
+.temp {
+    display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
+    width: 40%;
+    gap: 2.5rem;
+    padding: 0 3.5rem; /* 28px 120px */
+}
+
+.gradFun {
+    background-image: linear-gradient(90deg, #EBA439 0%, #C589F4 100%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.actions {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 1.5rem;
+}
+
+.actions a {
+    text-decoration: none;
+}
