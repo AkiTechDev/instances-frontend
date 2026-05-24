@@ -19,7 +19,7 @@
     /* End */
 
     display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
-    padding: 0 3.5rem; /* 28px 120px */
+    padding: 0 var(--padding-sm); /* 28px 120px */
     /* width: 40%; < Uncomment */
     gap: 2.5rem;
 }
@@ -28,7 +28,7 @@
     display: flex; flex-direction: column; justify-content: center; align-items: flex-start;
     width: 40%;
     gap: 2.5rem;
-    padding: 0 3.5rem; /* 28px 120px */
+    padding: 0 var(--padding-sm); /* 28px 120px */
 }
 
 .gradFun {

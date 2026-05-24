@@ -1,0 +1,49 @@
+.container {
+    width: min(100% - 2rem, 96rem); /* 1536px */
+    margin-inline: auto;
+
+    /* padding: 0 7.5rem; */
+    padding: var(--padding-outer-sides) var(--padding-outer-sides);
+    box-sizing: border-box;
+
+    display: flex;
+    gap: 3rem;
+}
+
+.card {
+    width: 100%;
+    border-radius: var(--r-pill);
+    padding: var(--padding-sm);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 4rem;
+    color: var(--text-colour-dark);
+    position: relative;
+    overflow: hidden;
+    background: var(--c-orange);
+}
+
+.card p {
+    opacity: 0.85;
+    margin-top: 1rem;
+}
+
+.card svg {
+    position: absolute; right: -60px; top: -60px;
+    width: 280px; height: 280px;
+}
+
+.squarcle {
+    position: absolute; right: -60px; top: -60px;
+    width: 280px; height: 280px;
+    background: #C589F4;
+    -webkit-mask: var(--icon) no-repeat center / contain;
+            mask: var(--icon) no-repeat center / contain;
+    transform: rotate(-30deg);
+}
+
+@media (max-width: 48rem)  { 
+    /* 768px  — tablet+  */ 
+    .card {
+        flex-direction: column;
+    }
+}

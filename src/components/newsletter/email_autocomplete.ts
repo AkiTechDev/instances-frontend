@@ -23,7 +23,7 @@ interface EmailAutocompleteWindow extends Window {
 
 export function emailautocomplete(
     selector: string,
-    options?: EmailAutocompleteOptions
+    //options?: EmailAutocompleteOptions
 ): EmailAutocompleteVanilla[] {
 
     const elems = Array.from(

@@ -3,7 +3,7 @@
     margin-inline: auto;
     position: sticky; top: 0; z-index: 50;
     display: flex; align-items: center; justify-content: space-between;
-    padding: 1.75rem 3.5rem; /* 28px 120px */
+    padding: 1.75rem var(--padding-sm); /* 28px 120px */
     /*background: rgba(25, 28, 46, 0.85); */
     backdrop-filter: blur(20px);
     border-radius: 0 0 var(--r-card) var(--r-card);

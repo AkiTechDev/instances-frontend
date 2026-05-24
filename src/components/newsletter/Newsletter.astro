@@ -5,8 +5,8 @@ import buttonBig from "../../styles/components/buttonBig.module.css";
 
 import CoffeePNG from '../../assets/images/coffee.png';
 import { Picture } from 'astro:assets';
----
 
+---
 <section class={styles.section}>
     <Picture src={CoffeePNG} formats={['avif', 'webp']} alt="Unrelated graphic of a take-away coffee cup" />
     <div class={styles.card}>
@@ -23,7 +23,7 @@ import { Picture } from 'astro:assets';
 
 <script>
     import { emailautocomplete } from './email_autocomplete';
-    document.addEventListener("DOMContentLoaded", function(e) {
+    document.addEventListener("DOMContentLoaded", function() {
         emailautocomplete("#email");
     });
 </script>

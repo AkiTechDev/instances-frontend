@@ -6,7 +6,7 @@ import banner from '../../../assets/games/ProjectZomboid/banner.jpeg?format=avif
 import * as v from "valibot";
 
 const ProjectZomboid: Game = {
-    name:     'ProjectZomboid',
+    name:     'Project Zomboid',
     category: 'ProjectZomboid',
     profiles: HeavyModpackProfiles,
     getBanner: async () => banner,

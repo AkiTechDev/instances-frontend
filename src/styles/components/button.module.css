@@ -22,6 +22,7 @@
 .hover   { background: #C589F4; border-color: #C589F4; color: #191C2E; }
 .out     { background: transparent; border-color: #EBA439; color: #EBA439; }
 .dark    { background: #191C2E; color: #fff; border-color: #191C2E; }
+.dark:hover {background: #C589F4; border-color: #C589F4; color: #191C2E;}
 .disabled{ background: #D0D0D0; color: #191C2E; border-color: #D0D0D0; }
 .link    { background: transparent; color: #EBA439; border: 0; padding: 4px 0; font-weight: 700; font-size: 14px; }
 
