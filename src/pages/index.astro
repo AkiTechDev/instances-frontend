@@ -808,15 +808,15 @@ const domain = "instances.aki-labs.com"
 </style>
 
 <script>
-  import { getMsal, login, signUp } from "../lib/auth";
+  import { msalReady, login } from "../lib/auth";
 
-  await getMsal();
+  await msalReady;
 
   document.querySelectorAll('[data-login]').forEach(btn => {
-    btn.addEventListener('click', login);
+    btn.addEventListener('click', () => login("/dashboard"));
   })
 
   document.querySelectorAll('[data-signup]').forEach(btn => {
-    btn.addEventListener('click', signUp);
+    btn.addEventListener('click', () => login("/dashboard"));
   })
 </script>

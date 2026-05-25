@@ -1,20 +1,10 @@
 import { query } from "@solidjs/router";
-import { msalInstance } from "../components/app/Auth/MsalProvider";
+import { getToken } from "./auth";
 
 export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 interface GenericResonse {
     message: string
-}
-
-const getToken = async (scopes: string[]) => {
-    const account = msalInstance.getActiveAccount();
-    if (!account) throw new Error("No active account");
-
-    return msalInstance.acquireTokenSilent({
-      scopes: scopes,
-      account,
-    })
 }
 
 export interface Instance {

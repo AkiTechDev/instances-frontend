@@ -93,7 +93,7 @@ const domain = "instances.aki-labs.com"
           <p class="subTitle">Manage your active instances, switch between games, and invite friends – all in one place.</p>
         </div>
         <div class="ctaButtons">
-          <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle]}><p class="buttonText">Start Playing Now</p></button>
+          <button data-login class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle]}><p class="buttonText">Start Playing Now</p></button>
           <button class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class="buttonText">Learn More</p></button>
         </div>
       </div>
@@ -395,16 +395,12 @@ const domain = "instances.aki-labs.com"
 </style>
 
 <script>
-  import { getMsal, login, signUp } from "../lib/auth";
+  import { msalReady, login } from "../lib/auth";
 
-  await getMsal();
+  await msalReady;
 
   document.querySelectorAll('[data-login]').forEach(btn => {
-    btn.addEventListener('click', login);
-  })
-
-  document.querySelectorAll('[data-signup]').forEach(btn => {
-    btn.addEventListener('click', signUp);
+    btn.addEventListener('click', () => login("/dashboard"));
   })
 </script>
 

@@ -1,9 +1,6 @@
-import { PublicClientApplication, type AccountInfo } from "@azure/msal-browser";
-import { msalConfig } from "../../../lib/auth";
-import { createContext, createSignal, useContext } from "solid-js";
-
-export const msalInstance = new PublicClientApplication(msalConfig);
-await msalInstance.initialize();
+import { EventType, InteractionRequiredAuthError, type AccountInfo, type EventMessage } from "@azure/msal-browser";
+import { msalReady, msalInstance } from "../../../lib/auth";
+import { createEffect, createContext, createResource, createSignal, Show, useContext, onCleanup, onMount } from "solid-js";
 
 type MsalContextType = {
     account: () => AccountInfo | null;
@@ -14,13 +11,50 @@ type MsalContextType = {
 
 export const MsalContext = createContext<MsalContextType>();
 
+function Authenticating() {
+    return <div>Authenticating...</div>
+}
+
+function LoginRedirect() {
+    onMount(async () => {
+        await msalReady;
+        await msalInstance.loginRedirect({ scopes: ["api://Instances/access"] });
+    });
+    return <div>Redirecting to login...</div>
+}
+
 export function MsalProvider(props: { children?: any }) {
-    const [account, setAccount] = createSignal<AccountInfo | null>(
-        msalInstance.getActiveAccount()
-    );
+    const [ready] = createResource(() => msalReady);
+    const [account, setAccount] = createSignal<AccountInfo | null>(null);
+
+    console.log("FUCKING LOG");
+
+    createEffect(() => {
+        if (ready.loading) return;
+        console.log("ACCOUNT", msalInstance.getActiveAccount());
+        setAccount(msalInstance.getActiveAccount());
+    });
+
+    const callbackId = msalInstance.addEventCallback((message: EventMessage) => {
+        switch (message.eventType) {
+            case EventType.LOGIN_SUCCESS:
+            case EventType.ACQUIRE_TOKEN_SUCCESS:
+            case EventType.LOGOUT_SUCCESS:
+            case EventType.ACTIVE_ACCOUNT_CHANGED:
+                setAccount(msalInstance.getActiveAccount());
+                break;
+        }
+    });
+
+    onCleanup(() => {
+        if (callbackId) msalInstance.removeEventCallback(callbackId);
+    });
+
 
     const getToken = async (scopes: string[]): Promise<string> => {
+        await msalReady;
         const current = account();
+
         if (!current) throw new Error("No active account");
 
         try {
@@ -30,30 +64,36 @@ export function MsalProvider(props: { children?: any }) {
             });
 
             return result.accessToken
-        } catch {
+        } catch (e) {
             // Silent failed - redirect to login
-            await msalInstance.acquireTokenRedirect({
-                scopes: ["api://Instances/access"],
-            });
-            throw new Error("Redirecting for token");
+            if (e instanceof InteractionRequiredAuthError) {
+                await msalInstance.acquireTokenRedirect({
+                    scopes: scopes,
+                });
+                throw new Error("Redirecting for token");
+            }
+            throw e;
         }
     };
 
     const login = async () => {
-        await msalInstance.loginRedirect({
-            scopes: ["api://Instances/access"],
-        });
+        await msalReady;
+        await msalInstance.loginRedirect({ scopes: ["api://Instances/access"] });
+    
     };
 
     const logout = () => {
         msalInstance.logoutRedirect();
-        setAccount(null);
     };
 
     return (
-        <MsalContext.Provider value={{ account, getToken, login, logout }}>
-            {props.children}
-        </MsalContext.Provider>
+        <Show when={!ready.loading} fallback={<Authenticating />}>
+            <Show when={account()} fallback={<LoginRedirect />}>
+                <MsalContext.Provider value={{ account, getToken, login, logout }}>
+                    {props.children}
+                </MsalContext.Provider>
+            </Show>
+        </Show>
     )
 }
 

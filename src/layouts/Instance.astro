@@ -76,24 +76,3 @@ import AppRouter from "../components/app/Router";
     }
 
 </style>
-
-<script>
-  import { getMsal } from "../lib/auth"
-  
-  const msalInstance = await getMsal();
-  if (!msalInstance) throw new Error("MSAL not initialized");
-
-  const result = await msalInstance.handleRedirectPromise();
-
-  if (result) {
-    msalInstance.setActiveAccount(result.account)
-  } else {
-    const accounts = msalInstance.getAllAccounts();
-
-    if (accounts.length === 0) {
-      window.location.href = "/";
-    } else {
-      msalInstance.setActiveAccount(accounts[0])
-    }
-  }
-</script>
