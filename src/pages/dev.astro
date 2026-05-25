@@ -11,13 +11,6 @@ import "../styles/theme/default.css"
 
 import buttonBig from "../styles/components/buttonBig.module.css"
 
-import LogoIcon from "../assets/icons/logos/icon.svg";
-
-const LogoIconUrl = `url(${LogoIcon.src})`;
-
-import sectionOneBackground from "../assets/landingIcon.svg"
-const sectionOneBackgroundUrl = `url(${sectionOneBackground.src})`;
-
 import squarcleIcon from "../assets/icons/squarcle.svg";
 const squarcleIconUrl = `url(${squarcleIcon.src})`;
 
@@ -92,49 +85,6 @@ const domain = "instances.aki-labs.com"
     <PromoCTA />
     <HowItWorks />
 
-    <!--
-    <section class="servicePropsSection">
-      <div class="propsContainer">
-        <div class="propsBackgroundContainer">
-          <Squarcle id="grad1" gradientStart="#c589f4" gradientEnd="#532b56" rotation=270 />
-          <Squarcle id="grad1" />
-          <Squarcle id="grad2" gradientStart="#EBA439" gradientEnd="#442904" rotation=180 />
-          <Squarcle id="grad1" rotation=90 />
-        </div>
-
-        <div class="serviceCardContainer">
-          <div class="serviceCard">
-            <h5 class="h5" style="color: #85B6FF; text-shadow: 0px 0px 4px #2D9CC4;">No setup,<br />no stress</h5>
-            <p class="subTitle">Launch your own game world in seconds, no port forwarding, no config files, no downtime.</p>
-          </div>
-
-          <div class="serviceCard">
-            <h5 class="h5" style="color: #C589F4; text-shadow: 0px 0px 4px #C353FF;">Fair, flexible</br />pricing</h5>
-            <p class="subTitle">Only pay for the hours you play. No monthly lock-ins or hidden fees.</p>
-          </div>
-
-          <div class="serviceCard">
-            <h5 class="h5" style="color: #EBA439; text-shadow: 0px 0px 4px #FF9D00;">Always<br />online</h5>
-            <p class="subTitle">Your world lives in the cloud, so friends can join anytime, even when you're offline.</p>
-          </div>
-
-          <div class="serviceCard">
-            <h5 class="h5" style="color: #85B6FF; text-shadow: 0px 0px 4px #2D9CC4;">Switch games,<br />not just servers</h5>
-            <p class="subTitle">Play Minecraft today, Terraria tomorrow, your setup follows you.</p>
-          </div>
-
-        </div>
-      </div>
-      <div class="propsHeadingContainer">
-        <div class="propsHeadingContent">
-          <h2 class="h2">Host Your Own Game Server Instantly!</h2>
-          <p class="subTitle">Instances take care of the servers, so you can focus on gaming with friends – anytime, anywhere.</p>
-        </div>
-        <img src={messageIcon} />
-      </div>
-    </section>
-    -->
-
 
     <section class="previewContainer">
       <div class="ctaContainer">
@@ -151,7 +101,7 @@ const domain = "instances.aki-labs.com"
       <Picture src={PreviewPNG} formats={["avif", "webp"]} width={1240} alt="A preview look of the service" />
     </section>
 
-    <section class="faqContainer">
+    <section id="faqs" class="faqContainer">
       <div class="faqHeaderContainer">
         <h3 class="h3">Frequently Asked Questions</h3>
         <p class="subTitle">No tech skills needed. Pay-as-you-go!</p>
@@ -236,118 +186,6 @@ const domain = "instances.aki-labs.com"
 	</body>
 </html>
 
-
-
-<style define:vars={{sectionOneBackgroundUrl, LogoIconUrl}}>
-  header {
-    background-color: transparent;
-
-    display: flex;
-    align-items: center;
-    
-    font-family: Lexend;
-    font-size: 1rem;
-    font-style: normal;
-    font-weight: 400;
-    color: #ffffff;
-  }
-
-  a {
-      text-decoration: inherit;
-      color: inherit;
-  }
-
-  button {
-      font: inherit
-  }
-</style>
-
-<style>
-  .servicePropsSection {
-    max-width: 1440px;
-    margin-left: auto;
-    margin-right: auto;
-
-    display: grid;
-    grid-template-columns: 4fr 2fr;
-    padding-bottom: 3.5rem;
-  }
-
-  .propsContainer {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-    align-items: center;
-    align-content: center;
-    gap: 1.5rem;
-    isolation: isolate;
-
-    max-width: 766px;
-  }
-
-  .propsBackgroundContainer {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    grid-template-rows: repeat(2, 1fr);
-    gap: 1.5rem;
-    opacity: 0.5;
-    filter: blur(8px);
-
-    position: absolute;
-  }
-
-  .propsBackgroundContainer img {
-    aspect-ratio: 1 / 1;
-  }
-
-  .serviceCardContainer {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    align-content: center;
-    gap: 1.5rem;
-
-    max-width: 766px;
-  }
-
-
-  .serviceCard {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 2.5rem 1.75rem;
-    gap: 1.25rem;
-
-    background: linear-gradient(295.31deg, rgba(14, 19, 44, 0.2) 4.75%, rgba(48, 58, 106, 0.2) 86.61%);
-    box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(22px);
-    /* Note: backdrop-filter has minimal browser support */
-    border-radius: 10px;
-
-  }
-
-  .serviceCard h5 {
-    flex-grow: 1;
-  }
-
-  .propsHeadingContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 1rem;
-
-    max-width: 450px;
-  }
-
-  .propsHeadingContent {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: var(--margin-text-sm);
-  }
-
-</style>
 
 <style>
   .previewContainer {
