@@ -2,10 +2,12 @@
 import styles from "./Hero.module.css";
 import button from "../../../styles/components/button.module.css";
 
-import HeroAsset from "../../../assets/landingIcon.svg";
+//import HeroAsset from "../../../assets/landingIcon.svg";
+//import MinecraftDiorama from "../assets/minecraftDiorama.svg";
+import MinecraftDiorama from "../../../assets/images/minecraft.png";
 ---
 
-<section class={styles.container} style={`--icon: url("${HeroAsset.src}")`}>
+<section class={styles.container} style={`--icon: url("")`}>
     <div class={styles.content}>
         <div class={styles.temp}>
             <h1 class="h1">We handle the servers.<br /><span class={styles.gradFun}>You handle the fun.</span></h1>
@@ -19,5 +21,6 @@ import HeroAsset from "../../../assets/landingIcon.svg";
                 </a>
             </div>
         </div>
+        <img src={MinecraftDiorama.src} />
     </div>
 </section>

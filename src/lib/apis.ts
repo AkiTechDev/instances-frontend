@@ -68,6 +68,7 @@ export const getInstanceState = query(async (instance: Instance): Promise<Instan
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch(`https://api.instances.aki-labs.com/${instance.game}/${instance.name}`, {
         method: "GET",
+        cache: "no-store", // 401 response when instance is delete, if created on same name, browser will return cache rather than ping pong
         headers: {
             "Authorization": `Bearer ${token.accessToken}`
         }
