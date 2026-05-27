@@ -2,7 +2,8 @@ import { createUniqueId, onCleanup, type Component } from "solid-js";
 
 import styles from "./InstanceOptions.module.css";
 import { useNavigate } from "@solidjs/router";
-import { deleteInstance, postDownloadGameData, sleep, type Instance } from "../../../lib/apis";
+import { deleteInstance, postDownloadGameData, type Instance } from "../../../lib/apis";
+import { sleep } from "../../../lib/utils";
 
 const InstanceOptions: Component<{ endpoint: string, instance: Instance }> = (props) => {
     const navigate = useNavigate();
