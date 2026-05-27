@@ -7,7 +7,7 @@ import Explore from "./Explore/Explore";
 import Extra from "./Extra/Extra";
 import Management from "./Management/Management";
 
-import { type Instance, getInstanceConfig, getInstanceEndpoint, getInstanceStatus, getInstances } from "../../lib/apis";
+import { type Instance, endpointOf, getInstanceConfig, getInstanceState, getInstanceStatus, getInstances } from "../../lib/apis";
 import { msalInstance } from "../../lib/auth";
 
 const AppRouter = () => {
@@ -18,18 +18,19 @@ const AppRouter = () => {
                     <Route path="/dashboard" component={Dashboard} preload={async () => {
                         const instances = await getInstances();
 
-                        instances.forEach((instance: Instance) => getInstanceEndpoint(instance));
+                        instances.forEach((instance: Instance) => getInstanceState(instance));
                     }} />
                     <Route path="/:game/:name" component={Management} preload={async (p) => {
                         const account = msalInstance.getActiveAccount();
-                        const endpoint = getInstanceEndpoint({ game: p.params.game, name: p.params.name, user_id: account!.homeAccountId} as Instance)
-                        endpoint.then(endpoint => {
-                            if (!endpoint) {
-                                return redirect("/dashboard?no-such-instance");
-                            }
-                            getInstanceConfig(endpoint)
-                            getInstanceStatus(endpoint)
-                        })
+                        const state = await getInstanceState({ game: p.params.game, name: p.params.name, user_id: account!.homeAccountId } as Instance);
+                        if (state.status === "gone") {
+                            return redirect("/dashboard?no-such-instance");
+                        }
+                        const endpoint = endpointOf(state);
+                        if (endpoint) {
+                            getInstanceConfig(endpoint);
+                            getInstanceStatus(endpoint);
+                        }
                     }}  />
                     <Route path="/explore" component={Explore} />
                     <Route path="/extra" component={Extra} />

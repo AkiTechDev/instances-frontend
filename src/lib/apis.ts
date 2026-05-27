@@ -1,8 +1,6 @@
 import { query } from "@solidjs/router";
 import { getToken } from "./auth";
 
-export const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-
 interface GenericResonse {
     message: string
 }
@@ -43,21 +41,52 @@ export interface InstanceConfig {
     game: any
 }
 
-export interface InstanceEndpoint {
-    endpoint: string,
+export type ProvisioningStatus =
+    | "creating" | "ready" | "updating" | "deleting"
+    | "rolling_back" | "rolled_back" | "failed" | "gone" | "unknown";
+
+interface ProvisioningEnvelope {
+    region: string;
+    raw_status: string;
+    created_at: string;
+    last_updated_at: string | null;
+    elapsed_seconds: number;
 }
 
-export const getInstanceEndpoint = query(async (instance: Instance): Promise<string> => {
+export type InstanceState =
+    | (ProvisioningEnvelope & { status: "creating";     message: string })
+    | (ProvisioningEnvelope & { status: "ready";        endpoint: string })
+    | (ProvisioningEnvelope & { status: "updating";     endpoint?: string; message: string })
+    | (ProvisioningEnvelope & { status: "deleting";     message: string })
+    | (ProvisioningEnvelope & { status: "rolling_back"; reason?: string; message: string })
+    | (ProvisioningEnvelope & { status: "rolled_back";  reason?: string; recovery: "delete" })
+    | (ProvisioningEnvelope & { status: "failed";       error: { failed_status: string; reason?: string }; recovery: "delete" | "contact_support" })
+    | (ProvisioningEnvelope & { status: "gone";         message: string })
+    | (ProvisioningEnvelope & { status: "unknown";      note: string });
+
+export const getInstanceState = query(async (instance: Instance): Promise<InstanceState> => {
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch(`https://api.instances.aki-labs.com/${instance.game}/${instance.name}`, {
         method: "GET",
+        cache: "no-store", // 401 response when instance is delete, if created on same name, browser will return cache rather than ping pong
         headers: {
             "Authorization": `Bearer ${token.accessToken}`
         }
     });
-    
-    return (await resp.json() as InstanceEndpoint).endpoint;
-}, "endpoint");
+
+    // 200/202/409/410 all carry a structured InstanceState body. Only auth/server errors throw.
+    if (resp.status === 401 || resp.status === 403 || resp.status >= 500) {
+        throw new Error(`Failed to fetch instance state (${resp.status})`);
+    }
+    return (await resp.json()) as InstanceState;
+}, "instanceState");
+
+export const endpointOf = (s: InstanceState | undefined): string | undefined => {
+    if (!s) return undefined;
+    if (s.status === "ready") return s.endpoint;
+    if (s.status === "updating") return s.endpoint;
+    return undefined;
+};
 
 export const getInstanceConfig = query(async (endpoint: string): Promise<InstanceConfig> => {
     const token = await getToken(["api://Instances/access"]);
