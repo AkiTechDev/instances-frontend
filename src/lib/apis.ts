@@ -15,6 +15,7 @@ export const getInstances = query(async (): Promise<Instance[]> => {
     const token = await getToken(["api://Instances/access"]);
     const resp = await fetch("https://api.instances.aki-labs.com/instances/list", {
         method: "GET",
+        cache: "no-store", // disk-cache the list and a delete + recreate looks stale to the user
         headers: {
             "Authorization": `Bearer ${token.accessToken}`
         }

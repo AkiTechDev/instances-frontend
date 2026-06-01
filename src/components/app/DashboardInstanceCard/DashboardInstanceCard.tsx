@@ -34,7 +34,7 @@ const cardSubtitle = (state: InstanceState | undefined): string => {
     if (!state) return "";
     switch (state.status) {
         case "ready":
-        case "updating":      return `Active ${timeAgo(state.elapsed_seconds)}`;
+        case "updating":      return `Created ${timeAgo(state.elapsed_seconds)}`;
         case "creating":
         case "deleting":
         case "rolling_back":

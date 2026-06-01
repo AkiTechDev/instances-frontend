@@ -1,5 +1,5 @@
 import { createSignal, For, createEffect, Show } from "solid-js";
-import { createAsync } from "@solidjs/router";
+import { createAsync, revalidate } from "@solidjs/router";
 import DashboardHeader from "../DashboardHeader/DashboardHeader";
 import DashboardSidebarNav from "../DashboardSidebarNav/DashboardSidebarNav";
 
@@ -18,6 +18,7 @@ import listViewIcon from "../../../assets/icons/list.svg";;
 import iconArrow from "../../../assets/icons/chevron.svg";
 import searchIcon from "../../../assets/icons/search.svg";;
 import crossIcon from "../../../assets/icons/cross.svg";
+import refreshIcon from "../../../assets/icons/refresh.svg";
 import LogoIcon from "../../../assets/icons/logos/icon.svg";
 import DashboardInstanceCard from "../DashboardInstanceCard/DashboardInstanceCard";
 import CreateInstanceModal, { type ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
@@ -89,6 +90,7 @@ const Dashboard = () => {
                             <button class={`bodyTextMedium ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Active Instances</button>
                         </label>
                         <button class={`bodyTextMedium ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Date Created</button>
+                        <button class={`bodyTextMedium ${filterBtn.button}`} style={`--icon: url(${refreshIcon.src})`} onClick={() => revalidate("instances")}>Refresh</button>
                         <div class={styles.toggleView}>
                             <input
                                 id="viewToggle"
