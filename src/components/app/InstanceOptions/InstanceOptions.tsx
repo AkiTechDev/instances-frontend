@@ -39,7 +39,7 @@ const InstanceOptions: Component<{ endpoint: string, instance: Instance }> = (pr
     // the CDK deploy workflow. With no values changed CDK synth diffs cleanly
     // and applies any template improvements published since the stack was last
     // deployed; no-ops if nothing has changed.
-    const refresh = async () => {
+    const updateInstance = async () => {
         if (!props.endpoint) return;
         try {
             const [config, runtime] = await Promise.all([
@@ -69,7 +69,7 @@ const InstanceOptions: Component<{ endpoint: string, instance: Instance }> = (pr
                 <span class={styles.dot}></span>
             </summary>
             <div class={styles.options}>
-                <button class="bodyTextMedium" onclick={refresh} disabled={!props.endpoint}>Refresh Instance</button>
+                <button class="bodyTextMedium" onclick={updateInstance} disabled={!props.endpoint}>Update Instance</button>
                 <button class="bodyTextMedium" onclick={async () => {await postDownloadGameData(props.endpoint); await sleep(1000); closeMenu() }}>Download Game Data</button>
                 <button class="bodyTextMedium" disabled>Transfer Ownership</button>
                 <button class="bodyTextMedium" disabled>Change Instance Location</button>

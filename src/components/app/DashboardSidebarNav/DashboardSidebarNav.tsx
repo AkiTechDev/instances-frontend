@@ -12,6 +12,7 @@ import searchIcon from "../../../assets/icons/search.svg"
 import allGamesIcon from "../../../assets/icons/allGames.svg";
 import type { ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
 import { gameRegistry } from "../../../lib/games/index";
+import { getInstances } from "../../../lib/apis";
 
 const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateIntanceModal: (options: ModalOptions) => void}) => {
     const [searchText, setSearchText] = createSignal("");
