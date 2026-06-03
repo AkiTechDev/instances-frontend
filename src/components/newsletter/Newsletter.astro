@@ -1,7 +1,7 @@
 <!-- NewsletterSection.astro -->
 ---
 import styles from './newsletter.module.css';
-import buttonBig from "../../styles/components/buttonBig.module.css";
+import button from "../../styles/components/button.module.css";
 
 import CoffeePNG from '../../assets/images/coffee.png';
 import { Picture } from 'astro:assets';
@@ -16,7 +16,7 @@ import { Picture } from 'astro:assets';
         </div>
         <form class={styles.form} id="newsletterForm">
             <input type="email" id="email" name="email" placeholder="Enter Your email" />
-            <button class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle]}><p class="buttonText">Submit</p></button>
+            <button class:list={[button.btn, button.vibrant]}><p class="buttonText">Submit</p></button>
         </form>
     </div>
 </section>

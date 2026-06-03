@@ -1,7 +1,7 @@
 import { createSignal, createResource, Show, For } from "solid-js";
 
 import styles from "./supportedGames.module.css";
-import buttonBig from "../../styles/components/buttonBig.module.css";
+import button from "../../styles/components/button.module.css";
 import GameCard from "../app/GameCard/GameCard";
 
 
@@ -53,7 +53,7 @@ const SupportedGameCard = () => {
         </Show>
         <button
             style="width:33%;"
-            class={`${buttonBig.buttonBig} ${buttonBig.transparentVibrantStyle}`}
+            class={`${button.btn} ${button.outline}`}
             onClick={() => setShowAll(prev => !prev)}
         >
             <p class="buttonText">{showAll() ? 'Show Less Games' : 'Show More Games'}</p>

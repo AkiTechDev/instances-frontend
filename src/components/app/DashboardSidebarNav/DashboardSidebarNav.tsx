@@ -1,4 +1,5 @@
 import { createSignal} from "solid-js"
+import { createAsync } from "@solidjs/router";
 
 import styles from "../Dashboard/Dashboard.module.css";
 
@@ -17,6 +18,10 @@ import { getInstances } from "../../../lib/apis";
 const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateIntanceModal: (options: ModalOptions) => void}) => {
     const [searchText, setSearchText] = createSignal("");
     const [collapsed, setCollapsed] = createSignal(false);
+
+    // `getInstances` is query-cached, so this re-uses the Dashboard's fetch.
+    const instances = createAsync(() => getInstances(), { initialValue: [] });
+    const userGames = () => new Set(instances().map(i => i.game));
 
     return (
         <aside class={`${styles.sidebar} ${collapsed() && styles.collapsed}`}>
@@ -54,6 +59,7 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
                 </div>
 
                 <For each={Object.entries(gameRegistry)
+                    .filter(([game_id,]) => userGames().has(game_id))
                     .filter(([game,]) => {
                         if (searchText() === "") { return true } else { return gameRegistry[game].name.toLowerCase().includes(searchText().toLowerCase()) }
                     })

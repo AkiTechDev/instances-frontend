@@ -16,6 +16,9 @@
 .btn.outlineLight { background: transparent; border-color: var(--c-white); color: var(--c-white); }
 .btn.outlineLight:hover { background: var(--c-white); color: var(--text-colour-dark); }
 
+.btn.outlineDark { background: transparent; border-color: var(--text-colour-dark); color: var(--text-colour-dark); }
+.btn.outlineDark:hover { background: var(--text-colour-dark); border-color: var(--text-colour-dark); color: var(--text-colour-light); }
+
 .btn.link { background: transparent; border: 0; color: #EBA439; padding: 4px 0; font-weight: 700; font-size: 14px; }
 
 .vibrant { background: #EBA439; border-color: #EBA439; color: #191C2E; }
