@@ -29,6 +29,7 @@ import { ResponsiveImage } from "@responsive-image/solid";
 
 
 import button from "../../../styles/components/button.module.css";
+import search from "../../../styles/components/search.module.css";
 
 const Dashboard = () => {
     const instances = createAsync(() => getInstances(), {
@@ -58,6 +59,17 @@ const Dashboard = () => {
         setOpenModal(true);
     }
 
+    const [isRefreshing, setIsRefreshing] = createSignal(false);
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+
+        revalidate("instances");
+
+        setTimeout(() => {
+            setIsRefreshing(false);
+        }, 3000); // 3 seconds
+    };
+
 
     return (
         <section class={styles.gridContainer}>
@@ -84,14 +96,19 @@ const Dashboard = () => {
                         <button class={`${button.btn} ${button.vibrant} ${button.icon}`} style={`--icon: url(${LogoIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}><p class="buttonText">Add New Instance</p></button>
                     </div>
                     <div class={styles.gameFiltersContainer}>
-                        <label class={styles.searchableContainer}>
-                            <div class={styles.searchIcon} style={`--icon: url("${searchIcon.src}")`}></div>
-                            <input id="instanceSearch" type="search" placeholder="Search your instances" value={instanceSearchText()} onInput={(e) => setInstanceSearchText(e.currentTarget.value)}></input>
-                            <button onClick={() => (setInstanceSearchText(""))} class={`${styles.inputClearBtn} ${instanceSearchText() ? styles.visible : styles.hidden}`} style={`--icon: url("${crossIcon.src}")`}></button>
+                        <label class={`${search.label} ${search.withFilterBtn}`} style={`--icon: url("${searchIcon.src}")`}>
+                            <input id="test" type="search" placeholder="Search your instances" value={instanceSearchText()} onInput={(e) => setInstanceSearchText(e.currentTarget.value)} />
+                            <button onClick={() => (setInstanceSearchText(""))} class={`${search.clearBtn} ${instanceSearchText() ? search.visible : ""}`} style={`--icon: url("${crossIcon.src}")`}></button>
                             <button class={`bodyTextMedium ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Active Instances</button>
                         </label>
                         <button class={`bodyTextMedium ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Date Created</button>
-                        <button class={`bodyTextMedium ${filterBtn.button}`} style={`--icon: url(${refreshIcon.src})`} onClick={() => revalidate("instances")}>Refresh</button>
+                        <button
+                            class={`bodyTextMedium ${filterBtn.button} ${isRefreshing() ? styles.active : ""}`}
+                            style={`--icon: url(${refreshIcon.src})`}
+                            onClick={() => handleRefresh()}
+                        >
+                                Refresh
+                        </button>
                         <div class={styles.toggleView}>
                             <input
                                 id="viewToggle"
