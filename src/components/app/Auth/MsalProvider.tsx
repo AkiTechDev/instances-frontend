@@ -27,11 +27,8 @@ export function MsalProvider(props: { children?: any }) {
     const [ready] = createResource(() => msalReady);
     const [account, setAccount] = createSignal<AccountInfo | null>(null);
 
-    console.log("FUCKING LOG");
-
     createEffect(() => {
         if (ready.loading) return;
-        console.log("ACCOUNT", msalInstance.getActiveAccount());
         setAccount(msalInstance.getActiveAccount());
     });
 

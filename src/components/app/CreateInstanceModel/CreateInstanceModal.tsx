@@ -134,7 +134,6 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
 
                     putCreateInstance(gameId()!, formData["instance_name"].replaceAll(' ', ''), new_config)
                     setTimeout(() => revalidate(getInstances.key, true), 5500)
-                    console.log("SETTING CLOSED")
                     props.setIsOpen(false);
 
                 }

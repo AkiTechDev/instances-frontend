@@ -19,7 +19,6 @@ import * as v from "valibot";
 */
 
 const ManagementGameConfiguration: Component<{ schema: v.ObjectSchema<any, undefined>, config: any, endpoint: string }> = (props) => {
-    console.log("GAME CONFIG", props.config);
     const gameForm = createForm({
         schema: props.schema,
         initialInput: props.config
