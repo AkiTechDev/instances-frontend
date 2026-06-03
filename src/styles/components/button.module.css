@@ -1,7 +1,7 @@
 .btn {
     font-family: Lexend; font-weight: 600; font-size: 16px; line-height: normal;
     border-radius: var(--r-pill); padding: 1rem 1.5rem; border: 1px solid transparent;
-    display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer;
     transition: all 0.15s;
 }
 
@@ -15,6 +15,12 @@
 
 .btn.outlineLight { background: transparent; border-color: var(--c-white); color: var(--c-white); }
 .btn.outlineLight:hover { background: var(--c-white); color: var(--text-colour-dark); }
+
+.btn.outlineDark { background: transparent; border-color: var(--text-colour-dark); color: var(--text-colour-dark); }
+.btn.outlineDark:hover { background: var(--text-colour-dark); border-color: var(--text-colour-dark); color: var(--text-colour-light); }
+
+.btn.secondary { background: var(--colour-text-secondary); border-color: var(--colour-text-secondary); color: var(--colour-text-primary); }
+.btn.secondary:hover { background: #C589F4; border-color: #C589F4; }
 
 .btn.link { background: transparent; border: 0; color: #EBA439; padding: 4px 0; font-weight: 700; font-size: 14px; }
 
@@ -32,3 +38,5 @@
     -webkit-mask: var(--icon) no-repeat center / contain;
     mask: var(--icon) no-repeat center / contain;
 }
+
+.rotate45::before { transform: rotate(45deg); }

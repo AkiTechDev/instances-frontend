@@ -154,117 +154,8 @@
         gap: 0.75rem;
     }
 
-    .searchableContainer {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 12px;
-
-        cursor: text;
-
-        /* Grey */
-        border-radius: 24px;
-        gap: 0.5rem;
-
-        padding-left: 0.5rem;
-        position: relative;
-
+    .gameFiltersContainer :first-child {
         margin-right: auto;
-    }
-
-    .searchableContainer::before {
-        content: "";
-        position: absolute;
-        inset: 0px;
-
-        /* Grey */
-        border-width: 1.5px;
-        border-style: solid;
-        border-color: #E2E3EB;
-        border-radius: 24px;
-
-        transition: all 0.5s ease;
-    }
-
-    .searchIcon {
-        width: 16px;
-        height: 16px;
-
-        background-color: var(--colour-text-primary);
-        mask: var(--icon) no-repeat center;
-        -webkit-mask: var(--icon) no-repeat center;
-
-        transition: all 0.5s ease;
-    }
-
-    .searchableContainer > input {
-        outline: none;
-        border: none;
-        background: transparent;
-        
-        display: flex;
-        align-items: center;
-        padding: 0.5rem 0;
-
-        font-family: Lexend;
-        font-style: normal;
-        font-weight: 400;
-        font-size: 1rem;
-        line-height: 130%;
-        color: var(--colour-text-primary);
-    }
-
-    .searchableContainer > input::placeholder {
-        transition: opacity 1s;
-        opacity: 0.6;
-    }
-
-    .searchableContainer:hover::before {
-        border-width: 1.5px;
-        border-style: solid;
-        border-color: transparent;
-        border-radius: 24px;
-        background: linear-gradient(90deg,rgba(197, 137, 244, 1) 0%, rgba(235, 235, 235, 1) 50%, rgba(235, 235, 235, 1) 100%) border-box;
-        mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-        mask-composite: exclude;
-        pointer-events: none;
-    }
-    
-
-    .searchableContainer:hover .searchIcon {
-        background-color: #C589F4;
-    }
-
-    .searchableContainer:focus-within::before {
-        border-color: #EBA439;
-    }
-
-    .searchableContainer:focus-within .searchIcon  {
-        background-color: #EBA439;
-    }
-
-    /* Hide native X */
-    .searchableContainer input[type="search"]::-webkit-search-cancel-button {
-        display: none;
-    }
-
-    .inputClearBtn {
-        width: 16px;
-        height: 16px;
-
-        background-color: var(--colour-text-primary);
-        mask: var(--icon) no-repeat center;
-        -webkit-mask: var(--icon) no-repeat center;
-
-        opacity: 0;
-        flex-shrink: 0;
-        pointer-events: none;
-        transition: opacity 0.3s ease;
-    }
-
-    .inputClearBtn.visible {
-        opacity: 1;
-        pointer-events: all;
     }
 
     /* Grid / List View Toggle */
@@ -546,4 +437,8 @@
         opacity: 0;
         width: 0;
         height: 0;
+    }
+
+    .active {
+        background-color: var(--c-orange);
     }

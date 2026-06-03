@@ -1,8 +1,9 @@
 import { createSignal} from "solid-js"
+import { createAsync } from "@solidjs/router";
 
 import styles from "../Dashboard/Dashboard.module.css";
 
-import btnWithIcon from '../../../styles/components/buttonWithIcons.module.css';
+import button from "../../../styles/components/button.module.css";
 
 import { For } from "solid-js";
 
@@ -12,10 +13,17 @@ import searchIcon from "../../../assets/icons/search.svg"
 import allGamesIcon from "../../../assets/icons/allGames.svg";
 import type { ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
 import { gameRegistry } from "../../../lib/games/index";
+import { getInstances } from "../../../lib/apis";
+import search from "../../../styles/components/search.module.css";
+import crossIcon from "../../../assets/icons/cross.svg";
 
 const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateIntanceModal: (options: ModalOptions) => void}) => {
     const [searchText, setSearchText] = createSignal("");
     const [collapsed, setCollapsed] = createSignal(false);
+
+    // `getInstances` is query-cached, so this re-uses the Dashboard's fetch.
+    const instances = createAsync(() => getInstances(), { initialValue: [] });
+    const userGames = () => new Set(instances().map(i => i.game));
 
     return (
         <aside class={`${styles.sidebar} ${collapsed() && styles.collapsed}`}>
@@ -28,16 +36,16 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
             }}></a>
             <div class={styles.sidebarHeader}>
                 <p class="subtitleSemi">My Games</p>
-                <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.rotate45}`} style={`--icon: url(${iconCross.src})`} onClick={() => props.openCreateIntanceModal({game_id: null, allow_game_change: true})}><p class="buttonTextSmall">Create New Game</p></button>
-                <label class={styles.searchableContainer}>
-                    <div class={styles.searchIcon} style={`--icon: url("${searchIcon.src}")`}></div>
+                <button class={`${button.btn} ${button.secondary} ${button.icon} ${button.rotate45}`} style={`--icon: url(${iconCross.src})`} onClick={() => props.openCreateIntanceModal({game_id: null, allow_game_change: true})}><p class="buttonTextSmall">Create New Game</p></button>
+                <label class={search.label} style={`--icon: url("${searchIcon.src}")`}>
                     <input
-                        type="search"
                         id="gameSearch"
+                        type="search"
                         placeholder="Find your game"
                         value={searchText()}
-                        onClick={() => setCollapsed(false)}
-                        onInput={(e) => setSearchText(e.currentTarget.value)}></input>
+                        onInput={(e) => setSearchText(e.currentTarget.value)} 
+                    />
+                    <button onClick={() => (setSearchText(""))} class={`${search.clearBtn} ${searchText() ? search.visible : ""}`} style={`--icon: url("${crossIcon.src}")`}></button>
                 </label>
             </div>
             <div class={styles.sidebarGamesContainer}>
@@ -53,6 +61,7 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
                 </div>
 
                 <For each={Object.entries(gameRegistry)
+                    .filter(([game_id,]) => userGames().has(game_id))
                     .filter(([game,]) => {
                         if (searchText() === "") { return true } else { return gameRegistry[game].name.toLowerCase().includes(searchText().toLowerCase()) }
                     })

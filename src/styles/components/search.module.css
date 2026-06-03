@@ -1,0 +1,94 @@
+.label {
+    box-sizing: border-box;
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    flex-direction: row;
+
+    border-radius: var(--r-chip); padding: 0rem 1rem; border: 1px solid transparent;
+    background: linear-gradient(white, white) padding-box,
+                var(--c-grey-200) border-box;
+    cursor: text;
+
+    /* Placeholder text */
+    font-family: Lexend; font-style: normal; font-weight: 500; font-size: 1rem;
+    color: var(--c-ink);
+}
+
+.label:hover {
+    background: linear-gradient(white, white) padding-box,
+                var(--c-purple) border-box;
+}
+
+.label:focus-within {
+    background: linear-gradient(white, white) padding-box,
+                var(--c-orange) border-box;
+}
+
+.label::before {
+    content: ""; width: 20px; height: 20px;
+    flex-shrink: 0;
+
+    background-color: var(--text-colour-dark);
+    mask: var(--icon) no-repeat center;
+    -webkit-mask: var(--icon) no-repeat center;
+}
+
+.label:hover::before {
+    background-color: var(--c-purple);
+}
+
+.label:focus-within::before {
+    background-color: var(--c-orange);
+}
+
+.label input {
+    padding: 0.5rem 0;
+    border: 1px solid transparent;
+    outline: none; background: transparent;
+    font-family: inherit; font-size: inherit; color: inherit; font-weight: inherit;
+
+    flex: 1;
+    min-width: 0;
+}
+
+.label input::placeholder {
+    opacity: 0.6;
+}
+
+/* Hide native X */
+.label input::-webkit-search-cancel-button {
+    display: none;
+}
+
+.clearBtn {
+    width: 16px; height: 16px;
+    flex: 0 0 16px; /* don't grow, don't shrink */
+
+    background-color: var(--text-colour-dark);
+    mask: var(--icon) no-repeat center;
+    -webkit-mask: var(--icon) no-repeat center;
+
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.1s ease;
+}
+
+.clearBtn.visible {
+    opacity: 1;
+    pointer-events: all;
+}
+
+
+
+.withFilterBtn {
+    padding-right: 0rem;
+}
+
+.withFilterBtn:hover {
+    background: linear-gradient(white, white) padding-box,
+                var(--c-grey-200) border-box;
+}
+
+.withFilterBtn:focus-within {
+    background: linear-gradient(white, white) padding-box,
+                linear-gradient(90deg, #EBA439 0%, #E2E3EB 100%) border-box;
+}

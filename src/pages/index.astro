@@ -10,7 +10,7 @@ import "../styles/theme/default.css"
 import colourStyles from "../styles/theme/colours.module.css"
 
 
-import buttonBig from "../styles/components/buttonBig.module.css"
+import button from "../styles/components/button.module.css"
 
 import LogoIcon from "../assets/icons/logos/icon.svg";
 
@@ -105,7 +105,7 @@ const domain = "instances.aki-labs.com"
             <h1 class="promoHeader">Get Your First Server Hour Free - <span class="textHiglight">No Credit Card</span> Required!</h1>
             <p class="promoText">Spin up your first game instance today and see how easy multiplayer hosting can be.</p>
           </div>
-          <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle, "h1"]}><p class="buttonText" style="z-index:2">Start Playing Now</p></button>
+          <button data-signup class:list={[button.btn, button.vibrant, "h1"]}><p class="buttonText" style="z-index:2">Start Playing Now</p></button>
         </div>
       </div>
     </section>
@@ -203,8 +203,8 @@ const domain = "instances.aki-labs.com"
           <p class="subTitle">Manage your active instances, switch between games, and invite friends – all in one place.</p>
         </div>
         <div class="ctaButtons">
-          <button data-signup class:list={[buttonBig.buttonBig, buttonBig.vibrantStyle]}><p class="buttonText">Start Playing Now</p></button>
-          <button class:list={[buttonBig.buttonBig, buttonBig.transparentVibrantStyle]}><p class="buttonText">Learn More</p></button>
+          <button data-signup class:list={[button.btn, button.vibrant]}><p class="buttonText">Start Playing Now</p></button>
+          <button class:list={[button.btn, button.outline]}><p class="buttonText">Learn More</p></button>
         </div>
       </div>
 

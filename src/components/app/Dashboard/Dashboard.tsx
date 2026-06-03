@@ -1,13 +1,10 @@
 import { createSignal, For, createEffect, Show } from "solid-js";
-import { createAsync } from "@solidjs/router";
+import { createAsync, revalidate } from "@solidjs/router";
 import DashboardHeader from "../DashboardHeader/DashboardHeader";
 import DashboardSidebarNav from "../DashboardSidebarNav/DashboardSidebarNav";
 
 // Dashboard Imports
 import styles from "./Dashboard.module.css";
-
-import buttonBig from "../../../styles/components/buttonBig.module.css";
-import btnWithIcon from "../../../styles/components/buttonWithIcons.module.css";
 
 // No Instances Imports
 import mouseImage from "../../../assets/images/mouse.png?format=avif;webp&responsive";
@@ -18,6 +15,7 @@ import listViewIcon from "../../../assets/icons/list.svg";;
 import iconArrow from "../../../assets/icons/chevron.svg";
 import searchIcon from "../../../assets/icons/search.svg";;
 import crossIcon from "../../../assets/icons/cross.svg";
+import refreshIcon from "../../../assets/icons/refresh.svg";
 import LogoIcon from "../../../assets/icons/logos/icon.svg";
 import DashboardInstanceCard from "../DashboardInstanceCard/DashboardInstanceCard";
 import CreateInstanceModal, { type ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
@@ -27,6 +25,9 @@ import { getInstances, type Instance } from "../../../lib/apis";
 import { gameRegistry } from "../../../lib/games/index";
 import { ResponsiveImage } from "@responsive-image/solid";
 
+
+import button from "../../../styles/components/button.module.css";
+import search from "../../../styles/components/search.module.css";
 
 const Dashboard = () => {
     const instances = createAsync(() => getInstances(), {
@@ -56,6 +57,17 @@ const Dashboard = () => {
         setOpenModal(true);
     }
 
+    const [isRefreshing, setIsRefreshing] = createSignal(false);
+    const handleRefresh = async () => {
+        setIsRefreshing(true);
+
+        revalidate("instances");
+
+        setTimeout(() => {
+            setIsRefreshing(false);
+        }, 3000); // 3 seconds
+    };
+
 
     return (
         <section class={styles.gridContainer}>
@@ -70,7 +82,7 @@ const Dashboard = () => {
                         <h6 class="h6">No Games Added Yet!</h6>
                         <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
                     </div>
-                    <button class={`${buttonBig.buttonBig} ${buttonBig.vibrantStyle} ${btnWithIcon.rotate45}`} style={`--icon: url(${crossIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: null, allow_game_change: true})}><p class="buttonText">Create New Game</p></button>
+                    <button class={`${button.btn} ${button.vibrant} ${button.icon} ${button.rotate45}`} style={`--icon: url(${crossIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: null, allow_game_change: true})}><p class="buttonText">Create New Game</p></button>
                 </div>
             )}
             { instances().length > 0 && (
@@ -79,16 +91,22 @@ const Dashboard = () => {
                 <div class={styles.gamesContainer}>
                     <div class={styles.gamesListHeader}>
                         <h4 class="h4">{(gameFilter() === "all") ? "All Instances" : gameRegistry[gameFilter()].name}</h4>
-                        <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.buttonBig}`} style={`--icon: url(${LogoIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}><p class="buttonText">Add New Instance</p></button>
+                        <button class={`${button.btn} ${button.vibrant} ${button.icon}`} style={`--icon: url(${LogoIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}><p class="buttonText">Add New Instance</p></button>
                     </div>
                     <div class={styles.gameFiltersContainer}>
-                        <label class={styles.searchableContainer}>
-                            <div class={styles.searchIcon} style={`--icon: url("${searchIcon.src}")`}></div>
-                            <input id="instanceSearch" type="search" placeholder="Search your instances" value={instanceSearchText()} onInput={(e) => setInstanceSearchText(e.currentTarget.value)}></input>
-                            <button onClick={() => (setInstanceSearchText(""))} class={`${styles.inputClearBtn} ${instanceSearchText() ? styles.visible : styles.hidden}`} style={`--icon: url("${crossIcon.src}")`}></button>
+                        <label class={`${search.label} ${search.withFilterBtn}`} style={`--icon: url("${searchIcon.src}")`}>
+                            <input id="test" type="search" placeholder="Search your instances" value={instanceSearchText()} onInput={(e) => setInstanceSearchText(e.currentTarget.value)} />
+                            <button onClick={() => (setInstanceSearchText(""))} class={`${search.clearBtn} ${instanceSearchText() ? search.visible : ""}`} style={`--icon: url("${crossIcon.src}")`}></button>
                             <button class={`bodyTextMedium ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Active Instances</button>
                         </label>
                         <button class={`bodyTextMedium ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Date Created</button>
+                        <button
+                            class={`bodyTextMedium ${filterBtn.button} ${isRefreshing() ? styles.active : ""}`}
+                            style={`--icon: url(${refreshIcon.src})`}
+                            onClick={() => handleRefresh()}
+                        >
+                                Refresh
+                        </button>
                         <div class={styles.toggleView}>
                             <input
                                 id="viewToggle"
