@@ -3,7 +3,7 @@ import { createAsync } from "@solidjs/router";
 
 import styles from "../Dashboard/Dashboard.module.css";
 
-import btnWithIcon from '../../../styles/components/buttonWithIcons.module.css';
+import button from "../../../styles/components/button.module.css";
 
 import { For } from "solid-js";
 
@@ -36,7 +36,7 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
             }}></a>
             <div class={styles.sidebarHeader}>
                 <p class="subtitleSemi">My Games</p>
-                <button class={`${btnWithIcon.buttonSlim} ${btnWithIcon.rotate45}`} style={`--icon: url(${iconCross.src})`} onClick={() => props.openCreateIntanceModal({game_id: null, allow_game_change: true})}><p class="buttonTextSmall">Create New Game</p></button>
+                <button class={`${button.btn} ${button.secondary} ${button.icon} ${button.rotate45}`} style={`--icon: url(${iconCross.src})`} onClick={() => props.openCreateIntanceModal({game_id: null, allow_game_change: true})}><p class="buttonTextSmall">Create New Game</p></button>
                 <label class={search.label} style={`--icon: url("${searchIcon.src}")`}>
                     <input
                         id="gameSearch"

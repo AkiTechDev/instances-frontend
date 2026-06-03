@@ -6,8 +6,6 @@ import DashboardSidebarNav from "../DashboardSidebarNav/DashboardSidebarNav";
 // Dashboard Imports
 import styles from "./Dashboard.module.css";
 
-import btnWithIcon from "../../../styles/components/buttonWithIcons.module.css";
-
 // No Instances Imports
 import mouseImage from "../../../assets/images/mouse.png?format=avif;webp&responsive";
 
@@ -84,7 +82,7 @@ const Dashboard = () => {
                         <h6 class="h6">No Games Added Yet!</h6>
                         <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
                     </div>
-                    <button class={`${button.btn} ${button.vibrant} ${button.icon} ${btnWithIcon.rotate45}`} style={`--icon: url(${crossIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: null, allow_game_change: true})}><p class="buttonText">Create New Game</p></button>
+                    <button class={`${button.btn} ${button.vibrant} ${button.icon} ${button.rotate45}`} style={`--icon: url(${crossIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: null, allow_game_change: true})}><p class="buttonText">Create New Game</p></button>
                 </div>
             )}
             { instances().length > 0 && (

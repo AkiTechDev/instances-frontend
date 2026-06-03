@@ -1,4 +1,5 @@
 .label {
+    box-sizing: border-box;
     display: inline-flex; align-items: center; gap: 0.5rem;
     flex-direction: row;
 
@@ -24,6 +25,7 @@
 
 .label::before {
     content: ""; width: 20px; height: 20px;
+    flex-shrink: 0;
 
     background-color: var(--text-colour-dark);
     mask: var(--icon) no-repeat center;
@@ -39,8 +41,11 @@
 }
 
 .label input {
-    padding: 0.5rem 0rem;
-    border: none; outline: none; background: transparent;
+    padding: 0.5rem 0;
+    border: 1px solid transparent;
+    box-sizing: border-box;
+    font-weight: 500;
+    outline: none; background: transparent;
     font-family: inherit; font-size: inherit; color: inherit; flex: 1;
 }
 
@@ -55,13 +60,13 @@
 
 .clearBtn {
     width: 16px; height: 16px;
+    flex-shrink: 0;
 
     background-color: var(--text-colour-dark);
     mask: var(--icon) no-repeat center;
     -webkit-mask: var(--icon) no-repeat center;
 
     opacity: 0;
-    flex-shrink: 1;
     pointer-events: none;
     transition: opacity 0.1s ease;
 }

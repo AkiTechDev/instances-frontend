@@ -6,7 +6,6 @@ import styles from "./Management.module.css";
 import ManagementHeader from "../ManagementHeader/ManagementHeader";
 import iconArrow from "../../../assets/icons/chevron.svg";
 
-import btnWithIcon from "../../../styles/components/buttonWithIcons.module.css";
 import button from "../../../styles/components/button.module.css";
 import stopIcon from "../../../assets/icons/stop.svg";
 import playIcon from "../../../assets/icons/play.svg";
@@ -151,7 +150,7 @@ const Management = () => {
 
                         <Show when={state() && isReadyOrUpdating(state())}>
                             <div class={styles.quickActions}>
-                                <button class={btnWithIcon.buttonSlim} style={`--icon: url(${ isRunning() ? stopIcon.src : playIcon.src})`} onClick={() => toggleInstanceButton()}><p class="buttonText">{isRunning() ? "Stop Game" : "Start Game"}</p></button>
+                                <button class={`${button.btn} ${button.secondary} ${button.icon}`} style={`--icon: url(${ isRunning() ? stopIcon.src : playIcon.src})`} onClick={() => toggleInstanceButton()}><p class="buttonText">{isRunning() ? "Stop Game" : "Start Game"}</p></button>
                                 <button class={`${button.btn} ${button.outlineDark}`}><p class="buttonText">Invite Friends</p></button>
                                 <InstanceOptions endpoint={endpoint()!} instance={instance} />
                             </div>

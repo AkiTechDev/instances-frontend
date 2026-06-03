@@ -19,6 +19,9 @@
 .btn.outlineDark { background: transparent; border-color: var(--text-colour-dark); color: var(--text-colour-dark); }
 .btn.outlineDark:hover { background: var(--text-colour-dark); border-color: var(--text-colour-dark); color: var(--text-colour-light); }
 
+.btn.secondary { background: var(--colour-text-secondary); border-color: var(--colour-text-secondary); color: var(--colour-text-primary); }
+.btn.secondary:hover { background: #C589F4; border-color: #C589F4; }
+
 .btn.link { background: transparent; border: 0; color: #EBA439; padding: 4px 0; font-weight: 700; font-size: 14px; }
 
 .vibrant { background: #EBA439; border-color: #EBA439; color: #191C2E; }
@@ -35,3 +38,5 @@
     -webkit-mask: var(--icon) no-repeat center / contain;
     mask: var(--icon) no-repeat center / contain;
 }
+
+.rotate45::before { transform: rotate(45deg); }
