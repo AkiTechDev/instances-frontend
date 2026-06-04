@@ -1,4 +1,12 @@
-import { createResource, createSignal, createUniqueId, Show, Suspense } from "solid-js";
+import {
+    createMemo,
+    createResource,
+    createSignal,
+    createUniqueId,
+    Show,
+    Suspense,
+    type Component,
+} from "solid-js";
 import { A, createAsync } from "@solidjs/router";
 import {
     endpointOf,
@@ -16,11 +24,12 @@ import InstanceOptions from "../InstanceOptions/InstanceOptions";
 import { gameRegistry } from "../../../lib/games/index";
 import { ResponsiveImage } from "@responsive-image/solid";
 
-const cardLabel = (state: InstanceState, isRunning: boolean): string => {
+const cardLabel = (state: InstanceState | undefined, isRunning: boolean): string => {
+    if (!state) return "";
     switch (state.status) {
         case "ready":
         case "updating":      return isRunning ? "RUNNING" : "STOPPED";
-        case "creating":      return "CREATING";
+        case "creating":      return "GENERATING";
         case "deleting":      return "DELETING";
         case "rolling_back":  return "ROLLING BACK";
         case "rolled_back":   return "FAILED";
@@ -35,7 +44,7 @@ const cardSubtitle = (state: InstanceState | undefined): string => {
     switch (state.status) {
         case "ready":
         case "updating":      return `Created ${timeAgo(state.elapsed_seconds)}`;
-        case "creating":
+        case "creating":      return `Generating`;
         case "deleting":
         case "rolling_back":
         case "gone":          return state.message;
@@ -48,41 +57,91 @@ const cardSubtitle = (state: InstanceState | undefined): string => {
 const canToggle = (state: InstanceState | undefined): boolean =>
     state?.status === "ready" || state?.status === "updating";
 
-const DashboardInstanceCard = (props: { instance: Instance, listView: boolean, idx: number }) => {
+type StatusVariant = "active" | "creating" | undefined;
+
+const statusVariantOf = (state: InstanceState | undefined, isRunning: boolean): StatusVariant => {
+    if (!state) return undefined;
+    switch (state.status) {
+        case "ready":
+        case "updating":      return isRunning ? "active" : undefined;
+        case "creating":      return "creating";
+        default:              return undefined;
+    }
+};
+
+const StatusBadge: Component<{ label: string; variant: StatusVariant }> = (props) => {
+    const variantClass = () => (props.variant ? styles[props.variant] : "");
+    return (
+        <div class={`${styles.statusContainer} ${variantClass()}`}>
+            <div class={`${styles.statusIndicator} ${variantClass()}`} />
+            <p class="smallestLabel">{props.label}</p>
+        </div>
+    );
+};
+
+const ToggleSwitch: Component<{
+    id: string;
+    checked: boolean;
+    disabled?: boolean;
+    onToggle: (e: Event) => void;
+}> = (props) => (
+    <>
+        <input
+            id={props.id}
+            type="checkbox"
+            checked={props.checked}
+            disabled={props.disabled}
+            onChange={props.onToggle}
+            onClick={(e) => e.stopImmediatePropagation()}
+        />
+        <label for={props.id}>
+            <p class="smallestLabel">ON</p>
+            <p class="smallestLabel">OFF</p>
+        </label>
+    </>
+);
+
+const DashboardInstanceCard: Component<{ instance: Instance; listView: boolean; idx: number }> = (props) => {
     const id = createUniqueId();
+    const detailHref = `/${props.instance.game}/${props.instance.name}`;
+    const gameName = createMemo(() => gameRegistry[props.instance.game]?.name ?? props.instance.game);
 
-    const game = createAsync(async () => {
+    const banner = createAsync(async () => {
         const entry = gameRegistry[props.instance.game];
-
-        if (!entry) throw new Error(`Unknown game: ${props.instance.game}`);
+        if (!entry) return undefined;
         const mod = await entry.load();
-        return mod.default;
+        return mod.default.getBanner();
     });
 
     const state = createAsync(() => getInstanceState(props.instance));
-    const endpoint = () => endpointOf(state());
+    const endpoint = createMemo(() => endpointOf(state()));
 
     const [runtime, { refetch: refetchRuntime }] = createResource(
         endpoint,
         (ep: string) => getInstanceStatus(ep),
     );
 
-    const runtimeRunning = () => {
+    const runtimeRunning = createMemo(() => {
         const r = runtime();
         return r ? "ipv6" in r : false;
-    };
-    const [optimistic, setOptimistic] = createSignal<boolean | null>(null);
-    const isRunning = () => optimistic() ?? runtimeRunning();
+    });
 
-    const banner = createAsync(async () => game()?.getBanner());
+    const [optimistic, setOptimistic] = createSignal<boolean | null>(null);
+    const [toggling, setToggling] = createSignal(false);
+    const isRunning = createMemo(() => optimistic() ?? runtimeRunning());
+
+    const labelText = createMemo(() => cardLabel(state(), isRunning()));
+    const subtitleText = createMemo(() => cardSubtitle(state()));
+    const variant = createMemo(() => statusVariantOf(state(), isRunning()));
 
     const toggle = async (e: Event) => {
         e.preventDefault();
         e.stopImmediatePropagation();
         const ep = endpoint();
-        if (!ep) return;
+        if (!ep || toggling()) return;
         const wasRunning = isRunning();
         setOptimistic(!wasRunning);
+        setToggling(true);
         try {
             await toggleInstance(ep, wasRunning);
             await sleep(2000);
@@ -91,66 +150,88 @@ const DashboardInstanceCard = (props: { instance: Instance, listView: boolean, i
         } catch (err) {
             console.error("toggle failed", err);
             setOptimistic(wasRunning);
+        } finally {
+            setToggling(false);
         }
     };
 
-    return (
-        <>
-            { props.listView === false && (
-                <A href={`/${props.instance.game}/${props.instance.name}`} class={styles.gameCard}>
-                    <Show when={banner()}>
-                        <div class={styles.imageWrapper}>
-                            <ResponsiveImage src={banner()!} />
-                            <Show when={state()}>
-                                <div class={`${styles.statusContainer} ${isRunning() ? styles.active : ""}`}>
-                                    <div class={`${styles.statusIndicator} ${isRunning() ? styles.active : ""}`}></div>
-                                    <p class="smallestLabel">{cardLabel(state()!, isRunning())}</p>
-                                </div>
-                                <Show when={canToggle(state())}>
-                                    <div class={styles.toggleContainer}>
-                                        <input id={`toggle-${id}`} type="checkbox" checked={isRunning()} onChange={(e) => toggle(e)} onClick={(e) => e.stopImmediatePropagation()} />
-                                        <label for={`toggle-${id}`}>
-                                            <p class="smallestLabel">ON</p>
-                                            <p class="smallestLabel">OFF</p>
-                                        </label>
-                                    </div>
-                                </Show>
-                            </Show>
-                            <p class="subtitleSemi">{gameRegistry[props.instance.game].name}</p>
-                        </div>
-                    </Show>
-                    <div class={styles.textWrapper}>
-                        <div class={styles.gamecardInfo}>
-                            <p class="statsText">{props.instance.name}</p>
-                            <InstanceOptions endpoint={endpoint() ?? ""} instance={props.instance} />
-                        </div>
-                        <p class={styles.metaText}>{cardSubtitle(state())}</p>
-                    </div>
-                </A>
-            )}
-
-            { props.listView === true && (
-                <A href={`/${props.instance.game}/${props.instance.name}`} class={styles.instanceList} style={`--colour: ${props.idx % 2 === 0 ? 'var(--colour-text-tertiary)' : '#F9F9F9'}`}>
-                    <p class="bodyTextSmallSemi">{props.instance.name}</p>
+    if (props.listView) {
+        return (
+            <A
+                href={detailHref}
+                class={styles.instanceList}
+                style={`--colour: ${props.idx % 2 === 0 ? 'var(--colour-text-tertiary)' : 'var(--c-cream-list)'}`}
+            >
+                <p class="bodyTextSmallSemi">{props.instance.name}</p>
+                <Suspense fallback={<div class={styles.listStatusSkeleton} aria-busy="true" />}>
                     <div class={styles.instanceStatusList}>
-                        <p class="bodyTextSmallestSemiCaps">{cardLabel(state()!, isRunning())}</p>
+                        <p class="bodyTextSmallestSemiCaps">{labelText()}</p>
                     </div>
-                    <p class="bodyTextSmall">{cardSubtitle(state())}</p>
-                    <div class={styles.toggleContainer}>
-                        <Show when={canToggle(state())}>
-                            <input id={`toggle-list-${id}`} type="checkbox" checked={isRunning()} onChange={(e) => toggle(e)} onClick={(e) => e.stopImmediatePropagation()} />
-                            <label for={`toggle-list-${id}`}>
-                                <p class="smallestLabel">ON</p>
-                                <p class="smallestLabel">OFF</p>
-                            </label>
-                        </Show>
-                    </div>
+                </Suspense>
+                <Suspense fallback={<p class={`bodyTextSmall ${styles.textSkeleton}`} aria-busy="true">&nbsp;</p>}>
+                    <p class="bodyTextSmall">{subtitleText()}</p>
+                </Suspense>
+                <div class={styles.toggleContainer}>
                     <Suspense>
-                        <InstanceOptions endpoint={endpoint() ?? ""} instance={props.instance} />
+                        <Show when={canToggle(state())}>
+                            <ToggleSwitch
+                                id={`toggle-list-${id}`}
+                                checked={isRunning()}
+                                disabled={toggling()}
+                                onToggle={toggle}
+                            />
+                        </Show>
                     </Suspense>
-                </A>
-            )}
-        </>
+                </div>
+                <InstanceOptions endpoint={endpoint() ?? ""} instance={props.instance} />
+            </A>
+        );
+    }
+
+    return (
+        <A href={detailHref} class={styles.card}>
+            <div class={styles.banner}>
+                <div class={styles.image}>
+                    <Suspense fallback={<div class={styles.bannerSkeleton} aria-busy="true" />}>
+                        <Show when={banner()} fallback={<div class={styles.bannerSkeleton} />}>
+                            <ResponsiveImage src={banner()!} width={260} />
+                        </Show>
+                    </Suspense>
+                </div>
+                <div class={styles.metadata}>
+                    <div>
+                        <Suspense fallback={<div class={styles.gridStatusSkeleton} aria-busy="true" />}>
+                            <Show when={state()}>
+                                <StatusBadge label={labelText()} variant={variant()} />
+                            </Show>
+                        </Suspense>
+                        <Suspense>
+                            <Show when={canToggle(state())}>
+                                <div class={styles.toggleContainer}>
+                                    <ToggleSwitch
+                                        id={`toggle-${id}`}
+                                        checked={isRunning()}
+                                        disabled={toggling()}
+                                        onToggle={toggle}
+                                    />
+                                </div>
+                            </Show>
+                        </Suspense>
+                    </div>
+                    <p class="subtitleSemi">{gameName()}</p>
+                </div>
+            </div>
+    
+            <div class={styles.content}>
+                <div class={styles.cta}>
+                    <p class="statsText">{props.instance.name}</p>
+                    <InstanceOptions endpoint={endpoint() ?? ""} instance={props.instance} />
+                </div>
+                <Suspense fallback={<p class={`${styles.metaText} ${styles.textSkeleton}`} aria-busy="true">&nbsp;</p>}>
+                    <p class={`${styles.metaText} ${state()?.status === "creating" ? styles.dotsAnim : ""}`}>{subtitleText()}</p>
+                </Suspense>
+            </div>
+        </A>
     );
 };
 
