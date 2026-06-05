@@ -47,7 +47,7 @@
     }
 
     .banner:has(.statusContainer.creating) .image img {
-        filter: grayscale(100%);
+        filter: grayscale(80%);
     }
 
     .banner:has(.statusContainer.creating) .image {
@@ -62,42 +62,45 @@
         z-index: 1;
         pointer-events: none;
 
-        /* Most of the gradient is transparent — only the middle ~30%
-            carries your green→orange→purple band, so the image is
-            always mostly visible. */
-        background: linear-gradient(
-            115deg,
-            transparent           25%,
-            var(--c-green-bright) 40%,
-            var(--c-orange)       50%,
-            var(--c-purple)       60%,
-            transparent           75%
-        );
-        background-size: 260% 100%;
+        /* Three soft radial colour "blobs" stacked together. Each is
+            larger than the container and drifts independently — together
+            they cover the image at every frame but never form a hard
+            seam, so the effect reads as morphing/aurora rather than
+            translation. */
+        background:
+            radial-gradient(circle, var(--c-green-bright) 0%, transparent 55%),
+            radial-gradient(circle, var(--c-orange)       0%, transparent 55%),
+            radial-gradient(circle, var(--c-purple)       0%, transparent 60%);
+        background-size: 140% 140%, 150% 150%, 160% 160%;
         background-repeat: no-repeat;
 
-        mix-blend-mode: overlay;   /* gentle; try `screen` for more pop */
-        opacity: 0.9;
+        mix-blend-mode: overlay;
 
-        /* Linear timing + offscreen-to-offscreen travel = continuous flow
-            (no perceptible "back to start" snap, no breathing). */
-        animation: creatingSweep 6s linear infinite;
+        animation: creatingMorph 14s ease-in-out infinite;
     }
 
-    @keyframes creatingSweep {
-        from { background-position: 180% 0; }
-        to   { background-position: -80% 0; }
+    @keyframes creatingMorph {
+        0%, 100% {
+            background-position: -20% -20%, 110% -10%,  40% 115%;
+        }
+        25% {
+            background-position:  60%  20%,  -15% 100%, 100% -20%;
+        }
+        50% {
+            background-position: 100% 100%,  50%   0%, -20%  50%;
+        }
+        75% {
+            background-position:  10% 110%, 100%  50%,  70% -20%;
+        }
     }
 
     @media (prefers-reduced-motion: reduce) {
         .banner:has(.statusContainer.creating) .image::before {
             animation: none;
-            background-position: 50% 0;
-            opacity: 0.35;
+            background-position: 20% 20%, 80% 30%, 50% 80%;
+            opacity: 0.55;
         }
     }
-
-
 
     /* Meta data styling */
 

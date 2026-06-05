@@ -1,13 +1,15 @@
 import {
+    createEffect,
     createMemo,
     createResource,
     createSignal,
     createUniqueId,
+    onCleanup,
     Show,
     Suspense,
     type Component,
 } from "solid-js";
-import { A, createAsync } from "@solidjs/router";
+import { A, createAsync, revalidate } from "@solidjs/router";
 import {
     endpointOf,
     getInstanceState,
@@ -115,6 +117,16 @@ const DashboardInstanceCard: Component<{ instance: Instance; listView: boolean; 
 
     const state = createAsync(() => getInstanceState(props.instance));
     const endpoint = createMemo(() => endpointOf(state()));
+
+    const isCreating = createMemo(() => state()?.status === "creating");
+
+    createEffect(() => {
+        if (!isCreating()) return;
+        const interval = setInterval(() => {
+            revalidate(getInstanceState.keyFor(props.instance));
+        }, 5000);
+        onCleanup(() => clearInterval(interval));
+    });
 
     const [runtime, { refetch: refetchRuntime }] = createResource(
         endpoint,
