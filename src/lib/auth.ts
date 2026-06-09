@@ -7,7 +7,7 @@ export const msalConfig = {
         knownAuthorities: ['akilaboratories.ciamlogin.com'],
         //clientId: 'b355e8f6-6973-4b89-821d-f6bada3cde4b',
         //authority: 'https://akilaboratoriesext.ciamlogin.com/f862f504-2fdc-4cb2-aed3-107ac3cb3154', // Replace the placeholder with your tenant subdomain 
-        redirectUri: 'https://instances.aki-labs.com/auth/redirect', // Points to window.location.origin. You must register this URI on Microsoft Entra admin center/App Registration.
+        redirectUri: 'https://www.instances.aki-labs.com/auth/redirect', // Points to window.location.origin. You must register this URI on Microsoft Entra admin center/App Registration.
         postLogoutRedirectUri: '/', // Indicates the page to navigate after logout.
         // navigateToLoginRequestUrl: false,
     },
