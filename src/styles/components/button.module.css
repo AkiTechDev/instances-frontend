@@ -37,6 +37,8 @@
     background-color: currentColor;
     -webkit-mask: var(--icon) no-repeat center / contain;
     mask: var(--icon) no-repeat center / contain;
+
+    flex-shrink: 0;
 }
 
 .rotate45::before { transform: rotate(45deg); }

@@ -79,6 +79,26 @@
 
 
 
+.label.collapsed {
+    padding: 0;
+    gap: 0;
+    height: 48px;
+    width: 100%;
+    box-sizing: border-box;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.label.collapsed input,
+.label.collapsed .clearBtn {
+    flex: 0 0 0;
+    width: 0;
+    padding: 0;
+    border: 0;
+    opacity: 0;
+    overflow: hidden;
+}
+
 .withFilterBtn {
     padding-right: 0rem;
 }

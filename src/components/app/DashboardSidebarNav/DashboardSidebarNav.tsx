@@ -1,7 +1,7 @@
 import { createSignal} from "solid-js"
 import { createAsync } from "@solidjs/router";
 
-import styles from "../Dashboard/Dashboard.module.css";
+import styles from "./DashboardSidebarNav.module.css";
 
 import button from "../../../styles/components/button.module.css";
 
@@ -36,8 +36,12 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
             }}></a>
             <div class={styles.sidebarHeader}>
                 <p class="subtitleSemi">My Games</p>
-                <button class={`${button.btn} ${button.secondary} ${button.icon} ${button.rotate45}`} style={`--icon: url(${iconCross.src})`} onClick={() => props.openCreateIntanceModal({game_id: null, allow_game_change: true})}><p class="buttonTextSmall">Create New Game</p></button>
-                <label class={search.label} style={`--icon: url("${searchIcon.src}")`}>
+                <button class={`${button.btn} ${button.secondary} ${button.icon} ${button.rotate45}`} style={`--icon: url(${iconCross.src})`} onClick={() => { setCollapsed(false); props.openCreateIntanceModal({game_id: null, allow_game_change: true})}}><p class="buttonTextSmall">Create New Game</p></button>
+                <label class={`${search.label} ${collapsed() ? search.collapsed : ""}`} style={`--icon: url("${searchIcon.src}")`} onclick={(e) => {
+                    if (collapsed()) {
+                        setCollapsed(false)
+                    }
+                }}>
                     <input
                         id="gameSearch"
                         type="search"

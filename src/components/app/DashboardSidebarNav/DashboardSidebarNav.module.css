@@ -1,0 +1,194 @@
+.sidebar {
+    composes: sidebar from "../Dashboard/Dashboard.module.css";
+
+    position: relative;
+
+    background: #F3F4F4;
+    padding: 0px 24px;
+    border-radius: 0px 0px 0px 20px;
+}
+
+.collapsed {
+    composes: collapsed from "../Dashboard/Dashboard.module.css";
+
+    padding: 0 1rem;
+}
+
+.sidebarCollapser {
+    top: calc((79px - 1lh) / 2);
+    position: absolute;
+    right: 0;
+    transform: translateX(50%) translateY(-25%);
+
+    width: 40px;
+    height: 40px;
+
+    border-radius: 22px;
+    background-color: var(--colour-text-tertiary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    cursor: pointer;
+}
+
+.sidebarCollapser::after {
+    content: "";
+    width: 24px;
+    height: 24px;
+
+    transition: transform 0.5s ease;
+    transform: rotate(180deg);
+
+    display: block;
+    background-color: var(--colour-text-primary);
+    mask: var(--icon) no-repeat center;
+    -webkit-mask: var(--icon) no-repeat center;
+}
+
+.sidebarHeader {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+}
+
+.sidebarHeader > p {
+    padding-top: calc((79px - 1lh) / 2);
+    margin-bottom: 20px;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    white-space: nowrap;
+    text-overflow: clip;
+}
+
+.sidebarHeader button {
+    width: 100%;
+}
+
+.sidebarHeader .buttonSlim::before {
+    transform: rotate(45);
+}
+
+.sidebarHeader label {
+    width: 100%;
+}
+
+.sidebarGamesContainer {
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+}
+
+.sidebarGame {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    border-radius: 8px;
+
+    border: none;
+    background-color: transparent;
+    position: relative;
+    width: 100%;
+}
+
+.sidebarGame input {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+
+    opacity: 0;
+}
+
+.sidebarGame label {
+    box-sizing: border-box;
+    display: flex;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+
+    padding: 12px;
+    gap: 10px;
+
+    align-items: center;
+    flex-shrink: 0;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.sidebar label span {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.sidebarGame label::before {
+    content: "";
+    display: block;
+    width: 24px;
+    height: 24px;
+    flex-shrink: 0;
+
+    background-color: var(--colour-text-primary);
+    mask: var(--icon) no-repeat center;
+    -webkit-mask: var(--icon) no-repeat center;
+}
+
+.sidebarGame:hover {
+    background-color: #DADADA;
+}
+
+.sidebarGame input[type="radio"]:checked + label {
+    background-color: #E0E0E0;
+}
+
+.sidebar.collapsed .sidebarCollapser::after {
+    transform: rotate(0deg);
+}
+
+.sidebar.collapsed .sidebarHeader {
+    gap: 1rem;
+    padding: 0 0.25rem;
+}
+
+.sidebar.collapsed .sidebarHeader > p {
+    opacity: 0;
+    width: 0;
+    height: 0;
+    overflow: hidden;
+    transition: opacity 0.3s ease;
+}
+
+.sidebar.collapsed .sidebarHeader button {
+    gap: 0;
+    height: 48px;
+}
+
+.sidebar.collapsed .sidebarHeader button > p {
+    opacity: 0;
+    overflow: hidden;
+    height: 0;
+}
+
+.sidebar.collapsed .sidebarGame > label {
+    gap: 0;
+    justify-content: center;
+}
+
+.sidebar.collapsed .sidebarGame label > * {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
