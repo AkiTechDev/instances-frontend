@@ -1,0 +1,135 @@
+---
+import "../styles/normalise.css"
+import "../styles/global.css"
+import "../styles/theme/default.css"
+import "../styles/variables.css"
+import "../styles/typography.css"
+
+import colourStyles from "../styles/theme/colours.module.css"
+import button from "../styles/components/button.module.css"
+
+import { Picture } from 'astro:assets';
+import Error404PNG from "../assets/images/Error404.png";
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="author" content="Aki Laboratories Limited">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="robots" content="noindex" />
+    <title>404 — You took a wrong turn | Instances</title>
+  </head>
+  <body class="errorBody">
+    <main class="errorContainer">
+      <h1 class:list={["h1", colourStyles.gradientOne, "errorCode"]}>404</h1>
+      <h2 class="h3 errorTitle">You've wandered off the map.</h2>
+      <p class="subTitle errorSubtitle">
+        This page got lost somewhere between the blocks. Don't worry &mdash; our explorer is on the case.
+      </p>
+
+      <div class="errorImageWrap">
+        <Picture
+          src={Error404PNG}
+          formats={['avif', 'webp']}
+          width={840}
+          alt="Pixel-art character standing on stone blocks, confused about where to go"
+          class="errorImage"
+        />
+      </div>
+
+      <div class="errorButtons">
+        <a href="/dashboard" class:list={[button.btn, button.vibrant]}>
+          <p class="buttonText">Go to Dashboard</p>
+        </a>
+        <a href="/" class:list={[button.btn, button.outlineDark]}>
+          <p class="buttonText">Back to Landing</p>
+        </a>
+      </div>
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  body.errorBody {
+    background: #ffffff;
+    color: var(--text-colour-dark);
+    min-height: 100vh;
+  }
+</style>
+
+<style>
+  .errorContainer {
+    max-width: var(--max-width);
+    margin-left: auto;
+    margin-right: auto;
+    padding: 4rem 2rem 5rem;
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+
+    color: var(--text-colour-dark);
+  }
+
+  .errorCode {
+    font-size: clamp(5rem, 14vw, 9.5rem);
+    line-height: 1;
+    margin: 0 0 var(--margin-text-sm) 0;
+  }
+
+  .errorTitle {
+    color: var(--text-colour-dark);
+    margin: 0 0 var(--margin-text-sm) 0;
+    max-width: 36rem;
+  }
+
+  .errorSubtitle {
+    color: var(--text-colour-dark);
+    opacity: 0.65;
+    max-width: 34rem;
+    margin: 0 0 var(--margin-el-md) 0;
+  }
+
+  .errorImageWrap {
+    width: 100%;
+    max-width: 720px;
+    margin-bottom: var(--margin-el-md);
+
+    animation: float 5s ease-in-out infinite;
+  }
+
+  .errorImage {
+    width: 100%;
+    height: auto;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+  }
+
+  .errorButtons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1.25rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .errorButtons a {
+    text-decoration: none;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-14px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .errorImageWrap { animation: none; }
+  }
+</style>
