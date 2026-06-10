@@ -14,6 +14,7 @@ import { gameRegistry } from "../../../lib/games/index";
 import { getInstances } from "../../../lib/apis";
 import search from "../../../styles/components/search.module.css";
 import crossIcon from "../../../assets/icons/cross.svg";
+import SearchNoResultsIcon from "../../../assets/icons/search_no_results.svg";
 
 const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateIntanceModal: (options: ModalOptions) => void}) => {
     const [searchText, setSearchText] = createSignal("");
@@ -53,7 +54,7 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
                 setCollapsed(!collapsed())
             }}></a>
             <div class={styles.sidebarHeader}>
-                <p class="subtitleSemi">My Games</p>
+                <p class={`${styles.title} subtitleSemi`}>My Games</p>
                 <button class={`${button.btn} ${button.secondary} ${button.icon} ${button.rotate45}`} style={`--icon: url(${iconCross.src})`} onClick={() => { setCollapsed(false); props.openCreateIntanceModal({game_id: null, allow_game_change: true})}}><p class="buttonTextSmall">Create New Game</p></button>
                 <label class={`${search.label} ${collapsed() ? search.collapsed : ""}`} style={`--icon: url("${searchIcon.src}")`} onclick={() => {
                     if (collapsed()) {
@@ -73,8 +74,11 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
             <div class={styles.sidebarGamesContainer}>
                 <Show when={hasMatches()} fallback={
                     <div class={styles.noMatches}>
-                        {/* TODO: replace with custom no-match content */}
-                        <p>No games match "{searchText()}"</p>
+                        <div class={styles.icon} style={`--icon: url(${SearchNoResultsIcon.src})`}></div>
+                        <div class={styles.content}>
+                            <p class="subtitleSemi">No games found.</p>
+                            <p class="bodyTextSmall">Please check your search and try again.</p>
+                        </div>
                     </div>
                 }>
                     <Show when={showAll()}>
