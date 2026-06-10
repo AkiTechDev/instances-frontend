@@ -65,6 +65,13 @@
 .sidebarHeader > * {
     width: 100%;
     height: 48px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.sidebarHeader button > p {
+    transition: opacity 0.3s ease;
+    overflow: hidden;
 }
 
 .sidebarHeader .buttonSlim::before {
@@ -127,7 +134,7 @@
     user-select: none;
 }
 
-.sidebar label span {
+.sidebarGame label span {
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
