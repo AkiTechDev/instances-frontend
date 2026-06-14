@@ -1,0 +1,24 @@
+---
+import { Picture } from 'astro:assets';
+import PreviewPNG from "../../../assets/images/PreviewLook.png";
+
+import button from "../../../styles/components/button.module.css";
+import styles from "./DashboardPreview.module.css";
+---
+
+<section class={styles.container}>
+    <div class={styles.cta}>
+        <div class={styles.content}>
+            <h2 class="h2">How It Looks</h2>
+            <p class="subTitle">Manage your active instances, switch between games, and invite friends - all in one place.</p>
+        </div>
+        <div class={styles.buttons}>
+            <button data-signup class:list={[button.btn, button.vibrant]}><p class="buttonText">Start Playing Now</p></button>
+            <button class:list={[button.btn, button.outline]}><p class="buttonText">Learn More</p></button>
+        </div>
+    </div>
+
+    <div class={styles.imgWrapper}>
+        <Picture src={PreviewPNG} formats={["avif", "webp"]} width={1156} height={761} densities={[1.5, 2]} alt="A preview look of the service" />
+    </div>
+</section>

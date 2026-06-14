@@ -39,13 +39,10 @@ import SupportedGames from "../components/supportedGames/SupportedGames.astro";
 import Newsletter from "../components/newsletter/Newsletter.astro";
 import Footer from "../components/footer/Footer.astro";
 
-import { Picture } from 'astro:assets';
-import PreviewPNG from "../assets/images/PreviewLook.png";
-import StaticPNG from "../assets/images/static1.png";
-
 import Header from "../components/astrojs/header/Header.astro";
 import Hero from "../components/astrojs/hero/Hero.astro";
 import HowItWorks from "../components/astrojs/HowItWorks/HowItWorks.astro"
+import DashboardPreview from "../components/astrojs/DashboardPreview/DashboardPreview.astro";
 
 const seo_des = "Host Minecraft, sandboxed games, and more with Instances. No contracts, no setup headaches. Switch games instantly, keep your world, and only pay for what you play.";
 const domain = "instances.aki-labs.com"
@@ -157,20 +154,7 @@ const domain = "instances.aki-labs.com"
       </div>
     </section>
 
-    <section class="previewContainer">
-      <div class="ctaContainer">
-        <div class="ctaContent">
-          <h2 class="h2">How It Looks</h2>
-          <p class="subTitle">Manage your active instances, switch between games, and invite friends – all in one place.</p>
-        </div>
-        <div class="ctaButtons">
-          <button data-signup class:list={[button.btn, button.vibrant]}><p class="buttonText">Start Playing Now</p></button>
-          <button class:list={[button.btn, button.outline]}><p class="buttonText">Learn More</p></button>
-        </div>
-      </div>
-
-      <Picture src={PreviewPNG} formats={["avif", "webp"]} width={1156} height={761} densities={[1.5, 2]} alt="A preview look of the service" />
-    </section>
+    <DashboardPreview />
 
     <section id="faqs" class="faqContainer">
       <div class="faqHeaderContainer">
@@ -561,75 +545,6 @@ const domain = "instances.aki-labs.com"
     gap: var(--margin-text-sm);
   }
 
-</style>
-
-<style>
-  .previewContainer {
-    width: min(100% - 2rem, 96rem); /* 1536px */
-    margin-inline: auto;
-
-    /* padding: 0 7.5rem; */
-    padding: 7.5rem var(--padding-sm); box-sizing: border-box;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-
-  .ctaContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 2.8125rem 0px;
-
-    gap: var(--margin-el-sm);
-    z-index: 3;
-  }  
-
-  .ctaContent {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: var(--margin-text-sm);
-    text-align: center;
-    max-width: 622px;
-
-    z-index: inherit;
-  }
-
-  .ctaButtons {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    gap: 1.25rem;
-    isolation: isolate;
-
-    z-index: inherit;
-  }
-
-  .previewContainer::before {
-    content: "";
-    position: absolute;
-
-    width: 1000px;
-    height: 1000px;
-
-    left: 50%;
-    top: 45%;
-
-    transform: translate(-50%, -50%);
-
-    background:
-      radial-gradient(
-        circle,
-        rgba(84, 140, 255, 0.45) 0%,
-        rgba(84, 140, 255, 0.2) 30%,
-        transparent 70%
-      );
-
-    z-index: 1;
-    pointer-events: none;
-  }
 </style>
 
 <style define:vars={{squarcleIconUrl}}>
