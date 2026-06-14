@@ -1,45 +1,40 @@
 ---
 import styles from "./HowItWorks.module.css";
+
+import Chest from "../../../assets/images/Chest.png";
+import CraftingBench from "../../../assets/images/CraftingBench.png";
+import Furnace from "../../../assets/images/Furnace.png";
+import { Picture } from "astro:assets";
 ---
 
 <section id="process" class={styles.container}>
     <div class={styles.content}>
-        <h2 class="h2">From "let's play tonight" to playing — in about a minute.</h2>
-        <p class="subTitle">No installs. No infrastructure. Same flow every time.</p>
+        <h2 class="h2">Start playing in 3 <span class="gradFun">Easy Steps</span></h2>
 
         <div class={styles.steps}>
-            <div class={styles.step}>
+            <div class={styles.step} style="background: linear-gradient(180deg, #191C2E 0%, #191F3E 100%) padding-box, linear-gradient(0deg, #EBA439 40%, #EBA439 100%) border-box;">
+                <Picture src={Chest} formats={['avif', 'webp']} width={80} height={128} alt="Minecraft Chest Icon." />
                 <div>
-                    <p class="subtitleSemiBig">01</p>
+                    <h5 class="h5" style="color: var(--c-orange); text-shadow: 0px 0px 4px var(--c-orange);">Step 1<br />Select Your Game</h5>
+                    <p class="subTitle">Pick from a list of popular titles like Minecraft, Valheim, etc.</p>
                 </div>
-                <h4 class="subtitleSemi">Pick your game</h4>
-                <p class="bodyText">Choose a game and any modpack you want. We support everything from vanilla Minecraft to deep modded packs.</p>
             </div>
 
-            <div class={styles.step}>
+            <div class={styles.step} style="background: linear-gradient(180deg, #191C2E 0%, #191F3E 100%) padding-box, linear-gradient(0deg, #C589F4 40%, #C589F4 100%) border-box;">
+                <Picture src={CraftingBench} formats={['avif', 'webp']} width={80} height={128} alt="Minecraft Chest Icon." />
                 <div>
-                    <p class="subtitleSemiBig">02</p>
+                    <h5 class="h5" style="color: var(--c-purple); text-shadow: 0px 0px 4px var(--c-purple);">Step 2<br />Select Your Game</h5>
+                    <p class="subTitle">Name it, pick your region, subscription type, and expected players.</p>
                 </div>
-                <h4 class="subtitleSemi">Pick a region</h4>
-                <p class="bodyText">Servers run in every major region so everyone in your group gets low ping. Move them anytime.</p>
             </div>
 
-            <div class={styles.step}>
+            <div class={styles.step} style="background: linear-gradient(180deg, #191C2E 0%, #191F3E 100%) padding-box, linear-gradient(0deg, #85B6FF 40%, #85B6FF 100%) border-box;">
+                <Picture src={Furnace} formats={['avif', 'webp']} width={80} height={128} alt="Minecraft Chest Icon." />
                 <div>
-                    <p class="subtitleSemiBig">03</p>
+                    <h5 class="h5" style="color: var(--c-blue-sky); text-shadow: 0px 0px 4px var(--c-blue-sky);">Step 3<br />Select Your Game</h5>
+                    <p class="subTitle">Launch instantly and invite friends and enjoy your favorite games.</p>
                 </div>
-                <h4 class="subtitleSemi">Click start</h4>
-                <p class="bodyText">Your server boots in seconds. Share the address with your friends — or invite them in-app.</p>
-            </div>
-
-            <div class={styles.step}>
-                <div>
-                    <p class="subtitleSemiBig">04</p>
-                </div>
-                <h4 class="subtitleSemi">Play, walk away</h4>
-                <p class="bodyText">When you're done, just close the game. We pause the server automatically and stop the meter.</p>
             </div>
         </div>
-
     </div>
 </section>

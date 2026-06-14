@@ -34,7 +34,7 @@ import button from "../../../styles/components/button.module.css";
 <script>
     import { msalInstance } from "../../../lib/auth";
 
-    if (msalInstance.getActiveAccount()) {
+    if (msalInstance.getAllAccounts()) {
         document.getElementById("loginBtn")?.remove();
         document.getElementById("signupBtn")?.remove();
 
