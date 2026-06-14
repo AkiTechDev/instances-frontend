@@ -13,6 +13,7 @@
     padding: 2.8125rem 0rem;
 
     gap: var(--margin-el-sm);
+    z-index: 1;
 }
 
 .cta > .content {
@@ -33,42 +34,45 @@
     display: flex; justify-content: center;
     padding-top: 5rem;
     width: 100%;
+    position: relative;
+    isolation: isolate;
+}
+
+.imgWrapper > :global(picture),
+.imgWrapper > :global(img) {
+    position: relative;
+    z-index: 1;
 }
 
 .imgWrapper::before {
     content: "";
     position: absolute;
-
-    width: 100%;
-    height: 100%;
-
     left: 50%;
-    top: 50%;
+    top: 55%;
+    width: 110%;
+    height: 90%;
+    transform: translate(-50%, -50%);
 
-    background: radial-gradient(
-      ellipse 500px 250px at 50% 60%,
-      rgba(9, 78, 255, 0.5),
-      transparent 70%
-    ),
+    background:
+      radial-gradient(
+        ellipse 55% 50% at 50% 50%,
+        rgba(197, 137, 244, 0.65),
+        rgba(187, 109, 248, 0.35) 45%,
+        transparent 75%
+      ),
+      radial-gradient(
+        ellipse 40% 35% at 35% 55%,
+        rgba(187, 109, 248, 0.45),
+        transparent 70%
+      ),
+      radial-gradient(
+        ellipse 45% 40% at 65% 45%,
+        rgba(94, 0, 151, 0.55),
+        transparent 70%
+      );
 
-    radial-gradient(
-      ellipse 400px 300px at 65% 55%,
-      rgba(9, 78, 255, 0.5),
-      transparent 70%
-    ),
-
-    radial-gradient(
-      ellipse 450px 200px at 35% 65%,
-      rgba(9, 78, 255, 0.5),
-      transparent 75%
-    ),
-
-    radial-gradient(
-      ellipse 350px 180px at 55% 75%,
-      rgba(9, 78, 255, 0.5),
-      transparent 80%
-    );
-
-    z-index: 2;
+    filter: blur(60px);
+    opacity: 0.9;
+    z-index: 0;
     pointer-events: none;
 }

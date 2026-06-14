@@ -1,23 +1,21 @@
 <!-- NewsletterSection.astro -->
 ---
 import styles from './newsletter.module.css';
-import button from "../../styles/components/button.module.css";
-
-import CoffeePNG from '../../assets/images/coffee.png';
-import { Picture } from 'astro:assets';
-
+import search from "../../styles/components/search.module.css";
+import ArrowIcon from "../../assets/icons/arrow.svg";
+import LogoIcon from "../../assets/icons/logos/icon.svg";
 ---
-<section class={styles.section}>
-    <Picture src={CoffeePNG} formats={['avif', 'webp']} alt="Unrelated graphic of a take-away coffee cup" />
+<section class={styles.container}>
     <div class={styles.card}>
-        <div class={styles.cardContent}>
+        <LogoIcon width={660} height={660} style={"--path1: #85B6FF; --path2: #253D4E; --path3: #C589F4"} />
+        <div class={styles.content}>
             <h4 class="h4">Stay in the Loop</h4>
             <p class="subTitle">Be the first to know about new games, platform updates, and special offers.</p>
         </div>
-        <form class={styles.form} id="newsletterForm">
-            <input type="email" id="email" name="email" placeholder="Enter Your email" />
-            <button class:list={[button.btn, button.vibrant]}><p class="buttonText">Submit</p></button>
-        </form>
+        <label class={`${search.label} ${search.withFilterBtn}`}>
+            <input id="email" type="email" name="email" placeholder="Enter your email" />
+            <button class={styles.submitBtn} style={`--icon: url("${ArrowIcon.src}")`}></button>
+        </label>
     </div>
 </section>
 
@@ -31,6 +29,6 @@ import { Picture } from 'astro:assets';
 <style is:global >
     .emailAutocomplete {
         color: var(--color-text-dark);
-        opacity: 0.8;
+        opacity: 0.7;
     }
 </style>

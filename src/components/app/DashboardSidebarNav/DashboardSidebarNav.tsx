@@ -56,7 +56,7 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
             <div class={styles.sidebarHeader}>
                 <p class={`${styles.title} subtitleSemi`}>My Games</p>
                 <button class={`${button.btn} ${button.secondary} ${button.icon} ${button.rotate45}`} style={`--icon: url(${iconCross.src})`} onClick={() => { setCollapsed(false); props.openCreateIntanceModal({game_id: null, allow_game_change: true})}}><p class="buttonTextSmall">Create New Game</p></button>
-                <label class={`${search.label} ${collapsed() ? search.collapsed : ""}`} style={`--icon: url("${searchIcon.src}")`} onclick={() => {
+                <label class={`${search.label} ${search.beforeIcon} ${collapsed() ? search.collapsed : ""}`} style={`--icon: url("${searchIcon.src}")`} onclick={() => {
                     if (collapsed()) {
                         setCollapsed(false)
                     }

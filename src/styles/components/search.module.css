@@ -23,7 +23,7 @@
                 var(--c-orange) border-box;
 }
 
-.label::before {
+.beforeIcon::before {
     content: ""; width: 20px; height: 20px;
     flex-shrink: 0;
 

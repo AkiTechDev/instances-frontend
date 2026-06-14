@@ -112,7 +112,7 @@ class EmailAutocompleteVanilla {
                     : fieldStyle.position;
 
             wrap.style.fontSize = fieldStyle.fontSize;
-            wrap.style.width = fieldStyle.width;
+            wrap.style.width = "100%";
 
             fieldObj.parentNode.insertBefore(wrap, fieldObj);
 

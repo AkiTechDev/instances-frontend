@@ -94,7 +94,7 @@ const Dashboard = () => {
                         <button class={`${button.btn} ${button.vibrant} ${button.icon}`} style={`--icon: url(${LogoIcon.src})`} onclick={() => OpenCreateInstanceModal({game_id: gameFilter() === "all" ? null : gameFilter(), allow_game_change: gameFilter() === "all" ? true : false})}><p class="buttonText">Add New Instance</p></button>
                     </div>
                     <div class={styles.gameFiltersContainer}>
-                        <label class={`${search.label} ${search.withFilterBtn}`} style={`--icon: url("${searchIcon.src}")`}>
+                        <label class={`${search.label} ${search.beforeIcon} ${search.withFilterBtn}`} style={`--icon: url("${searchIcon.src}")`}>
                             <input id="test" type="search" placeholder="Search your instances" value={instanceSearchText()} onInput={(e) => setInstanceSearchText(e.currentTarget.value)} />
                             <button onClick={() => (setInstanceSearchText(""))} class={`${search.clearBtn} ${instanceSearchText() ? search.visible : ""}`} style={`--icon: url("${crossIcon.src}")`}></button>
                             <button class={`bodyTextMedium ${filterBtn.button}`} style={`--icon: url(${iconArrow.src})`}>Active Instances</button>
