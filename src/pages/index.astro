@@ -45,6 +45,7 @@ import StaticPNG from "../assets/images/static1.png";
 
 import Header from "../components/astrojs/header/Header.astro";
 import Hero from "../components/astrojs/hero/Hero.astro";
+import HowItWorks from "../components/astrojs/HowItWorks/HowItWorks.astro"
 
 const seo_des = "Host Minecraft, sandboxed games, and more with Instances. No contracts, no setup headaches. Switch games instantly, keep your world, and only pay for what you play.";
 const domain = "instances.aki-labs.com"
@@ -112,48 +113,7 @@ const domain = "instances.aki-labs.com"
 
     <SupportedGames />
 
-    <section id="process" class="processSection">
-      <div class="processCardContainer">
-        <div class="processCard">
-          <img src={processStep1} />
-          <div class="processCardContent">
-            <h6 class:list={["h6", colourStyles.gradientOne]}>Select Your Game</h6>
-            <p class="subTitle">Pick from a list of support open world co-op games.</p>
-          </div>
-        </div>
-
-        <div class="processCard">
-          <img src={processStep2} />
-          <div class="processCardContent">
-            <h6 class:list={["h6", colourStyles.gradientOne]}>Customize Your Instance</h6>
-            <p class="subTitle">Name it, pick your region, subscription type, and expected players.</p>
-          </div>
-        </div>
-
-        <div class="processCard">
-          <img src={processStep3} />
-          <div class="processCardContent">
-            <h6 class:list={["h6", colourStyles.gradientOne]}>Start Playing</h6>
-            <p class="subTitle">Launch instantly and invite friends and enjoy your favourite games.</p>
-          </div>
-        </div>
-      </div>
-
-      <div class="processContentContainer">
-        <div class="processContent">
-          <h2 class="h2">Start Playing in <br />3 Steps</h2>
-          <div class="processBenefit">
-            <div class="purpleLogo"></div>
-            <p class="subTitle">No tech skills needed.</p>
-          </div>
-          <div class="processBenefit">
-            <div class="purpleLogo"></div>
-            <p class="subTitle">Pay-as-you-go!</p>
-          </div>
-        </div>
-        <Picture src={StaticPNG} formats={['avif', 'webp']} alt="Design graphic" width={450} />
-      </div>
-    </section>
+    <HowItWorks />
 
     <section id="services" class="servicePropsSection">
       <div class="propsContainer">
