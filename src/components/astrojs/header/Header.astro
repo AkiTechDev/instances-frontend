@@ -19,11 +19,28 @@ import button from "../../../styles/components/button.module.css";
         <!--<a class="bodyText" href="#privacy-policy">Privacy Policy</a> -->
     </nav>
     <div class={styles.actions}>
-        <button data-login class={`${button.btn} ${button.outlineLight} ${button.sm}`}>
+        <button id="loginBtn" data-login class={`${button.btn} ${button.outlineLight} ${button.sm}`}>
             <p class="buttonText">Log in</p>
         </button>
-        <button data-login class={`${button.btn} ${button.vibrant} ${button.sm} ${button.icon}`} style={`--icon: url(${LogoIcon.src});`}>
+        <button id="signupBtn" data-login class={`${button.btn} ${button.vibrant} ${button.sm} ${button.icon}`} style={`--icon: url(${LogoIcon.src});`}>
             <p class="buttonText">Start playing</p>
         </button>
+        <a href="/dashboard" id="dashboardBtn" class={`${button.btn} ${button.vibrant} ${button.sm}`} style="display: none; text-decoration: none;">
+            <p class="buttonText">Go to Dashboard</p>
+        </a>
     </div>
 </header>
+
+<script>
+    import { msalInstance } from "../../../lib/auth";
+
+    if (msalInstance.getActiveAccount()) {
+        document.getElementById("loginBtn")?.remove();
+        document.getElementById("signupBtn")?.remove();
+
+        const dashboardBtn = document.getElementById("dashboardBtn");
+        if (dashboardBtn) {
+            dashboardBtn.style.display = "";
+        }
+    }
+</script>
