@@ -19,6 +19,8 @@
     overflow: hidden;
     border-radius: 15px;
     border: 3px solid transparent;
+
+    transition: transform 0.5s ease;
 }
 
 .banner img {
@@ -44,7 +46,7 @@
     border: 3px solid var(--hover-colour-frame);
 }
 
-.container:hover .banner img {
+.container:hover > .banner {
     transform: scale(1.13);
 }
 

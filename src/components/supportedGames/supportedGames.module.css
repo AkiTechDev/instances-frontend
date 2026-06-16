@@ -1,17 +1,14 @@
 .container {
-    max-width: 1440px;
-    margin-left: auto;
-    margin-right: auto;
-  
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    padding: 6.25rem 5rem 5rem;
+    width: min(100% - 2rem, 96rem); /* 1536px */
+    margin-inline: auto;
+    position: relative;
+
+    /* padding: 0 7.5rem; */
+    padding: 7.5rem var(--padding-sm); box-sizing: border-box;
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
 
     gap: var(--margin-el-lg);
     text-align: center;
-    align-items: center;
 }
 
 .gamesContainer {

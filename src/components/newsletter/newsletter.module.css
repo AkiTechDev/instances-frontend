@@ -84,7 +84,7 @@
 
 .card > svg {
     position: absolute;
-    top: 2%;
+    top: 0;
     right: calc(var(--padding-sm) + 26px); /* Align with submit button, card padding + label padding (16px) half button size (26px)  */
     transform: translateY(-50%) translateX(50%) rotate(-45deg);
 

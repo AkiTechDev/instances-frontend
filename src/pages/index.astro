@@ -26,10 +26,10 @@ const squarcleIconUrl = `url(${squarcleIcon.src})`;
 
 import iconArrow from "../assets/icons/chevron.svg?url";
 
-import SupportedGames from "../components/supportedGames/SupportedGames.astro";
+import SupportedGames from "../components/SupportedGames/SupportedGames.astro"
 
 import Newsletter from "../components/newsletter/Newsletter.astro";
-import Footer from "../components/footer/Footer.astro";
+import Footer from "../components/astrojs/Footer/Footer.astro";
 
 import Header from "../components/astrojs/header/Header.astro";
 import Hero from "../components/astrojs/hero/Hero.astro";
@@ -150,7 +150,7 @@ const domain = "instances.aki-labs.com"
 
     <section id="faqs" class="faqContainer">
       <div class="faqHeaderContainer">
-        <h3 class="h3">Frequently Asked Questions</h3>
+        <h2 class="h2">Frequently Asked Questions</h2>
         <p class="subTitle">No tech skills needed. Pay-as-you-go!</p>
       </div>
 
@@ -364,101 +364,14 @@ const domain = "instances.aki-labs.com"
 </style>
 
 <style>
-  .processSection {
-    max-width: 1440px;
-    margin-left: auto;
-    margin-right: auto;
-
-
-    padding-top: 7.6875rem;
-    padding-bottom: 7.6875rem;
-    padding-left: 10rem;
-    padding-right: 10rem;
-
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-
-  }
-
-  .processCardContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    isolation: isolate;
-
-    overflow-y: auto;
-
-  }
-
-  .processCard {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-    gap: 2.25rem;
-
-    isolation: isolate;
-  }
-
-  .processCardContent {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 1.5rem 0 3rem;
-    gap: 1.25rem;
-  }
-
-  .processContentContainer {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.625rem;
-
-    max-width: 450px;
-
-    padding-left: 7.5rem;
-  }
-
-  .processContent {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    width: 100%;
-  }
-
-  .processContent > h2 {
-    margin-bottom: var(--margin-text-sm);
-  }
-
-  .processBenefit {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .purpleLogo {
-    width: 20px;
-    height: 20px;
-    background-color: #C589F4;
-    -webkit-mask: var(--LogoIconUrl) no-repeat center / contain;
-    mask: var(--LogoIconUrl) no-repeat center / contain;
-  }
-</style>
-
-<style>
   .servicePropsSection {
     width: min(100% - 2rem, 96rem); /* 1536px */
     margin-inline: auto;
     padding: 7.5rem var(--padding-sm); box-sizing: border-box;
+    padding-bottom: 3.5rem;
 
     display: grid;
     grid-template-columns: 2fr 4fr;
-    padding-bottom: 3.5rem;
   }
 
   .propsContainer {
@@ -541,17 +454,15 @@ const domain = "instances.aki-labs.com"
 
 <style define:vars={{squarcleIconUrl}}>
   .faqContainer {
-    max-width: 1440px;
-    margin-left: auto;
-    margin-right: auto;
+    width: min(100% - 2rem, 96rem); /* 1536px */
+    margin-inline: auto;
+    position: relative;
 
-    padding: 7.5rem 10rem 6.25rem;
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
+    /* padding: 0 7.5rem; */
+    padding: 7.5rem var(--padding-sm); box-sizing: border-box;
+    display: flex; flex-direction: row; align-items: flex-start; justify-content: space-between;
     gap: 3rem;
 
-    justify-content: space-between;
 
     z-index: 2;
   }

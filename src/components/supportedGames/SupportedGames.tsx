@@ -1,6 +1,6 @@
 import { createSignal, createResource, Show, For } from "solid-js";
 
-import styles from "./supportedGames.module.css";
+import styles from "./SupportedGames.module.css";
 import button from "../../styles/components/button.module.css";
 import GameCard from "../app/GameCard/GameCard";
 
