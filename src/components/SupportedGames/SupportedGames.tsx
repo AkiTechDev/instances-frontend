@@ -52,7 +52,7 @@ const SupportedGameCard = () => {
             </Show>
         </Show>
         <button
-            style="width:33%;"
+            style="width:100%;"
             class={`${button.btn} ${button.outline}`}
             onClick={() => setShowAll(prev => !prev)}
         >

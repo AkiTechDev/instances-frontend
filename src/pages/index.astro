@@ -8,16 +8,12 @@ import "../styles/typography.css"
 
 import "../styles/theme/default.css"
 
-import button from "../styles/components/button.module.css"
-
 import LogoIcon from "../assets/icons/logos/icon.svg";
 
 const LogoIconUrl = `url(${LogoIcon.src})`;
 
 import sectionOneBackground from "../assets/landingIcon.svg"
 const sectionOneBackgroundUrl = `url(${sectionOneBackground.src})`;
-
-import promoBackgroundImage from "../assets/promoBackground.svg?url";
 
 import Squarcle from "../components/squarcle/Squarcle.astro";
 
@@ -26,7 +22,7 @@ const squarcleIconUrl = `url(${squarcleIcon.src})`;
 
 import iconArrow from "../assets/icons/chevron.svg?url";
 
-import SupportedGames from "../components/fuckingstupidissue/SupportedGames.astro"
+import SupportedGames from "../components/SupportedGames/SupportedGames.astro"
 
 import Newsletter from "../components/newsletter/Newsletter.astro";
 import Footer from "../components/astrojs/Footer/Footer.astro";
@@ -35,6 +31,7 @@ import Header from "../components/astrojs/header/Header.astro";
 import Hero from "../components/astrojs/hero/Hero.astro";
 import HowItWorks from "../components/astrojs/HowItWorks/HowItWorks.astro"
 import DashboardPreview from "../components/astrojs/DashboardPreview/DashboardPreview.astro";
+import PromoCTA from "../components/astrojs/PromoCTA/PromoCTA.astro"
 
 const seo_des = "Host Minecraft, sandboxed games, and more with Instances. No contracts, no setup headaches. Switch games instantly, keep your world, and only pay for what you play.";
 const domain = "instances.aki-labs.com"
@@ -85,20 +82,8 @@ const domain = "instances.aki-labs.com"
 	<body>
     <Header />
     <Hero />
-    
-    <section>
-      <div class="promoContainer">
-        <img src={promoBackgroundImage} />
-        <div class="promoCTA">
-          <div class="promoIcon"></div>
-          <div class="promoContent">
-            <h1 class="promoHeader">Get Your First Server Hour Free - <span class="textHiglight">No Credit Card</span> Required!</h1>
-            <p class="promoText">Spin up your first game instance today and see how easy multiplayer hosting can be.</p>
-          </div>
-          <button data-signup class:list={[button.btn, button.vibrant, "h1"]}><p class="buttonText" style="z-index:2">Start Playing Now</p></button>
-        </div>
-      </div>
-    </section>
+
+    <PromoCTA />
 
     <HowItWorks />
 
@@ -257,109 +242,6 @@ const domain = "instances.aki-labs.com"
 
   button {
       font: inherit
-  }
-
-  .promoBackground {
-    background: linear-gradient(180deg, #22263E 0%, #191C2E 100%);
-  }
-
-  .promoContainer {
-    max-width: var(--max-width);
-    margin-left: auto;
-    margin-right: auto;
-    padding-left: 5rem;
-    padding-right: 5rem;
-    padding-top: 2.5rem;
-    padding-bottom: 0;
-
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    position: relative;
-  }
-
-  .promoCTA {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    padding: 3.5rem 10rem 4rem;
-    isolation: isolate;
-
-    background: rgba(14, 24, 42, 0.7);
-    background-blend-mode: overlay, normal;
-    backdrop-filter: blur(1rem);
-    border-radius: 0.625rem;
-
-    margin-top: -18rem;
-    z-index: 0;
-  }
-
-  .promoIcon {
-    z-index: 1;
-    position: absolute;
-    inset: 0;
-    background-color: #ffffff;
-
-    mask: var(--LogoIconUrl) repeat 50% 50%;
-    opacity: 0.02;
-
-  }
-
-  .promoContent {
-    gap: var(--margin-text-nm);
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    z-index: 2;
-  }
-  .promoHeader {
-    font-family: Lexend;
-    font-style: normal;
-    font-weight: 600;
-    font-size: 3rem;
-    align-items: center;
-    flex-direction: row;
-    text-align: center;
-    text-transform: uppercase;
-
-    color: #ffffff;
-
-    margin: 0;
-    max-width: 60rem;
-    z-index: inherit;
-  }
-
-  .textHiglight {
-    display: inline;
-    background: linear-gradient(90deg, #EBA439 0%, #C589F4 100%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-
-    z-index: inherit;
-  }
-
-  .promoText {
-    margin: 0;
-
-    text-align: center;
-
-    font-family: Lexend;
-    font-style: normal;
-    font-weight: 600;
-    font-size: 1.375rem;
-    max-width: 37.5rem;
-    line-height: 150%;
-
-    margin-bottom: var(--margin-el-nm);
-
-    z-index: inherit;    
   }
 </style>
 

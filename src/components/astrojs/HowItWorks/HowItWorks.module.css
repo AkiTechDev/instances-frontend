@@ -1,11 +1,5 @@
+
 .container {
-    width: 100%;
-
-    align-items: center;
-    align-content: center;
-}
-
-.content {
     width: min(100% - 2rem, 96rem); /* 1536px */
     margin-inline: auto;
 
@@ -13,26 +7,103 @@
     padding: 7.5rem var(--padding-sm); box-sizing: border-box;
 
     color: var(--text-colour-light); text-align: center;
-    display: flex; flex-direction: column; gap: 5rem; /* Gap is larged var + 24px, due to the games card which have extra 24 padding */
+    display: flex; flex-direction: row;
+
+    gap: 5.5rem;
 }
 
-.steps {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
-    gap: 24px;
+.container > .content {
+    display: flex; flex-direction: column;
+    gap: 1.5rem;
+    text-align: left;
+    width: min-content;
+    white-space: nowrap;
 }
 
-.step {
-    display: flex; flex-direction: column; align-items: center;
-    padding: 4rem 1.75rem; gap: 40px;
+.content > p {
+    white-space: wrap;
+    width: 80%;
+    flex-grow: 0;
+}
+
+.next {
+    position: absolute;
+    top: 50%;
+    right: 0rem; /* half of width: centers button on card's right edge */
+    z-index: 2;
+    width: 3rem; height: 3rem;
+    border-radius: 50%;
+    background: transparent;
+    border: 1px solid transparent;
+    cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    transform: translateY(-50%) translateX(50%);
+}
+
+.next:hover * {
+    color: var(--c-green-bright);
+}
+
+.next:active {
+    transform: translateY(-50%) translateX(50%) scale(0.94);
+}
+
+.next:focus-visible {
+    outline: 2px solid var(--c-blue-sky, #80c4ff);
+    outline-offset: 2px;
+}
+
+.cards {
+    flex: 1;
+    min-width: 0;
+    overflow: visible;
+    container-type: inline-size;
+    position: relative;
+    /* clip only the left side; right/top/bottom remain visible for peek + button */
+    clip-path: inset(-100vw -100vw -100vw 0);
+}
+
+.track {
+    display: flex; flex-direction: row;
+    gap: 1.5rem;
+    width: 100cqw;
+    transform: translateX(calc(var(--idx, 0) * -1 * (100cqw + 1.5rem)));
+    transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card {
+    flex: 0 0 100cqw;
     box-sizing: border-box;
 
-    border-radius: var(--r-card); border: 1px solid transparent;
-    background: linear-gradient(180deg, #191C2E 0%, #191F3E 100%) padding-box,
-                linear-gradient(180deg,rgba(235, 164, 57, 1) 0%, rgba(235, 164, 57, 0.4) 100%) border-box;
+    display: flex; flex-direction: row; justify-content: flex-start; align-items: center;
+    padding: 2rem;
+    gap: 3rem;
+
+    background: rgba(239, 241, 255, 0.05);
+    border-radius: var(--r-sm);
+
+    text-align: left;
 }
 
-.step div {
+.card h4 {
+    font-size: 22px;
+}
+
+.card > picture {
+    width: 112px;
+    height: 112px;
+
+    display: flex; align-items: center; justify-content: center;
+    align-content: center;
+
+}
+
+.card > .content {
     display: flex; flex-direction: column;
-    gap: 20px;
+    gap: 1.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .track { transition: none; }
+    .next { transition: none; }
 }

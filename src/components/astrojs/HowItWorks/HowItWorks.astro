@@ -5,36 +5,66 @@ import Chest from "../../../assets/images/Chest.png";
 import CraftingBench from "../../../assets/images/CraftingBench.png";
 import Furnace from "../../../assets/images/Furnace.png";
 import { Picture } from "astro:assets";
+
+import Squarcle from "../../../assets/icons/squarcleHole.svg";
 ---
 
 <section id="process" class={styles.container}>
     <div class={styles.content}>
-        <h2 class="h2">Start playing in 3 <span class="gradFun">Easy Steps</span></h2>
-
-        <div class={styles.steps}>
-            <div class={styles.step} style="background: linear-gradient(180deg, #191C2E 0%, #191F3E 100%) padding-box, linear-gradient(180deg,rgba(235, 164, 57, 1) 0%, rgba(235, 164, 57, 0.4) 100%) border-box;">
-                <Picture src={Chest} formats={['avif', 'webp']} width={80} height={128} alt="Minecraft Chest Icon." />
-                <div>
-                    <h5 class="h5" style="color: var(--c-orange); text-shadow: 0px 0px 4px var(--c-orange);">Step 1<br />Select Your Game</h5>
+        <h2 class="h2">Start Playing<br />in <span class="gradFun">3 Easy Steps</span></h2>
+        <p class="subTitle">Designed for casual gamers who just want to play.</p>
+    </div>
+    <div class={styles.cards}>
+        <button type="button" class={styles.next} data-carousel-next aria-label="Show next step">
+            <Squarcle style="width: 40px; height: 40px; transform: rotate(-135deg); color: var(--c-purple);"/>
+        </button>
+        <div class={styles.track} data-carousel-track style="--idx: 0">
+            <div class={styles.card}>
+                <Picture src={Chest} formats={['avif', 'webp']} width={50} height={80} alt="Minecraft Chest Icon." />
+                <div class={styles.content}>
+                    <div style="color: var(--c-orange); text-shadow: 0px 0px 3px var(--c-orange);">
+                        <h4 class="h4">STEP 1</h4>
+                        <h5 class="h5">Select Your Game</h5>
+                    </div>
                     <p class="subTitle">Pick from a list of popular titles like Minecraft, Valheim, etc.</p>
                 </div>
             </div>
 
-            <div class={styles.step} style="background: linear-gradient(180deg, #191C2E 0%, #191F3E 100%) padding-box, linear-gradient(180deg,rgba(197, 137, 244, 1) 0%, rgba(197, 137, 244, 0.4) 100%) border-box;">
-                <Picture src={CraftingBench} formats={['avif', 'webp']} width={80} height={128} alt="Minecraft Chest Icon." />
-                <div>
-                    <h5 class="h5" style="color: var(--c-purple); text-shadow: 0px 0px 4px var(--c-purple);">Step 2<br />Select Your Game</h5>
+            <div class={styles.card}>
+                <Picture src={CraftingBench} formats={['avif', 'webp']} width={50} height={80} alt="Minecraft Crafting Bench Icon." />
+                <div class={styles.content}>
+                    <div style="color: var(--c-purple); text-shadow: 0px 0px 3px var(--c-purple);">
+                        <h4 class="h4">STEP 2</h4>
+                        <h5 class="h5">Customise Your Instance</h5>
+                    </div>
                     <p class="subTitle">Name it, pick your region, subscription type, and expected players.</p>
                 </div>
             </div>
 
-            <div class={styles.step} style="background: linear-gradient(180deg, #191C2E 0%, #191F3E 100%) padding-box, linear-gradient(180deg,rgba(133, 182, 255, 1) 0%, rgba(133, 182, 255, 0.4) 100%) border-box;">
-                <Picture src={Furnace} formats={['avif', 'webp']} width={80} height={128} alt="Minecraft Chest Icon." />
-                <div>
-                    <h5 class="h5" style="color: var(--c-blue-sky); text-shadow: 0px 0px 4px var(--c-blue-sky);">Step 3<br />Select Your Game</h5>
+            <div class={styles.card}>
+                <Picture src={Furnace} formats={['avif', 'webp']} width={50} height={80} alt="Minecraft Furnace Icon." />
+                <div class={styles.content}>
+                    <div style="color: var(--c-blue-sky); text-shadow: 0px 0px 3px var(--c-blue-sky);">
+                        <h4 class="h4">STEP 3</h4>
+                        <h5 class="h5">Start Playing</h5>
+                    </div>
                     <p class="subTitle">Launch instantly and invite friends and enjoy your favorite games.</p>
                 </div>
             </div>
         </div>
     </div>
 </section>
+
+<script>
+    const section = document.getElementById('process');
+    const track = section?.querySelector<HTMLElement>('[data-carousel-track]');
+    const next = section?.querySelector<HTMLButtonElement>('[data-carousel-next]');
+    if (track && next) {
+        const total = track.children.length;
+        let idx = 0;
+        next.addEventListener('click', () => {
+            idx = (idx + 1) % total;
+            track.style.setProperty('--idx', String(idx));
+        });
+    }
+</script>

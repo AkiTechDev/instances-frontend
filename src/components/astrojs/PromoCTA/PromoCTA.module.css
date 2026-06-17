@@ -3,47 +3,51 @@
     margin-inline: auto;
 
     /* padding: 0 7.5rem; */
-    padding: var(--padding-outer-sides) var(--padding-outer-sides);
-    box-sizing: border-box;
+    padding: 7.5rem var(--padding-sm); box-sizing: border-box;
+    display: flex; flex-direction: row; align-items: flex-start; justify-content: space-between;
 
-    display: flex;
-    gap: 3rem;
-}
-
-.card {
-    width: 100%;
-    border-radius: var(--r-pill);
-    padding: var(--padding-sm);
-    display: flex; align-items: center; justify-content: space-between;
     gap: 4rem;
-    color: var(--text-colour-dark);
-    position: relative;
-    overflow: hidden;
-    background: var(--c-orange);
 }
 
-.card p {
-    opacity: 0.85;
-    margin-top: 1rem;
+.cta {
+    display: flex; flex-direction: column; justify-content: center; align-items: center;
+    gap: 2.5rem;
+    max-width: 600px;
 }
 
-.card svg {
-    position: absolute; right: -60px; top: -60px;
-    width: 280px; height: 280px;
+.cta > .content {
+    display: flex; flex-direction: column; align-items: center;
+    text-align: center;
+    gap: 1.5rem;
 }
 
-.squarcle {
-    position: absolute; right: -60px; top: -60px;
-    width: 280px; height: 280px;
-    background: #C589F4;
-    -webkit-mask: var(--icon) no-repeat center / contain;
-            mask: var(--icon) no-repeat center / contain;
-    transform: rotate(-30deg);
+.free {
+    background:
+        linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.9) 50%, transparent 65%) 200% 0 / 250% 100% no-repeat,
+        linear-gradient(239.39deg, #C589F4 15.39%, #EBA439 31.73%, #80F733 42.79%);
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; text-fill-color: transparent;
+    animation: shine 2.8s ease-in-out infinite;
 }
 
-@media (max-width: 48rem)  { 
-    /* 768px  — tablet+  */ 
-    .card {
-        flex-direction: column;
-    }
+@keyframes shine {
+    0%   { background-position: 200% 0, 0 0; }
+    60%  { background-position: -100% 0, 0 0; }
+    100% { background-position: -100% 0, 0 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .free { animation: none; }
+    .credit { animation: none; }
+}
+
+.credit {
+    background:
+        linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.9) 50%, transparent 65%) 200% 0 / 250% 100% no-repeat,
+        linear-gradient(239.39deg, #80F733 0%, #EBA439 50%, #C589F4 100%) -100%/ 200%;
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent; text-fill-color: transparent;
+
+     animation: shine 2.8s ease-in-out infinite;
+
 }

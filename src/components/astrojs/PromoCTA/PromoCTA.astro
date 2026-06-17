@@ -2,19 +2,23 @@
 import styles from "./PromoCTA.module.css";
 import button from "../../../styles/components/button.module.css";
 
-import Squarcle from "../../squarcle/Squarcle.astro";
-//import SqaurcleIcon from "../../../assets/icons/squarcle.svg";
+import PresentIcon from "../../../assets/icons/present.svg";
 ---
 
 <section class={styles.container}>
-    <div class={styles.card}>
-        <Squarcle width="280" height="280" rotation="60" />
-        <!--<div class={styles.squarcle} style={`--icon: url("${SqaurcleIcon.src}")`}></div>-->
-        <div style="z-index: 1;">
-            <h2 class="h2">Ready to play?</h2>
-            <p class="statsTitle">Sign up in a minute. We'll spin up your first server free<br />— see if you like it before any meter starts.</p>
+    <PresentIcon />
+    <div class={styles.cta}>
+        <div class={styles.content}>
+            <h1 class="h1Caps">
+                Get Your First Server Hour <span class={styles.free}>Free</span> - <span class={styles.credit}>No Credit Card</span> Required!
+            </h1>
+            <p class="subTitle">
+                Spin up your first game server today and see how easy multiplayer hosting can be.
+            </p>
         </div>
-
-        <button style="z-index: 1;" class:list={[button.btn, button.dark]}>Start Playing Now</button>
+        <button class={`${button.btn} ${button.vibrant} buttonText`}>
+            Start Playing Now
+        </button>
     </div>
+    <PresentIcon />
 </section>
