@@ -24,7 +24,8 @@
 .free {
     background:
         linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.9) 50%, transparent 65%) 200% 0 / 250% 100% no-repeat,
-        linear-gradient(239.39deg, #C589F4 15.39%, #EBA439 31.73%, #80F733 42.79%);
+        linear-gradient(247.43deg, #C589F4 9.05%, #EBA439 50.45%, #80F733 91.85%);
+        
     -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent; text-fill-color: transparent;
     animation: shine 2.8s ease-in-out infinite;
@@ -36,15 +37,40 @@
     100% { background-position: -100% 0, 0 0; }
 }
 
+.present {
+    transform-origin: 50% 90%;
+    animation: wiggle 2.4s ease-in-out infinite;
+}
+
+@keyframes wiggle {
+    0%, 100% { transform: rotate(0deg) translateY(0); }
+    6%   { transform: rotate(-3deg) translateY(0); }
+    12%  { transform: rotate(3deg) translateY(-1px); }
+    18%  { transform: rotate(-6deg) translateY(0); }
+    24%  { transform: rotate(6deg) translateY(-2px); }
+    30%  { transform: rotate(-9deg) translateY(0); }
+    36%  { transform: rotate(10deg) translateY(-3px); }
+    42%  { transform: rotate(-11deg) translateY(-1px); }
+    48%  { transform: rotate(11deg) translateY(-4px); }
+    54%  { transform: rotate(-10deg) translateY(-1px); }
+    60%  { transform: rotate(9deg) translateY(-3px); }
+    66%  { transform: rotate(-7deg) translateY(0); }
+    72%  { transform: rotate(6deg) translateY(-2px); }
+    78%  { transform: rotate(-4deg) translateY(0); }
+    84%  { transform: rotate(3deg) translateY(-1px); }
+    92%  { transform: rotate(-1deg) translateY(0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .free { animation: none; }
     .credit { animation: none; }
+    .present { animation: none; }
 }
 
 .credit {
     background:
         linear-gradient(110deg, transparent 35%, rgba(255, 255, 255, 0.9) 50%, transparent 65%) 200% 0 / 250% 100% no-repeat,
-        linear-gradient(239.39deg, #80F733 0%, #EBA439 50%, #C589F4 100%) -100%/ 200%;
+        linear-gradient(247.43deg, #C589F4 9.05%, #EBA439 50.45%, #80F733 91.85%);
     -webkit-background-clip: text; background-clip: text;
     -webkit-text-fill-color: transparent; text-fill-color: transparent;
 

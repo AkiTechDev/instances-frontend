@@ -12,6 +12,7 @@
 
 .container img {
     width: 50%;
+    animation: float 5s ease-in-out infinite;
 }
 
 .content {
@@ -40,3 +41,12 @@
 .actions a {
     text-decoration: none;
 }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-14px); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .errorImageWrap { animation: none; }
+  }
