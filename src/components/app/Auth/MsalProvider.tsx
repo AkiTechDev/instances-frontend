@@ -2,6 +2,8 @@ import { EventType, InteractionRequiredAuthError, type AccountInfo, type EventMe
 import { msalReady, msalInstance } from "../../../lib/auth";
 import { createEffect, createContext, createResource, createSignal, Show, useContext, onCleanup, onMount } from "solid-js";
 
+import authenticatingStyles from "./Authenticating.module.css";
+
 type MsalContextType = {
     account: () => AccountInfo | null;
     getToken: (scopes: string[]) => Promise<string>;
@@ -12,7 +14,12 @@ type MsalContextType = {
 export const MsalContext = createContext<MsalContextType>();
 
 function Authenticating() {
-    return <div>Authenticating...</div>
+    return (
+        <div class={authenticatingStyles.container}>
+            <h3 class="h3">Authenticating</h3>
+            <p class="subTitle">Confirming it's really you</p>
+        </div>
+    )
 }
 
 function LoginRedirect() {
@@ -20,7 +27,12 @@ function LoginRedirect() {
         await msalReady;
         await msalInstance.loginRedirect({ scopes: ["api://Instances/access"] });
     });
-    return <div>Redirecting to login...</div>
+    return (
+        <div class={authenticatingStyles.container}>
+            <h3 class="h3">Authenticating</h3>
+            <p class="subTitle">Confirming it's really you</p>
+        </div>
+    )
 }
 
 export function MsalProvider(props: { children?: any }) {
