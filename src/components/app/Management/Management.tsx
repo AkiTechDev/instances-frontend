@@ -1,5 +1,5 @@
 import { createAsync, useNavigate, useParams } from "@solidjs/router";
-import { createResource, createSignal, Show } from "solid-js";
+import { type Component, createEffect, createResource, createSignal, Index, Match, on, Show, Suspense, Switch } from "solid-js";
 
 import styles from "./Management.module.css";
 
@@ -20,6 +20,7 @@ import {
     getInstanceStatus,
     toggleInstance,
     type Instance,
+    type InstanceRuntimeStatus,
     type InstanceState,
 } from "../../../lib/apis";
 import { sleep } from "../../../lib/utils";
@@ -41,6 +42,66 @@ const provisioningMessage = (s: InstanceState): string => {
     if (s.status === "unknown") return s.note;
     return s.raw_status;
 };
+
+// Suspense fallbacks: render the form's grid/connectivity shape so the layout
+// holds steady while config()/state()/runtime() resolve, then the real fields
+// swap in without a pop-in.
+const ConfigFormSkeleton: Component<{ rows: number }> = (props) => (
+    <div class={styles.formSkeleton} aria-busy="true">
+        <Index each={Array.from({ length: props.rows })}>
+            {() => (
+                <div class={styles.skeletonField}>
+                    <div class={`${styles.skeleton} ${styles.skeletonLabel}`} />
+                    <div class={`${styles.skeleton} ${styles.skeletonInput}`} />
+                </div>
+            )}
+        </Index>
+        <div class={`${styles.skeleton} ${styles.skeletonButton}`} />
+    </div>
+);
+
+const PanelBodySkeleton = () => (
+    <>
+        <div class={styles.quickActions} aria-busy="true">
+            <div class={`${styles.skeleton} ${styles.skeletonPanelButton}`} />
+            <div class={`${styles.skeleton} ${styles.skeletonPanelButton}`} />
+        </div>
+        <div class={styles.connectivity}>
+            <Index each={Array.from({ length: 3 })}>
+                {() => (
+                    <div class={styles.connectivityInfo}>
+                        <div class={`${styles.skeleton} ${styles.skeletonLabel}`} />
+                        <div class={`${styles.skeleton} ${styles.skeletonValue}`} />
+                    </div>
+                )}
+            </Index>
+        </div>
+    </>
+);
+
+// A single copyable connectivity value (domain / ip). Renders nothing when the
+// value is absent so we never print empty or placeholder rows.
+const CopyRow: Component<{ label: string; value?: string; onCopy: (v: string | null) => void }> = (props) => (
+    <Show when={props.value}>
+        <div class={styles.connectivityInfo}>
+            <p class="statsTitle">{props.label}</p>
+            <Tooltip tooltipContent="Copied!" tooltipContentStyle="bodyTextSmallest" enableTimeout={true} timeoutDuration={1000}>
+                <p class={`statsText ${styles.copy}`} style={`--icon: url(${clipboardIcon.src})`} onClick={(e) => props.onCopy(e.currentTarget.textContent)}>{props.value}</p>
+            </Tooltip>
+        </div>
+    </Show>
+);
+
+// Headline + sub-line used for every non-running runtime state. `busy` adds the
+// pulse used while the instance is transitioning.
+const StatusBanner: Component<{ title: string; subtitle?: string; busy?: boolean }> = (props) => (
+    <div class={styles.statusBanner}>
+        <p class={`statsText ${props.busy ? styles.pulse : ""}`}>{props.title}</p>
+        <Show when={props.subtitle}>
+            <p class={`bodyTextSmall ${styles.statusSub}`}>{props.subtitle}</p>
+        </Show>
+    </div>
+);
 
 const Management = () => {
     const params = useParams();
@@ -81,52 +142,114 @@ const Management = () => {
         return ep ? getInstanceConfig(ep) : undefined;
     });
 
+    // Reserve the config column from the first paint. While state is still
+    // loading we optimistically assume a ready instance (the common case) so the
+    // grid keeps its two-column shape and the panel never flashes full-width;
+    // once state resolves we only keep the column for reachable ready/updating
+    // instances (provisioning/failed correctly collapse to the panel-only view).
+    const showConfigColumn = () => {
+        const s = state();
+        if (!s) return true;
+        return isReadyOrUpdating(s) && !!endpoint();
+    };
+
     const [runtime, { refetch: refetchRuntime }] = createResource(
         endpoint,
         (ep: string) => getInstanceStatus(ep),
     );
 
-    const runtimeRunning = () => {
-        const r = runtime();
-        return r ? "ipv6" in r : false;
-    };
-    const [optimistic, setOptimistic] = createSignal<boolean | null>(null);
-    const isRunning = () => optimistic() ?? runtimeRunning();
-
     const banner = createAsync(async () => game()?.getBanner());
     const schema = createAsync(async () => game()?.getSchema());
+
+    // One coarse status drives the whole panel: while a toggle is in flight the
+    // optimistic intent wins (instant feedback), otherwise the latest polled
+    // runtime state (falling back to "stopped" before the first poll lands).
+    const [optimistic, setOptimistic] = createSignal<"starting" | "stopping" | null>(null);
+    const status = (): InstanceRuntimeStatus["state"] =>
+        optimistic() ?? runtime()?.state ?? "stopped";
+
+    const isRunning = () => status() === "running";
+    const canToggle = () =>
+        status() === "running" || status() === "stopped" || status() === "error";
+
+    // Typed views onto the current runtime payload for the connectivity panel.
+    const running = () => {
+        const r = runtime();
+        return r?.state === "running" ? r : undefined;
+    };
+    const startingPhase = () => {
+        const r = runtime();
+        return r?.state === "starting" ? r.phase : undefined;
+    };
+    const statusError = () => {
+        const r = runtime();
+        return r && (r.state === "forbidden" || r.state === "error") ? r.error?.message : undefined;
+    };
+
+    const toggleLabel = () => {
+        switch (status()) {
+            case "starting": return "Starting…";
+            case "stopping": return "Stopping…";
+            case "running":  return "Stop Game";
+            default:         return "Start Game";
+        }
+    };
 
     const copyText = async (data: string | null) => {
         if (!data) return;
         await navigator.clipboard.writeText(data.replaceAll(" ", ""));
     };
 
-    const toggleInstanceButton = async () => {
-        const ep = endpoint();
-        if (!ep) return;
-        const wasRunning = isRunning();
-        setOptimistic(!wasRunning);
+    // Poll /status until the instance settles. Guarded so the toggle handler and
+    // the auto-resume effect below share one in-flight loop rather than stacking.
+    const [polling, setPolling] = createSignal(false);
+    const settled = (s?: InstanceRuntimeStatus["state"]) =>
+        s === "running" || s === "stopped" || s === "forbidden" || s === "error";
+
+    // `target` lets a toggle wait for its destination (e.g. "running") and ignore
+    // the *current* settled state, which the gateway keeps reporting for a beat
+    // after the action — that lag is what snapped the panel straight back on the
+    // first click. `initialDelayMs` holds the optimistic first-stage text before
+    // we poll at all, so the very first request can't just echo the old state.
+    const pollStatus = async (opts?: { target?: InstanceRuntimeStatus["state"]; initialDelayMs?: number }) => {
+        if (polling()) return;
+        setPolling(true);
         try {
-            await toggleInstance(ep, wasRunning);
-            if (!wasRunning) {
-                // Starting — poll runtime every 5 s until ipv6 appears (max 5 min).
-                const deadline = Date.now() + 5 * 60_000;
-                while (Date.now() < deadline) {
-                    await sleep(5000);
-                    const fresh = await refetchRuntime();
-                    if (fresh && "ipv6" in fresh) break;
-                }
-            } else {
-                // Stopping — short delay, then one refresh.
-                await sleep(2000);
-                await refetchRuntime();
+            if (opts?.initialDelayMs) await sleep(opts.initialDelayMs);
+            const deadline = Date.now() + 5 * 60_000;
+            while (Date.now() < deadline) {
+                const s = (await refetchRuntime())?.state;
+                if (s === "forbidden" || s === "error") break;
+                if (opts?.target ? s === opts.target : settled(s)) break;
+                await sleep(4000);
             }
-            setOptimistic(null);
-        } catch (err) {
-            console.error("toggle failed", err);
-            setOptimistic(wasRunning);
+        } finally {
+            setPolling(false);
         }
     };
+
+    const toggleInstanceButton = async () => {
+        const ep = endpoint();
+        if (!ep || !canToggle()) return;
+        const wasRunning = isRunning();
+        setOptimistic(wasRunning ? "stopping" : "starting");
+        try {
+            await toggleInstance(ep, wasRunning);
+            // Hold the first-stage text, then poll for the destination state
+            // (not the lagging current one) so the panel doesn't flash back.
+            await pollStatus({ target: wasRunning ? "stopped" : "running", initialDelayMs: 4000 });
+        } catch (err) {
+            console.error("toggle failed", err);
+        } finally {
+            setOptimistic(null);
+        }
+    };
+
+    // Landing on the page mid start/stop: resume polling immediately — no delay,
+    // no target, just run until it settles.
+    createEffect(on(() => runtime()?.state, (s) => {
+        if (s === "starting" || s === "stopping") void pollStatus();
+    }));
 
     return (
         <Show when={game()}>
@@ -148,63 +271,72 @@ const Management = () => {
                             </div>
                         </div>
 
-                        <Show when={state() && isReadyOrUpdating(state())}>
-                            <div class={styles.quickActions}>
-                                <button class={`${button.btn} ${button.secondary} ${button.icon}`} style={`--icon: url(${ isRunning() ? stopIcon.src : playIcon.src})`} onClick={() => toggleInstanceButton()}><p class="buttonText">{isRunning() ? "Stop Game" : "Start Game"}</p></button>
-                                <button class={`${button.btn} ${button.outlineDark}`}><p class="buttonText">Invite Friends</p></button>
-                                <InstanceOptions endpoint={endpoint()!} instance={instance} />
-                            </div>
-                            <div class={styles.connectivity}>
-                                <div class={styles.connectivityInfo}>
-                                    <p class="statsTitle">Domain</p>
-                                    <Tooltip tooltipContent="Copied!" tooltipContentStyle="bodyTextSmallest" enableTimeout={true} timeoutDuration={1000}>
-                                        <p class={`statsText ${ runtime()?.domain ? styles.copy : ""}`} style={`--icon: url(${clipboardIcon.src})`} onClick={(e) => copyText(e.currentTarget.textContent)}>{runtime()?.domain ? runtime()?.domain : "The game is has not started :)"} </p>
-                                    </Tooltip>
+                        <Suspense fallback={<PanelBodySkeleton />}>
+                            <Show when={state() && isReadyOrUpdating(state())}>
+                                <div class={styles.quickActions}>
+                                    <button class={`${button.btn} ${button.secondary} ${button.icon}`} style={`--icon: url(${ (status() === "running" || status() === "stopping") ? stopIcon.src : playIcon.src})`} disabled={!canToggle()} onClick={() => toggleInstanceButton()}><p class="buttonText">{toggleLabel()}</p></button>
+                                    <button class={`${button.btn} ${button.outlineDark}`}><p class="buttonText">Invite Friends</p></button>
+                                    <InstanceOptions endpoint={endpoint()!} instance={instance} />
                                 </div>
+                                <div class={styles.connectivity}>
+                                    <Switch fallback={<StatusBanner title="Your world is offline" subtitle="Hit Start to drop back in" />}>
+                                        <Match when={status() === "running"}>
+                                            <CopyRow label="Domain" value={running()?.domain} onCopy={copyText} />
+                                            <CopyRow label="IPv4 Address" value={running()?.ipv4} onCopy={copyText} />
+                                            <CopyRow label="IPv6 Address" value={running()?.ipv6} onCopy={copyText} />
+                                        </Match>
+                                        <Match when={status() === "starting"}>
+                                            <StatusBanner busy title="Waking up your world…" subtitle={startingPhase() ?? "Getting things ready"} />
+                                        </Match>
+                                        <Match when={status() === "stopping"}>
+                                            <StatusBanner busy title="Powering down…" subtitle="Tidying up your world" />
+                                        </Match>
+                                        <Match when={status() === "forbidden"}>
+                                            <StatusBanner title="No access" subtitle="You're not the owner of this instance" />
+                                        </Match>
+                                        <Match when={status() === "error"}>
+                                            <StatusBanner title="Something went sideways" subtitle={statusError() ?? "We couldn't reach your server — try again shortly"} />
+                                        </Match>
+                                    </Switch>
+                                </div>
+                            </Show>
 
-                                <div class={styles.connectivityInfo}>
-                                    <p class="statsTitle">IPv4 Address</p>
-                                    <Tooltip tooltipContent="Copied!" tooltipContentStyle="bodyTextSmallest" enableTimeout={true} timeoutDuration={1000}>
-                                        <p class={`statsText ${ runtime()?.ipv4 ? styles.copy : ""}`} style={`--icon: url(${clipboardIcon.src})`} onClick={(e) => copyText(e.currentTarget.textContent)}>{runtime()?.ipv4 ? runtime()?.ipv4 : "The game is has not started :)"} </p>
-                                    </Tooltip>
+                            <Show when={state() && !isReadyOrUpdating(state())}>
+                                <div class={styles.quickActions}>
+                                    <InstanceOptions endpoint="" instance={instance} />
                                 </div>
-
-                                <div class={styles.connectivityInfo}>
-                                    <p class="statsTitle">IPv6 Address</p>
-                                    <Tooltip tooltipContent="Copied!" tooltipContentStyle="bodyTextSmallest" enableTimeout={true} timeoutDuration={1000}>
-                                        <p class={`statsText ${ runtime()?.ipv6 ? styles.copy : ""}`} style={`--icon: url(${clipboardIcon.src})`} onClick={(e) => copyText(e.currentTarget.textContent)}>{runtime()?.ipv6 ? runtime()?.ipv6 : "The game is has not started :)"} </p>
-                                    </Tooltip>
+                                <div class={styles.connectivity}>
+                                    <div class={styles.connectivityInfo}>
+                                        <p class="statsTitle">{state()!.raw_status}</p>
+                                        <p class="statsText">{provisioningMessage(state()!)}</p>
+                                    </div>
                                 </div>
-                            </div>
-                        </Show>
-
-                        <Show when={state() && !isReadyOrUpdating(state())}>
-                            <div class={styles.quickActions}>
-                                <InstanceOptions endpoint="" instance={instance} />
-                            </div>
-                            <div class={styles.connectivity}>
-                                <div class={styles.connectivityInfo}>
-                                    <p class="statsTitle">{state()!.raw_status}</p>
-                                    <p class="statsText">{provisioningMessage(state()!)}</p>
-                                </div>
-                            </div>
-                        </Show>
+                            </Show>
+                        </Suspense>
                     </div>
 
-                    <Show when={state() && isReadyOrUpdating(state()) && config()}>
+                    <Show when={showConfigColumn()}>
                         <div class={styles.instanceConfigContainer}>
                             <div class={styles.instanceConfigHeader}>
                                 <h6 class="h6">{instance.name} Settings</h6>
                                 <p class="bodyText">You can edit the Instance to your preference at any time.</p>
                             </div>
-                            <ManagementInstanceConfigForm config={config()!} instance={instance} endpoint={endpoint()!} profiles={game()!.profiles} />
+                            <Suspense fallback={<ConfigFormSkeleton rows={4} />}>
+                                <Show when={config()} fallback={<ConfigFormSkeleton rows={4} />}>
+                                    <ManagementInstanceConfigForm config={config()!} instance={instance} endpoint={endpoint()!} profiles={game()!.profiles} />
+                                </Show>
+                            </Suspense>
                         </div>
                         <div class={styles.instanceConfigContainer}>
                             <div class={styles.instanceConfigHeader}>
                                 <h6 class="h6">{game()!.name} Settings</h6>
                                 <p class="bodyText">Adjust how the game feels.</p>
                             </div>
-                            <ManagementGameConfiguration schema={schema()!} config={config()!.game} endpoint={endpoint()!} />
+                            <Suspense fallback={<ConfigFormSkeleton rows={5} />}>
+                                <Show when={config() && schema()} fallback={<ConfigFormSkeleton rows={5} />}>
+                                    <ManagementGameConfiguration schema={schema()!} config={config()!.game} endpoint={endpoint()!} />
+                                </Show>
+                            </Suspense>
                         </div>
                     </Show>
                 </div>

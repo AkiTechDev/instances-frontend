@@ -121,10 +121,7 @@ const DashboardInstanceCard: Component<{ instance: Instance; listView: boolean; 
         (ep: string) => getInstanceStatus(ep),
     );
 
-    const runtimeRunning = createMemo(() => {
-        const r = runtime();
-        return r ? "ipv6" in r : false;
-    });
+    const runtimeRunning = createMemo(() => runtime()?.state === "running");
 
     const [optimistic, setOptimistic] = createSignal<boolean | null>(null);
     const [toggling, setToggling] = createSignal(false);

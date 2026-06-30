@@ -50,7 +50,7 @@ const InstanceOptions: Component<{ endpoint: string, instance: Instance }> = (pr
                 plan: config.plan,
                 cpu: config.cpu,
                 memory: config.memory,
-                auto_start: !!(runtime && "ipv6" in runtime),
+                auto_start: runtime?.state === "running",
             });
             await revalidate("instanceState");
         } catch (err) {

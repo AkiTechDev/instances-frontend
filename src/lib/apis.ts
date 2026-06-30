@@ -110,34 +110,50 @@ export const getInstanceConfig = query(async (endpoint: string): Promise<Instanc
     return data as InstanceConfig
 }, "instanceConfig")
 
-export interface InstanceStatus {
-    ipv6: string,
-    ipv4?: string,
-    domain?: string,
+export interface StatusError {
+    code?: string,
+    message?: string,
+    details?: unknown,
 }
 
-export interface InstanceStatusBadRequest {
-    code: string,
-    message: string,
-    details: null
-}
+// Runtime status of a provisioned instance's game server. The gateway encodes
+// the lifecycle phase in the HTTP status code as well as the body, so we map
+// each code to a tagged member instead of throwing — that lets the UI message
+// every outcome (including forbidden / server fault) rather than blanking.
+export type InstanceRuntimeStatus =
+    | { state: "running";   health: string; ipv6: string; ipv4?: string; domain?: string } // 200
+    | { state: "starting";  phase: string }                                                 // 202
+    | { state: "stopping" }                                                                  // 503
+    | { state: "stopped" }                                                                   // 409
+    | { state: "forbidden"; error: StatusError }                                             // 403
+    | { state: "error";     error: StatusError };                                            // 500 / unexpected
 
-export const getInstanceStatus = async (endpoint: string): Promise<InstanceStatus> => {
+export const getInstanceStatus = async (endpoint: string): Promise<InstanceRuntimeStatus> => {
     const token = await getToken(["api://Instances/access"]);
 
-    if (endpoint === undefined) {
-        throw new Error("Invalid endpoint");
-    };
+    let resp: Response;
+    try {
+        resp = await fetch(`${endpoint}/status`, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token.accessToken}`
+            }
+        });
+    } catch {
+        return { state: "error", error: { message: "Couldn't reach the instance" } };
+    }
 
-    const resp = await fetch(`${endpoint}/status`, {
-        method: "GET",
-        headers: {
-            "Authorization": `Bearer ${token.accessToken}`
-        }
-    });
+    const data = await resp.json().catch(() => null);
 
-    const data = await resp.json();
-    return data as InstanceStatus
+    switch (resp.status) {
+        case 200: // running — body carries health + ipv6/ipv4?/domain?
+        case 202: // starting — body carries phase
+            return data as InstanceRuntimeStatus;
+        case 409: return { state: "stopped" };
+        case 503: return { state: "stopping" };
+        case 403: return { state: "forbidden", error: (data ?? {}) as StatusError };
+        default:  return { state: "error", error: (data ?? {}) as StatusError };
+    }
 };
 
 export const toggleInstance = async (endpoint: string, isRunning: boolean): Promise<GenericResonse> => {
