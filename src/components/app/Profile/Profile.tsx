@@ -18,7 +18,6 @@ const Profile: Component<{}> = () => {
     return (
         <div
             class={styles.container}
-            onMouseEnter={() => document.getElementById("profile")?.showPopover()}
             onMouseLeave={() => document.getElementById("profile")?.hidePopover()}
         >
             <button popoverTarget="profile" aria-haspopup="true" style={`--icon: url("${iconArrow.src}")`}>
