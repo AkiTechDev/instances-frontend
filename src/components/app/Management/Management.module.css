@@ -126,7 +126,7 @@
     color: var(--colour-text-tertiary);
     width: 100%;
 
-    z-index: 1;
+    z-index: 2;
 }
 
 .quickActions {
@@ -291,22 +291,8 @@
 }
 
 
-/* Suspense skeletons — shimmer paint shared via .skeleton, shape via the
-   dimension classes. Mirrors the DashboardInstanceCard skeleton conventions
-   (color-mix over --c-ink) so the loading state matches the rest of the app. */
-.skeleton {
-    background-color: color-mix(in srgb, var(--c-ink) 8%, transparent);
-    background-image: linear-gradient(
-        90deg,
-        transparent 0%,
-        color-mix(in srgb, var(--c-ink) 6%, transparent) 50%,
-        transparent 100%
-    );
-    background-size: 200% 100%;
-    background-repeat: no-repeat;
-    border-radius: 6px;
-    animation: managementSkeletonShimmer 1.4s ease-in-out infinite;
-}
+/* Suspense skeleton shapes — the shimmer paint + pulse come from the shared
+   effects module; these classes only carry dimensions. */
 
 /* Form skeleton — matches .instanceConfigSettings grid in the real forms. */
 .formSkeleton {
@@ -327,6 +313,7 @@
     width: 40%;
     height: 0.85rem;
     margin-left: 1rem;
+    border-radius: 6px;
 }
 
 .skeletonInput {
@@ -353,17 +340,7 @@
 .skeletonValue {
     width: 60%;
     height: 1rem;
-}
-
-@keyframes managementSkeletonShimmer {
-    0%   { background-position: 200% 0; }
-    100% { background-position: -200% 0; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .skeleton {
-        animation: none;
-    }
+    border-radius: 6px;
 }
 
 
@@ -379,17 +356,12 @@
     opacity: 0.6;
 }
 
-.pulse {
-    animation: statusPulse 1.4s ease-in-out infinite;
+/* Banner in-progress treatment (creating / updating) — grayscale the art and
+   contain the shared colour sweep overlay's blend mode. */
+.bannerWrapper {
+    isolation: isolate;
 }
 
-@keyframes statusPulse {
-    0%, 100% { opacity: 1; }
-    50%      { opacity: 0.5; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .pulse {
-        animation: none;
-    }
+.bannerBusy img {
+    filter: grayscale(100%);
 }

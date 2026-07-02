@@ -1,13 +1,15 @@
 import {
+    createEffect,
     createMemo,
     createResource,
     createSignal,
     createUniqueId,
+    on,
     Show,
     Suspense,
     type Component,
 } from "solid-js";
-import { A, createAsync } from "@solidjs/router";
+import { A, createAsync, revalidate } from "@solidjs/router";
 import {
     endpointOf,
     getInstanceState,
@@ -19,6 +21,7 @@ import {
 import { sleep, timeAgo } from "../../../lib/utils";
 
 import styles from "./DashboardInstanceCard.module.css";
+import effects from "../../../styles/components/effects.module.css";
 
 import InstanceOptions from "../InstanceOptions/InstanceOptions";
 import { gameRegistry } from "../../../lib/games/index";
@@ -27,8 +30,8 @@ import { ResponsiveImage } from "@responsive-image/solid";
 const cardLabel = (state: InstanceState | undefined, isRunning: boolean): string => {
     if (!state) return "";
     switch (state.status) {
-        case "ready":
-        case "updating":      return isRunning ? "RUNNING" : "STOPPED";
+        case "ready":         return isRunning ? "RUNNING" : "STOPPED";
+        case "updating":      return "UPDATING";
         case "creating":      return "GENERATING";
         case "deleting":      return "DELETING";
         case "rolling_back":  return "ROLLING BACK";
@@ -42,8 +45,8 @@ const cardLabel = (state: InstanceState | undefined, isRunning: boolean): string
 const cardSubtitle = (state: InstanceState | undefined): string => {
     if (!state) return "";
     switch (state.status) {
-        case "ready":
-        case "updating":      return `Created ${timeAgo(state.elapsed_seconds)}`;
+        case "ready":         return `Created ${timeAgo(state.elapsed_seconds)}`;
+        case "updating":      return `Updating`;
         case "creating":      return `Generating`;
         case "deleting":
         case "rolling_back":
@@ -54,16 +57,18 @@ const cardSubtitle = (state: InstanceState | undefined): string => {
     }
 };
 
+// Only "ready" is toggleable — while updating, CloudFormation may cycle the
+// server, so we hide the toggle rather than imply the user controls it.
 const canToggle = (state: InstanceState | undefined): boolean =>
-    state?.status === "ready" || state?.status === "updating";
+    state?.status === "ready";
 
-type StatusVariant = "active" | "creating" | undefined;
+type StatusVariant = "active" | "creating" | "updating" | undefined;
 
 const statusVariantOf = (state: InstanceState | undefined, isRunning: boolean): StatusVariant => {
     if (!state) return undefined;
     switch (state.status) {
-        case "ready":
-        case "updating":      return isRunning ? "active" : undefined;
+        case "ready":         return isRunning ? "active" : undefined;
+        case "updating":      return "updating";
         case "creating":      return "creating";
         default:              return undefined;
     }
@@ -130,6 +135,10 @@ const DashboardInstanceCard: Component<{ instance: Instance; listView: boolean; 
     const labelText = createMemo(() => cardLabel(state(), isRunning()));
     const subtitleText = createMemo(() => cardSubtitle(state()));
     const variant = createMemo(() => statusVariantOf(state(), isRunning()));
+    const bannerBusy = createMemo(() => {
+        const s = state()?.status;
+        return s === "creating" || s === "updating";
+    });
 
     const toggle = async (e: Event) => {
         e.preventDefault();
@@ -152,6 +161,30 @@ const DashboardInstanceCard: Component<{ instance: Instance; listView: boolean; 
         }
     };
 
+    // While the instance is updating, poll its state until the update completes.
+    // Sleep-before-refetch gives the gateway a beat to move off the lagging
+    // "updating" status (same lag guard as the Management start/stop poll).
+    const [pollingState, setPollingState] = createSignal(false);
+    const pollWhileUpdating = async () => {
+        if (pollingState()) return;
+        setPollingState(true);
+        try {
+            const deadline = Date.now() + 5 * 60_000;
+            while (Date.now() < deadline) {
+                await sleep(9000);
+                await revalidate(getInstanceState.keyFor(props.instance));
+                const s = state()?.status;
+                if (s && s !== "updating") break;
+            }
+        } finally {
+            setPollingState(false);
+        }
+    };
+
+    createEffect(on(() => state()?.status, (s) => {
+        if (s === "updating") void pollWhileUpdating();
+    }));
+
     if (props.listView) {
         return (
             <A
@@ -160,12 +193,12 @@ const DashboardInstanceCard: Component<{ instance: Instance; listView: boolean; 
                 style={`--colour: ${props.idx % 2 === 0 ? 'var(--colour-text-tertiary)' : 'var(--c-cream-list)'}`}
             >
                 <p class="bodyTextSmallSemi">{props.instance.name}</p>
-                <Suspense fallback={<div class={styles.listStatusSkeleton} aria-busy="true" />}>
+                <Suspense fallback={<div class={`${effects.skeleton} ${styles.listStatusSkeleton}`} aria-busy="true" />}>
                     <div class={styles.instanceStatusList}>
                         <p class="bodyTextSmallestSemiCaps">{labelText()}</p>
                     </div>
                 </Suspense>
-                <Suspense fallback={<p class={`bodyTextSmall ${styles.textSkeleton}`} aria-busy="true">&nbsp;</p>}>
+                <Suspense fallback={<p class={`bodyTextSmall ${effects.skeleton} ${styles.textSkeleton}`} aria-busy="true">&nbsp;</p>}>
                     <p class="bodyTextSmall">{subtitleText()}</p>
                 </Suspense>
                 <div class={styles.toggleContainer}>
@@ -189,15 +222,18 @@ const DashboardInstanceCard: Component<{ instance: Instance; listView: boolean; 
         <A href={detailHref} class={styles.card}>
             <div class={styles.banner}>
                 <div class={styles.image}>
-                    <Suspense fallback={<div class={styles.bannerSkeleton} aria-busy="true" />}>
-                        <Show when={banner()} fallback={<div class={styles.bannerSkeleton} />}>
+                    <Suspense fallback={<div class={`${effects.skeletonOnDark} ${styles.bannerSkeleton}`} aria-busy="true" />}>
+                        <Show when={banner()} fallback={<div class={`${effects.skeletonOnDark} ${styles.bannerSkeleton}`} />}>
                             <ResponsiveImage src={banner()!} width={260} />
                         </Show>
                     </Suspense>
+                    <Show when={bannerBusy()}>
+                        <div class={effects.sweep} />
+                    </Show>
                 </div>
                 <div class={styles.metadata}>
                     <div>
-                        <Suspense fallback={<div class={styles.gridStatusSkeleton} aria-busy="true" />}>
+                        <Suspense fallback={<div class={`${effects.skeletonOnDark} ${styles.gridStatusSkeleton}`} aria-busy="true" />}>
                             <Show when={state()}>
                                 <StatusBadge label={labelText()} variant={variant()} />
                             </Show>
@@ -224,8 +260,8 @@ const DashboardInstanceCard: Component<{ instance: Instance; listView: boolean; 
                     <p class="statsText">{props.instance.name}</p>
                     <InstanceOptions endpoint={endpoint() ?? ""} instance={props.instance} />
                 </div>
-                <Suspense fallback={<p class={`${styles.metaText} ${styles.textSkeleton}`} aria-busy="true">&nbsp;</p>}>
-                    <p class={`${styles.metaText} ${state()?.status === "creating" ? styles.dotsAnim : ""}`}>{subtitleText()}</p>
+                <Suspense fallback={<p class={`${styles.metaText} ${effects.skeleton} ${styles.textSkeleton}`} aria-busy="true">&nbsp;</p>}>
+                    <p class={`${styles.metaText} ${(state()?.status === "creating" || state()?.status === "updating") ? styles.dotsAnim : ""}`}>{subtitleText()}</p>
                 </Suspense>
             </div>
         </A>

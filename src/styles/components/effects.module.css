@@ -1,0 +1,98 @@
+/* Shared visual effects — shimmer skeletons, pulse, and the "in-progress"
+   colour sweep (generating / updating). Import the module and apply the class;
+   the animation + keyframes live here so consumers never redefine them.
+   Combine a paint class with a component-local shape class for sizing, e.g.
+   class={`${effects.skeleton} ${local.skeletonInput}`}. */
+
+/* ---------- Skeleton shimmer ---------- */
+
+/* Light surfaces (forms, text on cream / white). */
+.skeleton {
+    background-color: color-mix(in srgb, var(--c-ink) 8%, transparent);
+    background-image: linear-gradient(
+        90deg,
+        transparent 0%,
+        color-mix(in srgb, var(--c-ink) 6%, transparent) 50%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    animation: effectsShimmer 1.4s ease-in-out infinite;
+}
+
+/* Dark surfaces (over banner imagery / dark chips). */
+.skeletonOnDark {
+    background-color: color-mix(in srgb, var(--c-ink) 55%, transparent);
+    background-image: linear-gradient(
+        90deg,
+        transparent 0%,
+        color-mix(in srgb, var(--c-white) 10%, transparent) 50%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    animation: effectsShimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes effectsShimmer {
+    0%   { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ---------- Pulse (transitional text) ---------- */
+
+.pulse {
+    animation: effectsPulse 1.4s ease-in-out infinite;
+}
+
+@keyframes effectsPulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: 0.5; }
+}
+
+/* ---------- In-progress sweep (generating / updating) ----------
+   Apply .sweep to an absolutely-positioned overlay filling a media box. The
+   parent needs a stacking context (isolation: isolate) so the overlay blends
+   with the image only; desaturate the underlying <img> at the call site. */
+
+.sweep {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    border-radius: inherit;
+
+    /* Mostly transparent — only the middle band carries the colour, so the
+       image stays visible. */
+    background: linear-gradient(
+        115deg,
+        transparent           25%,
+        var(--c-green-bright) 40%,
+        var(--c-orange)       50%,
+        var(--c-purple)       60%,
+        transparent           75%
+    );
+    background-size: 260% 100%;
+    background-repeat: no-repeat;
+    mix-blend-mode: overlay;
+    opacity: 0.9;
+    animation: effectsSweep 6s linear infinite;
+}
+
+@keyframes effectsSweep {
+    from { background-position: 180% 0; }
+    to   { background-position: -80% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton,
+    .skeletonOnDark,
+    .pulse {
+        animation: none;
+    }
+    .sweep {
+        animation: none;
+        background-position: 50% 0;
+        opacity: 0.35;
+    }
+}

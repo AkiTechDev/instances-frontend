@@ -16,7 +16,7 @@ import { postInstanceConfig, type Instance, type InstanceConfig, type PostInstan
 import type { InstanceProfile } from "../../../lib/games/types";
 
 
-const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance: Instance, endpoint: string, profiles: { [id: string]: InstanceProfile } }> = (props) => {
+const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance: Instance, endpoint: string, profiles: { [id: string]: InstanceProfile }, onSubmitted?: () => void }> = (props) => {
     const [currentProfile, setCurrentProfile] = createSignal(Object.keys(props.profiles).find(k => props.profiles[k]["cpu"] === props.config["cpu"] && props.profiles[k]["memory"] === props.config["memory"]) || "ERR")
 
     const InstanceConfigurationSchema = v.object({
@@ -48,6 +48,7 @@ const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance
               };
               setCurrentProfile(values["profile"])
               await postInstanceConfig(props.endpoint, new_config)
+              props.onSubmitted?.()
           }
       }
     

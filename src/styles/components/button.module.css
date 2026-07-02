@@ -24,6 +24,11 @@
 
 .btn.link { background: transparent; border: 0; color: #EBA439; padding: 4px 0; font-weight: 700; font-size: 14px; }
 
+.btn:disabled, .btn:disabled:hover {
+    background: #D0D0D0; border-color: #D0D0D0; color: #191C2E;
+    opacity: 0.6; cursor: not-allowed;
+}
+
 .vibrant { background: #EBA439; border-color: #EBA439; color: #191C2E; }
 .hover   { background: #C589F4; border-color: #C589F4; color: #191C2E; }
 .out     { background: transparent; border-color: #EBA439; color: #EBA439; }

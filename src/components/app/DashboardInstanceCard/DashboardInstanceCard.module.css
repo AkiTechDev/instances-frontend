@@ -46,56 +46,16 @@
 
     }
 
-    .banner:has(.statusContainer.creating) .image img {
+    .banner:has(.statusContainer.creating, .statusContainer.updating) .image img {
         filter: grayscale(100%);
     }
 
-    .banner:has(.statusContainer.creating) .image {
+    .banner:has(.statusContainer.creating, .statusContainer.updating) .image {
         isolation: isolate;
     }
 
-    .banner:has(.statusContainer.creating) .image::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: var(--r-sm);
-        z-index: 1;
-        pointer-events: none;
-
-        /* Most of the gradient is transparent — only the middle ~30%
-            carries your green→orange→purple band, so the image is
-            always mostly visible. */
-        background: linear-gradient(
-            115deg,
-            transparent           25%,
-            var(--c-green-bright) 40%,
-            var(--c-orange)       50%,
-            var(--c-purple)       60%,
-            transparent           75%
-        );
-        background-size: 260% 100%;
-        background-repeat: no-repeat;
-
-        mix-blend-mode: overlay;   /* gentle; try `screen` for more pop */
-        opacity: 0.9;
-
-        /* Linear timing + offscreen-to-offscreen travel = continuous flow
-            (no perceptible "back to start" snap, no breathing). */
-        animation: creatingSweep 6s linear infinite;
-    }
-
-    @keyframes creatingSweep {
-        from { background-position: 180% 0; }
-        to   { background-position: -80% 0; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .banner:has(.statusContainer.creating) .image::before {
-            animation: none;
-            background-position: 50% 0;
-            opacity: 0.35;
-        }
-    }
+    /* The animated colour sweep itself is a shared overlay rendered as a
+       <div class={effects.sweep}>, defined in styles/components/effects.module.css. */
 
 
 
@@ -139,7 +99,8 @@
             0 0 18px rgba(128, 247, 51, 0.3);
     }
 
-    .statusContainer.creating {
+    .statusContainer.creating,
+    .statusContainer.updating {
         border: 1px solid rgba(235, 164, 57, 0.45);
         backdrop-filter: blur(2px);
         box-shadow:
@@ -165,7 +126,8 @@
             0 0 18px rgba(128, 247, 51, 0.3);
     }
 
-    .statusIndicator.creating {
+    .statusIndicator.creating,
+    .statusIndicator.updating {
         background: var(--c-orange);
         box-shadow: 0px 0px 4px rgba(235, 164, 57, 0.7); /* orange glow */
     }
@@ -375,39 +337,19 @@
     }
 
 
-    /* Suspense skeletons (kept at the bottom so they win the cascade
-       when layered on top of `.statusContainer` / `.instanceStatusList`). */
+    /* Suspense skeletons — dimensions only; the shimmer paint comes from the
+       shared effects module (.skeleton / .skeletonOnDark), applied alongside. */
 
     .bannerSkeleton {
         position: absolute;
         inset: 0;
         border-radius: var(--r-sm);
-        background-color: color-mix(in srgb, var(--c-ink) 55%, transparent);
-        background-image: linear-gradient(
-            90deg,
-            transparent 0%,
-            color-mix(in srgb, var(--c-white) 8%, transparent) 50%,
-            transparent 100%
-        );
-        background-size: 200% 100%;
-        background-repeat: no-repeat;
-        animation: dashboardCardShimmer 1.4s ease-in-out infinite;
     }
 
     .gridStatusSkeleton {
         width: 90px;
         height: 22px;
         border-radius: var(--r-chip);
-        background-color: color-mix(in srgb, var(--c-ink) 55%, transparent);
-        background-image: linear-gradient(
-            90deg,
-            transparent 0%,
-            color-mix(in srgb, var(--c-white) 10%, transparent) 50%,
-            transparent 100%
-        );
-        background-size: 200% 100%;
-        background-repeat: no-repeat;
-        animation: dashboardCardShimmer 1.4s ease-in-out infinite;
     }
 
     .listStatusSkeleton {
@@ -416,16 +358,6 @@
         height: 22px;
         margin: 0 1rem;
         border-radius: 16px;
-        background-color: color-mix(in srgb, var(--c-ink) 8%, transparent);
-        background-image: linear-gradient(
-            90deg,
-            transparent 0%,
-            color-mix(in srgb, var(--c-ink) 6%, transparent) 50%,
-            transparent 100%
-        );
-        background-size: 200% 100%;
-        background-repeat: no-repeat;
-        animation: dashboardCardShimmer 1.4s ease-in-out infinite;
     }
 
     .textSkeleton {
@@ -433,28 +365,4 @@
         min-width: 6ch;
         border-radius: 4px;
         color: transparent;
-        background-color: color-mix(in srgb, var(--c-ink) 8%, transparent);
-        background-image: linear-gradient(
-            90deg,
-            transparent 0%,
-            color-mix(in srgb, var(--c-ink) 6%, transparent) 50%,
-            transparent 100%
-        );
-        background-size: 200% 100%;
-        background-repeat: no-repeat;
-        animation: dashboardCardShimmer 1.4s ease-in-out infinite;
-    }
-
-    @keyframes dashboardCardShimmer {
-        0%   { background-position: 200% 0; }
-        100% { background-position: -200% 0; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-        .bannerSkeleton,
-        .gridStatusSkeleton,
-        .listStatusSkeleton,
-        .textSkeleton {
-            animation: none;
-        }
     }

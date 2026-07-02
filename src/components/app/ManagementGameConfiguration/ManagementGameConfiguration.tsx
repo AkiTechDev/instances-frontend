@@ -18,7 +18,7 @@ import * as v from "valibot";
 2. Schema schema schema
 */
 
-const ManagementGameConfiguration: Component<{ schema: v.ObjectSchema<any, undefined>, config: any, endpoint: string }> = (props) => {
+const ManagementGameConfiguration: Component<{ schema: v.ObjectSchema<any, undefined>, config: any, endpoint: string, onSubmitted?: () => void }> = (props) => {
     const gameForm = createForm({
         schema: props.schema,
         initialInput: props.config
@@ -29,6 +29,7 @@ const ManagementGameConfiguration: Component<{ schema: v.ObjectSchema<any, undef
     const submitForm: SubmitHandler<typeof props.schema> = async (values) => {
         if (gameForm.isValid) {
             await postGameConfig(props.endpoint, values)
+            props.onSubmitted?.()
         }
     }
 
