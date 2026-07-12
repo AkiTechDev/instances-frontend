@@ -60,6 +60,7 @@
     grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
     gap: 1rem;
     width: 100%;
+    align-items: end;          /* keep inputs aligned when a label wraps to two lines */
 }
 
 .exit {

@@ -58,7 +58,7 @@ const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance
           {(field) => (
             <FormSelect field={field}
               field_id="plan"
-              field_label="Tier"
+              field_label="TIER"
               field_placeholder={props.config["plan"]}
               field_options={instance_tiers}
             />
@@ -69,7 +69,7 @@ const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance
           {(field) => (
             <FormSelect field={field}
               field_id="profile"
-              field_label="Player Count"
+              field_label="PLAYER_COUNT"
               field_placeholder={currentProfile()}
               field_options={Object.keys(props.profiles)}
             />
@@ -77,14 +77,14 @@ const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance
         </Field>
 
         <div class={selectStyles.instanceConfigSettingsContainer}>
-            <label class="bodyTextSmall">Region </label>
+            <label class="bodyTextSmall">REGION</label>
             <select value={regions[props.config["region"]]} class={`${selectStyles.select} bodyText`} disabled>
               <option class="bodyText" value={regions[props.config["region"]]} selected>{regions[props.config["region"]]}</option>
             </select>
         </div>
 
         <div class={selectStyles.instanceConfigSettingsContainer}>
-            <label class="bodyTextSmall">Cost </label>
+            <label class="bodyTextSmall">COST</label>
             <select value="Cost" class={`${selectStyles.select} bodyText`} disabled>
               <option class="bodyText" value="$00/hour" selected>${fgCalc("us-east-1", props.profiles[formProfile.input || ""].memory, props.profiles[formProfile.input || ""].cpu, formTier.input || "")}/hour</option>
             </select>

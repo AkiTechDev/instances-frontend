@@ -4,9 +4,11 @@
     align-items: flex-start;
 
     gap: 0.25rem;
-    padding-right: 0.5rem;
+    min-width: 0;               /* let the control shrink instead of overflowing its track */
 }
 
+/* Indent the label to line up with the input's text (1rem in from the pill),
+   not the box edge — aligning to the edge looks off against the border-radius. */
 .instanceConfigSettingsContainer > label {
     padding-left: 1rem;
 }
@@ -27,15 +29,30 @@
     padding: 0.5rem 1rem;
 
     cursor: pointer;
+    text-transform: capitalize;
 }
 
 .select::-ms-expand {
   display: none;
 }
 
-.fieldXS   { grid-column: span 1; }   /* checkbox, toggle */
-.fieldSM   { grid-column: span 2; }   /* short number, zip code */
-.fieldMD   { grid-column: span 3; }   /* first name, date */
-.field-lg   { grid-column: span 6; }   /* email, phone */
-.field-xl   { grid-column: span 8; }   /* address */
-.field-full { grid-column: span 12; }  /* textarea, full-width inputs */
+/* Control band — normalises the height of every control (input, select,
+   toggle) so they line up across a grid row regardless of type. */
+.control {
+    display: flex;
+    align-items: center;
+    min-height: 40px;
+    padding-left: 1rem;         /* match the label indent so the switch sits under it */
+}
+
+/* Legacy spans — kept for the instance & create forms (auto-fit grids). */
+.fieldXS   { grid-column: span 1; }
+.fieldSM   { grid-column: span 2; }
+.fieldMD   { grid-column: span 3; }
+
+/* 12-column width scale — opt in via the `size` prop on the form modules. */
+.sizeXS   { grid-column: span 2; }    /* toggle — just wide enough for a one-line label */
+.sizeSM   { grid-column: span 3; }    /* number */
+.sizeMD   { grid-column: span 4; }    /* select, short text */
+.sizeLG   { grid-column: span 6; }    /* long text */
+.sizeFull { grid-column: span 12; }   /* textarea / full width */
