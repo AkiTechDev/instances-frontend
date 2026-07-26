@@ -33,6 +33,8 @@ import HowItWorks from "../components/astrojs/HowItWorks/HowItWorks.astro"
 import DashboardPreview from "../components/astrojs/DashboardPreview/DashboardPreview.astro";
 import PromoCTA from "../components/astrojs/PromoCTA/PromoCTA.astro"
 
+import Banner from "../assets/images/WelcomeToInstances.png";
+
 const seo_des = "Host Minecraft, sandbox games, and more with Instances. No contracts, no setup hassle. Switch games instantly, keep your world, and only pay for what you play.";
 const domain = "instances.aki-labs.com"
 
@@ -62,7 +64,7 @@ const domain = "instances.aki-labs.com"
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Instances - Game Servers Made Easy, Pay As You Play">
     <meta name="twitter:description" content={seo_des}>
-    <meta name="twitter:image" content={`https://${domain}/og-image.jpg`}>
+    <meta name="twitter:image" content={Banner.src}>
     <meta name="twitter:site" content="@aki_labs">
 
 
@@ -71,7 +73,7 @@ const domain = "instances.aki-labs.com"
     <meta property="og:description" content={seo_des}>
     <meta property="og:type" content="website">
     <meta property="og:url" content=`https://${domain}`>
-    <meta property="og:image" content=`https://${domain}/og-image.jpg`>
+    <meta property="og:image" content={Banner.src}>
     <meta property="og:site_name" content="Instances">
     <meta property="og:locale" content="en_US">
 

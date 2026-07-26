@@ -13,6 +13,11 @@ import Newsletter from "../components/newsletter/Newsletter.astro";
 import Footer from "../components/astrojs/Footer/Footer.astro";
 
 import AppRouter from "../components/app/Router";
+
+import Banner from "../assets/images/WelcomeToInstances.png";
+
+const seo_des = "Host Minecraft, sandbox games, and more with Instances. No contracts, no setup hassle. Switch games instantly, keep your world, and only pay for what you play.";
+const domain = "instances.aki-labs.com"
 ---
 <!-- Below is your "component template." It's just HTML, but with
     some magic sprinkled in to help you build great templates. -->
@@ -28,23 +33,23 @@ import AppRouter from "../components/app/Router";
 
         <title>My Games - Instances</title>
 
-        <!-- Claude said no because its behind a login, test manually once published to the domain
+        <!-- Claude said no because its behind a login, test manually once published to the domain -->
         <meta name="twitter:card" content="summary_large_image">
         <meta name="twitter:title" content="Instances - Game Servers Made Easy, Pay As You Play">
         <meta name="twitter:description" content={seo_des}>
-        <meta name="twitter:image" content={`https://${domain}/og-image.jpg`}>
+        <meta name="twitter:image" content={Banner.src}>
         <meta name="twitter:site" content="@aki_labs">
 
 
-        Open Graph
+        <!-- Open Graph -->
         <meta property="og:title" content="Instances - Game Servers Made Easy, Pay As You Play">
         <meta property="og:description" content={seo_des}>
         <meta property="og:type" content="website">
         <meta property="og:url" content=`https://${domain}`>
-        <meta property="og:image" content=`https://${domain}/og-image.jpg`>
+        <meta property="og:image" content={Banner.src}>
         <meta property="og:site_name" content="Instances">
         <meta property="og:locale" content="en_US">
-        -->
+        
 
         <meta name="robots" content="none" />
         <link rel="canonical" href="https://instances.aki-labs.com">
