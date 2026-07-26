@@ -1,4 +1,4 @@
-import { LogLevel, PublicClientApplication } from "@azure/msal-browser";
+import { InteractionRequiredAuthError, LogLevel, PublicClientApplication } from "@azure/msal-browser";
 
 export const msalConfig = {
     auth: {
@@ -49,16 +49,53 @@ export const msalReady = msalInstance.initialize().then(async () => {
 })
 
 
+// Guard so that several token requests failing at once (e.g. the dashboard
+// preloading many instances after a long idle) trigger only ONE interactive
+// redirect instead of racing and throwing `interaction_in_progress`.
+let redirecting = false;
+
+const redirectForInteraction = async (scopes: string[]): Promise<never> => {
+    if (!redirecting) {
+        redirecting = true;
+        try {
+            await msalInstance.acquireTokenRedirect({
+                scopes,
+                // Pass the (possibly stale) account as a login hint so the
+                // re-auth pre-fills the user instead of showing a blank prompt.
+                account: msalInstance.getActiveAccount() ?? undefined,
+            });
+        } catch (e) {
+            redirecting = false;
+            throw e;
+        }
+    }
+    // The browser is navigating to the sign-in page; keep callers pending
+    // rather than rejecting, so no in-flight request surfaces an uncaught
+    // rejection while the page unloads.
+    return new Promise<never>(() => { });
+};
+
 export const getToken = async (scopes: string[]) => {
     await msalReady;
     const account = msalInstance.getActiveAccount();
 
-    if (!account) throw new Error("No active account");
+    // No cached account at all -> straight to interactive sign-in.
+    if (!account) return redirectForInteraction(scopes);
 
-    return await msalInstance.acquireTokenSilent({
-        scopes,
-        account: account
-    });
+    try {
+        return await msalInstance.acquireTokenSilent({
+            scopes,
+            account: account
+        });
+    } catch (e) {
+        // Tokens expired AND the server session is gone (e.g. AADSTS160021
+        // after a day idle) -> MSAL cannot refresh silently. Re-authenticate
+        // interactively instead of letting the rejection go uncaught.
+        if (e instanceof InteractionRequiredAuthError) {
+            return redirectForInteraction(scopes);
+        }
+        throw e;
+    }
 };
 
 

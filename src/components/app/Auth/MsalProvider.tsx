@@ -1,5 +1,5 @@
-import { EventType, InteractionRequiredAuthError, type AccountInfo, type EventMessage } from "@azure/msal-browser";
-import { msalReady, msalInstance } from "../../../lib/auth";
+import { EventType, type AccountInfo, type EventMessage } from "@azure/msal-browser";
+import { getToken as acquireToken, msalReady, msalInstance } from "../../../lib/auth";
 import { createEffect, createContext, createResource, createSignal, Show, useContext, onCleanup, onMount } from "solid-js";
 
 import authenticatingStyles from "./Authenticating.module.css";
@@ -60,29 +60,12 @@ export function MsalProvider(props: { children?: any }) {
     });
 
 
+    // Delegate to the shared token path in lib/auth so silent-refresh failures
+    // (expired session -> InteractionRequiredAuthError) fall back to an
+    // interactive redirect in one place rather than being duplicated here.
     const getToken = async (scopes: string[]): Promise<string> => {
-        await msalReady;
-        const current = account();
-
-        if (!current) throw new Error("No active account");
-
-        try {
-            const result = await msalInstance.acquireTokenSilent({
-                scopes,
-                account: current
-            });
-
-            return result.accessToken
-        } catch (e) {
-            // Silent failed - redirect to login
-            if (e instanceof InteractionRequiredAuthError) {
-                await msalInstance.acquireTokenRedirect({
-                    scopes: scopes,
-                });
-                throw new Error("Redirecting for token");
-            }
-            throw e;
-        }
+        const result = await acquireToken(scopes);
+        return result.accessToken;
     };
 
     const login = async () => {
