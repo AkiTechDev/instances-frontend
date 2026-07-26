@@ -1,7 +1,7 @@
 import type { Game } from '../types';
 import { HeavyModpackProfiles } from '../profiles';
 
-import banner from '../../../assets/games/MinecraftRLCraft/banner.avif?format=avif;webp&responsive';
+import banner from '../../../assets/games/MinecraftRLCraft/banner.png?format=avif;webp&responsive';
 import { MinecraftJavaConfigurationSchema } from './MinecraftJava/schema';
 
 const MinecraftRLCraft: Game = {
