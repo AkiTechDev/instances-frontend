@@ -1,7 +1,7 @@
 import type { Game } from '../types';
 import { HeavyModpackProfiles } from '../profiles';
 
-import banner from '../../../assets/games/Hytale/banner.jpg?format=avif;webp&responsive';
+import banner from '../../../assets/games/Hytale/banner.png?format=avif;webp&responsive';
 
 import * as v from "valibot";
 

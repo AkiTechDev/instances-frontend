@@ -1,7 +1,7 @@
 import type { Game } from '../types';
 import { HeavyModpackProfiles } from '../profiles';
 
-import banner from '../../../assets/games/MinecraftCursedWalking/banner.avif?format=avif;webp&responsive';
+import banner from '../../../assets/games/MinecraftCursedWalking/banner.png?format=avif;webp&responsive';
 import { MinecraftJavaConfigurationSchema } from './MinecraftJava/schema';
 
 const MinecraftCursedWalking: Game = {

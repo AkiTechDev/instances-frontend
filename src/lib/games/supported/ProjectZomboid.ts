@@ -1,7 +1,7 @@
 import type { Game } from '../types';
 import { HeavyModpackProfiles } from '../profiles';
 
-import banner from '../../../assets/games/ProjectZomboid/banner.jpeg?format=avif;webp&responsive';
+import banner from '../../../assets/games/ProjectZomboid/banner.png?format=avif;webp&responsive';
 
 import * as v from "valibot";
 
