@@ -1,15 +1,20 @@
-import type { InstanceProfile } from './types';
+function genMemoryOptions(start: number, end: number, size: number): any {
+    let list = []
 
-export const DefaultProfiles: { [id: string]: InstanceProfile } = {
-    "2-3 Players":  { cpu: 2048, memory: 4096 },
-    "5-10 Players": { cpu: 4096, memory: 8192 },
-    "10+ Players":  { cpu: 4096, memory: 12288 },
-};
+    for (var i = start; i <= end; i+= size) {
+        list.push(i)
+    }
 
-// You can define heavier profiles for modpacks etc.
-export const HeavyModpackProfiles: { [id: string]: InstanceProfile } = {
-    "Solo":         { cpu: 2048, memory: 4096},
-    "2-3 Players":  { cpu: 4096, memory: 8192 },
-    "5-10 Players": { cpu: 4096, memory: 12288 },
-    "10+ Players":  { cpu: 8192, memory: 16384 },
-};
+    return list
+}
+
+// ECS Fargate vCPU + RAM options
+export const ProfileOptions = {
+    256: [512, 1024, 2048],
+    512: genMemoryOptions(1024, 4096, 1024),
+    1024: genMemoryOptions(2048, 8192, 1024),
+    2048: genMemoryOptions(4096, 16384, 1024),
+    4096: genMemoryOptions(8192, 30720, 1024),
+    8192: genMemoryOptions(16384, 61440, 4096),
+    16384: genMemoryOptions(32768, 122880, 8192),
+}
