@@ -21,6 +21,14 @@
     66%, 100% { content: "..."; }
 }
 
+/* Terminal states (e.g. misconfiguration) — nothing is in progress, so drop
+   the animated ellipsis that implies waiting. */
+.container.static > h3::after {
+    content: none;
+    animation: none;
+    width: auto;
+}
+
 .container > p {
     opacity: 0.7;
 }

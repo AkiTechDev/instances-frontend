@@ -12,12 +12,12 @@ export interface Instance {
 }
 
 export const getInstances = query(async (): Promise<Instance[]> => {
-    const token = await getToken(["api://Instances/access"]);
+    const token = await getToken();
     const resp = await fetch("https://api.instances.aki-labs.com/instances/list", {
         method: "GET",
         cache: "no-store", // disk-cache the list and a delete + recreate looks stale to the user
         headers: {
-            "Authorization": `Bearer ${token.accessToken}`
+            "Authorization": `Bearer ${token}`
         }
     });
 
@@ -66,12 +66,12 @@ export type InstanceState =
     | (ProvisioningEnvelope & { status: "unknown";      note: string });
 
 export const getInstanceState = query(async (instance: Instance): Promise<InstanceState> => {
-    const token = await getToken(["api://Instances/access"]);
+    const token = await getToken();
     const resp = await fetch(`https://api.instances.aki-labs.com/${instance.game}/${instance.name}`, {
         method: "GET",
         cache: "no-store", // 401 response when instance is delete, if created on same name, browser will return cache rather than ping pong
         headers: {
-            "Authorization": `Bearer ${token.accessToken}`
+            "Authorization": `Bearer ${token}`
         }
     });
 
@@ -90,7 +90,7 @@ export const endpointOf = (s: InstanceState | undefined): string | undefined => 
 };
 
 export const getInstanceConfig = query(async (endpoint: string): Promise<InstanceConfig> => {
-    const token = await getToken(["api://Instances/access"]);
+    const token = await getToken();
 
     if (endpoint === undefined) {
         throw new Error("Invalid endpoint");
@@ -99,7 +99,7 @@ export const getInstanceConfig = query(async (endpoint: string): Promise<Instanc
     const resp = await fetch(`${endpoint}/config`, {
         method: "GET",
         headers: {
-            "Authorization": `Bearer ${token.accessToken}`
+            "Authorization": `Bearer ${token}`
         }
     });
 
@@ -129,14 +129,14 @@ export type InstanceRuntimeStatus =
     | { state: "error";     error: StatusError };                                            // 500 / unexpected
 
 export const getInstanceStatus = async (endpoint: string): Promise<InstanceRuntimeStatus> => {
-    const token = await getToken(["api://Instances/access"]);
+    const token = await getToken();
 
     let resp: Response;
     try {
         resp = await fetch(`${endpoint}/status`, {
             method: "GET",
             headers: {
-                "Authorization": `Bearer ${token.accessToken}`
+                "Authorization": `Bearer ${token}`
             }
         });
     } catch {
@@ -157,13 +157,13 @@ export const getInstanceStatus = async (endpoint: string): Promise<InstanceRunti
 };
 
 export const toggleInstance = async (endpoint: string, isRunning: boolean): Promise<GenericResonse> => {
-    const token = await getToken(["api://Instances/access"]);
+    const token = await getToken();
     const uri = isRunning ? "stop" : "start";
 
     const resp = await fetch(`${endpoint}/${uri}`, {
         method: "GET",
         headers: {
-            "Authorization": `Bearer ${token.accessToken}`
+            "Authorization": `Bearer ${token}`
         }
     });
     return await resp.json() as GenericResonse;
@@ -178,11 +178,11 @@ export interface PostInstanceConfig {
 }
 
 export const postInstanceConfig = async (endpoint: string, config: PostInstanceConfig): Promise<GenericResonse> => {
-    const token = await getToken(["api://Instances/access"]);
+    const token = await getToken();
     const resp = await fetch(`${endpoint}/config/instance`, {
         method: "POST",
         headers: {
-            "Authorization": `Bearer ${token.accessToken}`,
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
         },
         body: JSON.stringify(config)
@@ -196,11 +196,11 @@ export const postInstanceConfig = async (endpoint: string, config: PostInstanceC
 
 
 export const postGameConfig = async (endpoint: string, config: any): Promise<GenericResonse> => {
-    const token = await getToken(["api://Instances/access"]);
+    const token = await getToken();
     const resp = await fetch(`${endpoint}/config/game`, {
         method: "POST",
         headers: {
-            "Authorization": `Bearer ${token.accessToken}`,
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
         },
         body: JSON.stringify(config)
@@ -213,11 +213,11 @@ export const postGameConfig = async (endpoint: string, config: any): Promise<Gen
 
 
 export const postDownloadGameData = async (endpoint: string): Promise<GenericResonse> => {
-    const token = await getToken(["api://Instances/access"]);
+    const token = await getToken();
     const resp = await fetch(`${endpoint}/download`, {
         method: "POST",
         headers: {
-            "Authorization": `Bearer ${token.accessToken}`,
+            "Authorization": `Bearer ${token}`,
         },
     });
 
@@ -227,11 +227,11 @@ export const postDownloadGameData = async (endpoint: string): Promise<GenericRes
 };
 
 export const deleteInstance = async (instance: Instance): Promise<GenericResonse> => {
-    const token = await getToken(["api://Instances/access"]);
+    const token = await getToken();
     const resp = await fetch(`https://api.instances.aki-labs.com/${instance.game}/${instance.name}`, {
         method: "DELETE",
         headers: {
-            "Authorization": `Bearer ${token.accessToken}`,
+            "Authorization": `Bearer ${token}`,
         },
     });
 
@@ -251,11 +251,11 @@ export interface PutCreateInstance {
 };
 
 export const putCreateInstance = async (game_id: string, instance_name: string, config: any): Promise<GenericResonse> => {
-    const token = await getToken(["api://Instances/access"]);
+    const token = await getToken();
     const resp = await fetch(`https://api.instances.aki-labs.com/${game_id}/${instance_name}`, {
         method: "PUT",
         headers: {
-            "Authorization": `Bearer ${token.accessToken}`,
+            "Authorization": `Bearer ${token}`,
             "Content-Type": "application/json"
         },
         body: JSON.stringify(config)

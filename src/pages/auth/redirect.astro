@@ -1,16 +1,22 @@
 ---
+// Landing point for the Zitadel authorization-code redirect. The page exchanges
+// the code for tokens (PKCE verifier comes from sessionStorage) and then
+// forwards the user to wherever they were originally heading.
 Astro.response.headers.set("Cache-Control", "no-store");
 ---
 
-<!DOCTYPE html>
-<html>
+<!doctype html>
+<html lang="en">
     <head>
-        <title>Authenticating...</title>
+        <meta charset="UTF-8" />
+        <title>Signing you in...</title>
+        <meta name="robots" content="noindex, nofollow" />
+        <meta name="referrer" content="strict-origin-when-cross-origin" />
     </head>
     <body>
         <script>
-            import { broadcastResponseToMainFrame } from "@azure/msal-browser/redirect-bridge";
-            broadcastResponseToMainFrame().catch(console.error);
+            import { handleRedirectCallback } from "../../lib/auth";
+            handleRedirectCallback();
         </script>
     </body>
 </html>

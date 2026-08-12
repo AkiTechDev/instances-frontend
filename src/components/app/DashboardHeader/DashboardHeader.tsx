@@ -1,14 +1,16 @@
 import styles from './DashboardHeader.module.css';
 
-import { useMsal } from '../Auth/MsalProvider';
+import { useAuth } from '../Auth/AuthProvider';
 import Profile from '../Profile/Profile';
 
 const DashboardHeader = () => {
-    const { account } = useMsal();
-    
+    const { account } = useAuth();
+
+    console.log(account());
+
     return (
     <header class={styles.header}>
-        <h2 class="statsText">Welcome back, {account()!.name}. Ready to play?</h2>
+        <h2 class="statsText">Welcome back, {account().name}. Ready to play?</h2>
         <Profile />
     </header>
 )};

@@ -493,9 +493,7 @@ const domain = "instances.aki-labs.com"
 </style>
 
 <script>
-  import { msalReady, login } from "../lib/auth";
-
-  await msalReady;
+  import { login } from "../lib/auth";
 
   document.querySelectorAll('[data-login]').forEach(btn => {
     btn.addEventListener('click', () => login("/dashboard"));
