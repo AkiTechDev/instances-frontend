@@ -27,7 +27,7 @@ export default defineConfig({
       https: true
     },
     ssr: {
-      external: ['@azure/msal-browser'],
+      external: ['oidc-client-ts'],
     },
     plugins: [basicSsl(), solidSVG(), responsiveImage()]
   },

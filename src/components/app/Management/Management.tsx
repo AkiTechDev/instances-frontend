@@ -25,7 +25,7 @@ import {
     type InstanceState,
 } from "../../../lib/apis";
 import { sleep } from "../../../lib/utils";
-import { useMsal } from "../Auth/MsalProvider";
+import { useAuth } from "../Auth/AuthProvider";
 import ManagementInstanceConfigForm from "../ManagementInstanceConfiguration/ManagementInstanceConfiguration";
 import { regions } from "../../../lib/regions";
 import ManagementGameConfiguration from "../ManagementGameConfiguration/ManagementGameConfiguration";
@@ -107,7 +107,7 @@ const StatusBanner: Component<{ title: string; subtitle?: string; busy?: boolean
 const Management = () => {
     const params = useParams();
     const navigate = useNavigate();
-    const { account } = useMsal();
+    const { account } = useAuth();
 
     const game = createAsync(async () => {
         if (params.game && params.game in gameRegistry) {
@@ -125,7 +125,7 @@ const Management = () => {
     const instance: Instance = {
         game: params.game || "",
         name: params.name || "",
-        user_id: account()!.homeAccountId,
+        user_id: account().sub,
     };
 
     const state = createAsync(async () => {

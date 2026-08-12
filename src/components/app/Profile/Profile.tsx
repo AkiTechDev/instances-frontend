@@ -6,14 +6,13 @@ import iconArrow from "../../../assets/icons/chevron.svg";
 import profileIcon from "../../../assets/icons/profile.svg";
 import helpIcon from "../../../assets/icons/help.svg";
 import logoutIcon from "../../../assets/icons/logout.svg";
-import { useMsal } from "../Auth/MsalProvider";
+import { useAuth } from "../Auth/AuthProvider";
+import { accountSettingsUrl } from "../../../lib/auth";
 import { ResponsiveImage } from "@responsive-image/solid";
 import ProfileJPG from "../../../assets/images/profile.jpg?responsive";
 
 const Profile: Component<{}> = () => {
-    const { logout, account } = useMsal();
-
-    
+    const { logout } = useAuth();
 
     return (
         <div
@@ -25,7 +24,7 @@ const Profile: Component<{}> = () => {
             </button>
 
             <ul id="profile" popover role="menu">
-                <li><a href={`https://myaccount.microsoft.com/?tenant=${account()?.tenantId}`} role="menuitem" class="bodyTextMedium" target="_blank" rel="noopener noreferrer" style={`--iconUrl: url(${profileIcon.src})`}>Account Settings</a></li>
+                <li><a href={accountSettingsUrl()} role="menuitem" class="bodyTextMedium" target="_blank" rel="noopener noreferrer" style={`--iconUrl: url(${profileIcon.src})`}>Account Settings</a></li>
                 <li><a href="/" rel="external" role="menuitem" class="bodyTextMedium" style={`--iconUrl: url(${helpIcon.src})`}>Help</a></li>
                 <li><a role="menuitem" class="bodyTextMedium" style={`--iconUrl: url(${logoutIcon.src})`} onclick={() => logout()}>Log Out</a></li>
             </ul>

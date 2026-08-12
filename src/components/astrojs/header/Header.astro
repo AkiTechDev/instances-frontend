@@ -32,9 +32,9 @@ import button from "../../../styles/components/button.module.css";
 </header>
 
 <script>
-    import { msalInstance } from "../../../lib/auth";
+    import { hasSession } from "../../../lib/auth";
 
-    if (msalInstance.getAllAccounts()) {
+    if (await hasSession()) {
         document.getElementById("loginBtn")?.remove();
         document.getElementById("signupBtn")?.remove();
 
