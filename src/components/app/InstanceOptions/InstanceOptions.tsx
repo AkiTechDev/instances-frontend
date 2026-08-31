@@ -1,9 +1,8 @@
-import { createUniqueId, onCleanup, type Component } from "solid-js";
+import { createSignal, createUniqueId, onCleanup, Show, type Component } from "solid-js";
 
 import styles from "./InstanceOptions.module.css";
 import { revalidate, useNavigate } from "@solidjs/router";
 import {
-    deleteInstance,
     getInstanceConfig,
     getInstanceStatus,
     postDownloadGameData,
@@ -11,10 +10,12 @@ import {
     type Instance,
 } from "../../../lib/apis";
 import { sleep } from "../../../lib/utils";
+import DeleteInstanceModal from "../DeleteInstanceModal/DeleteInstanceModal";
 
 const InstanceOptions: Component<{ endpoint: string, instance: Instance }> = (props) => {
     const navigate = useNavigate();
     const id = createUniqueId();
+    const [confirmingDelete, setConfirmingDelete] = createSignal(false);
     let elRef: HTMLDetailsElement | undefined;
 
     const closeMenu = () => {
@@ -62,6 +63,17 @@ const InstanceOptions: Component<{ endpoint: string, instance: Instance }> = (pr
 
 
     return (
+        <>
+        <Show when={confirmingDelete()}>
+            <DeleteInstanceModal
+                instance={props.instance}
+                onClose={() => setConfirmingDelete(false)}
+                onDeleted={() => {
+                    setConfirmingDelete(false);
+                    navigate("/dashboard", { replace: true });
+                }}
+            />
+        </Show>
         <details ref={elRef} name="Instance Settings" class={styles.container} onclick={(e) => e.stopImmediatePropagation()}>
             <summary id={`options${id}`}>
                 <span class={styles.dot}></span>
@@ -73,9 +85,10 @@ const InstanceOptions: Component<{ endpoint: string, instance: Instance }> = (pr
                 <button class="bodyTextMedium" onclick={async () => {await postDownloadGameData(props.endpoint); await sleep(1000); closeMenu() }}>Download Game Data</button>
                 <button class="bodyTextMedium" disabled>Transfer Ownership</button>
                 <button class="bodyTextMedium" disabled>Change Instance Location</button>
-                <button class="bodyTextMedium" onclick={async () => {await deleteInstance(props.instance); navigate("/dashboard", { replace: true }) }}>Delete Instance</button>
+                <button class={`bodyTextMedium ${styles.destructive}`} onclick={() => { setConfirmingDelete(true); closeMenu(); }}>Delete Instance</button>
             </div>
         </details>
+        </>
     )
 }
 

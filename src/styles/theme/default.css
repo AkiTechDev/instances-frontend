@@ -36,6 +36,11 @@
     --c-grey-600:       #898989;   /* "stopped" indicator dot */
     --c-grey-700:       #757575;   /* secondary text (timestamps) */
 
+    /* Destructive — delete and other irreversible actions */
+    --c-red:            #D93A3A;
+    --c-red-deep:       #B32B2B;   /* hover/pressed shade + error text */
+    --c-red-soft:       #FDECEC;   /* tinted background for warning marks */
+
     /* Status backgrounds */
     --c-status-stopped-bg:  rgba(25, 28, 46, 0.75);
     --c-status-running-bg:  #80F733;

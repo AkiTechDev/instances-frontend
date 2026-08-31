@@ -108,6 +108,14 @@
   text-decoration: underline;
 }
 
+.options button.destructive {
+  color: var(--c-red);
+}
+
+.options button.destructive:hover {
+  color: var(--c-red-deep);
+}
+
 .alignRight {
   left: auto;
   right: 0;
