@@ -39,6 +39,7 @@ export interface InstanceConfig {
     plan: string
     domain: string,
     region: string,
+    webhook_url?: string,
     game: any
 }
 
@@ -174,7 +175,8 @@ export interface PostInstanceConfig {
     plan: string,
     cpu: number,
     memory: number,
-    auto_start: boolean    
+    auto_start: boolean,
+    webhook_url?: string
 }
 
 export const postInstanceConfig = async (endpoint: string, config: PostInstanceConfig): Promise<GenericResonse> => {
@@ -247,7 +249,8 @@ export interface PutCreateInstance {
     auto_start: boolean,
     memory: number,
     cpu: number,
-    region: string
+    region: string,
+    webhook_url?: string
 };
 
 export const putCreateInstance = async (game_id: string, instance_name: string, config: any): Promise<GenericResonse> => {

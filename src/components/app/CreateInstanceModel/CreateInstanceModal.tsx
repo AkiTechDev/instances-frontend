@@ -11,6 +11,8 @@ import { regions } from "../../../lib/regions";
 import { createForm, Field, Form, useField, type SubmitHandler } from "@formisch/solid";
 import FormSelect from "../FormModules/FormSelect";
 import FormTextInput from "../FormModules/FormTextInput";
+import AdvancedSettingsToggle from "../FormModules/AdvancedSettingsToggle";
+import { webhookUrlPlaceholder, webhookUrlSchema } from "../../../lib/webhook";
 import { fullSeverName, generateRandomName } from "../../../lib/name_generator";
 
 import selectStyles from "../FormModules/FormSelect.module.css";
@@ -31,6 +33,7 @@ export interface ModalOptions {
 const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: string | null, allow_game_change: boolean, regions: {[id: string]: string} | undefined}> = (props) => {
     const [gameId, setGameId] = createSignal(props.game_id);
     const [instanceName, setInstanceName] = createSignal(fullSeverName(generateRandomName()));
+    const [showAdvanced, setShowAdvanced] = createSignal(false);
     let mainBodyRef: HTMLDivElement | undefined;
 
     const handleBodyClick = (e: MouseEvent) => {
@@ -80,7 +83,8 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                 plan: v.picklist(instance_tiers),
                 auto_start: v.boolean(),
                 profile: v.picklist(Object.keys(profiles()!)),
-                region: v.picklist(Object.keys(regions))
+                region: v.picklist(Object.keys(regions)),
+                webhook_url: webhookUrlSchema
             });
             return createForm({
                 schema: schema,
@@ -89,7 +93,8 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                     plan: "Premium",
                     auto_start: false,
                     profile: Object.keys(profiles()!)[0],
-                    region: Object.keys(props.regions!)[0]
+                    region: Object.keys(props.regions!)[0],
+                    webhook_url: ""
                 }
             });
         }
@@ -123,12 +128,16 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
             let CreateInstanceSchema = form()!["~internal"].schema
             let fnc: SubmitHandler<typeof CreateInstanceSchema> = async (formData: any) => {
                 if (form()!.isValid) {
+                    const webhook_url = (formData["webhook_url"] ?? "").trim();
                     const new_config: PutCreateInstance = {
                         cpu: profiles()![formData["profile"]]["cpu"],
                         memory: profiles()![formData["profile"]]["memory"],
                         plan: formData["plan"],
                         auto_start: formData["auto_start"],
-                        region: formData["region"]
+                        region: formData["region"],
+                        // Left out entirely when blank — a new instance has no
+                        // webhook to clear, so there is nothing to send.
+                        ...(webhook_url ? { webhook_url } : {})
                     };
 
 
@@ -236,9 +245,29 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                                 </select>
                             </div>
 
-                            <button class={`${submitBtnStyle.button} buttonTextSmall`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={form()!.isSubmitting}>
-                                {form()!.isSubmitting ? "Creating Instance" : form()!.isSubmitted ? "Creating Instance" : "Create Instance"}
-                            </button>
+                            <Show when={showAdvanced()}>
+                                <div class={styles.advanced}>
+                                    <Field of={form()!} path={['webhook_url']}>
+                                        {(field) => (
+                                            <FormTextInput
+                                                field={field}
+                                                field_id="webhook_url"
+                                                field_label="Webhook URL"
+                                                field_placeholder={webhookUrlPlaceholder}
+                                                field_maxlength={2048}
+                                            />
+                                        )}
+                                    </Field>
+                                </div>
+                            </Show>
+
+                            <div class={styles.formFooter}>
+                                <AdvancedSettingsToggle expanded={showAdvanced()} onToggle={() => setShowAdvanced(!showAdvanced())} />
+
+                                <button class={`${submitBtnStyle.button} buttonTextSmall`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={form()!.isSubmitting}>
+                                    {form()!.isSubmitting ? "Creating Instance" : form()!.isSubmitted ? "Creating Instance" : "Create Instance"}
+                                </button>
+                            </div>
                         </Show>
                     </Form>
                 </Show>

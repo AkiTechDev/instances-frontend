@@ -1,0 +1,41 @@
+/* Discloses the advanced half of a settings form. Sits bottom-left of the form
+   footer, opposite the submit button — text-only, so the two never compete. */
+.toggle {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
+
+    border: 0;
+    background: transparent;
+    color: var(--c-orange);
+
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+}
+
+.toggle:hover {
+    color: var(--c-purple);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+.toggle::after {
+    content: "";
+    width: 12px;
+    height: 12px;
+    flex-shrink: 0;
+
+    background-color: currentColor;
+    mask: var(--icon) no-repeat center / contain;
+    -webkit-mask: var(--icon) no-repeat center / contain;
+
+    transition: transform 0.15s;
+}
+
+/* Chevron points down while collapsed, up once the fields are revealed. */
+.expanded::after {
+    transform: rotate(180deg);
+}

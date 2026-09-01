@@ -1,28 +1,51 @@
-import { type Component, createSignal } from "solid-js";
+import { type Component, createSignal, createUniqueId, onCleanup, onMount, Show } from "solid-js";
+import { Portal } from "solid-js/web";
 import { createForm, Form, Field, useField, type SubmitHandler } from "@formisch/solid";
 import * as v from 'valibot';
 import FormSelect from "../FormModules/FormSelect";
+import FormTextInput from "../FormModules/FormTextInput";
+import AdvancedSettingsToggle from "../FormModules/AdvancedSettingsToggle";
 
 import { fgCalc } from "../../../lib/pricing";
 import instance_tiers from "../../../lib/instance_tiers";
+import { webhookUrlPlaceholder, webhookUrlSchema } from "../../../lib/webhook";
 
 import styles from "./ManagementInstanceConfiguration.module.css";
 
 import selectStyles from "../FormModules/FormSelect.module.css";
 import submitBtnStyle from "../../../styles/components/formSubmitButton.module.css";
 import iconTick from "../../../assets/icons/tick.svg";
+import iconCross from "../../../assets/icons/cross.svg";
 import { regions } from "../../../lib/regions";
 import { postInstanceConfig, type Instance, type InstanceConfig, type PostInstanceConfig } from "../../../lib/apis";
 import type { InstanceProfile } from "../../../lib/games/types";
 
 
-const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance: Instance, endpoint: string, profiles: { [id: string]: InstanceProfile }, onSubmitted?: () => void }> = (props) => {
+interface InstanceConfigFormProps {
+  config: InstanceConfig,
+  endpoint: string,
+  profiles: { [id: string]: InstanceProfile },
+  onSubmitted?: () => void
+}
+
+/**
+ * The settings form itself. Rendered twice over the same config: inline on the
+ * management panel with the everyday fields only, and inside the all-settings
+ * modal with the advanced ones as well. Each render owns its own form state, so
+ * the modal always opens on the last saved config rather than on half-finished
+ * edits left behind in the panel.
+ */
+const InstanceConfigForm: Component<InstanceConfigFormProps & {
+  advanced?: boolean,
+  onShowAll?: () => void
+}> = (props) => {
     const [currentProfile, setCurrentProfile] = createSignal(Object.keys(props.profiles).find(k => props.profiles[k]["cpu"] === props.config["cpu"] && props.profiles[k]["memory"] === props.config["memory"]) || "ERR")
 
     const InstanceConfigurationSchema = v.object({
       plan: v.picklist(instance_tiers),
       profile: v.picklist(Object.keys(props.profiles)),
-      auto_start: v.boolean()
+      auto_start: v.boolean(),
+      webhook_url: webhookUrlSchema
     });
 
 
@@ -31,7 +54,8 @@ const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance
       initialInput: {
         "auto_start": false,
         "plan": props.config["plan"],
-        "profile": currentProfile()
+        "profile": currentProfile(),
+        "webhook_url": props.config["webhook_url"] ?? ""
       }
     })
 
@@ -44,14 +68,16 @@ const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance
                 cpu: props.profiles[values["profile"]]["cpu"],
                 memory: props.profiles[values["profile"]]["memory"],
                 plan: values["plan"],
-                auto_start: values["auto_start"]
+                auto_start: values["auto_start"],
+                // Always sent — a blank value is how the user clears a webhook.
+                webhook_url: (values["webhook_url"] ?? "").trim()
               };
               setCurrentProfile(values["profile"])
               await postInstanceConfig(props.endpoint, new_config)
               props.onSubmitted?.()
           }
       }
-    
+
     return (
       <Form of={instanceForm} onSubmit={submitForm} class={styles.instanceConfigSettings}>
         <Field of={instanceForm} path={['plan']}>
@@ -89,7 +115,7 @@ const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance
               <option class="bodyText" value="$00/hour" selected>${fgCalc("us-east-1", props.profiles[formProfile.input || ""].memory, props.profiles[formProfile.input || ""].cpu, formTier.input || "")}/hour</option>
             </select>
         </div>
-        
+
         {/* <Field of={instanceForm} path={["auto_start"]}>
           {(field) => (
             <FormCheckbox field={field}
@@ -99,11 +125,125 @@ const ManagementInstanceConfigForm: Component<{ config: InstanceConfig, instance
             />
           )}
         </Field> */}
-        <div></div>
-        <button class={`${submitBtnStyle.button} buttonTextSmall`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={!instanceForm.isDirty || instanceForm.isSubmitting}>
-          {instanceForm.isSubmitting ? "Saving Settings" : instanceForm.isSubmitted ? "Settings Saved" : "Save Settings"}
-        </button>
+
+        <Show when={props.advanced}>
+          <div class={styles.advanced}>
+            <Field of={instanceForm} path={["webhook_url"]}>
+              {(field) => (
+                <FormTextInput field={field}
+                  field_id="webhook_url"
+                  field_label="WEBHOOK_URL"
+                  field_placeholder={webhookUrlPlaceholder}
+                  field_maxlength={2048}
+                />
+              )}
+            </Field>
+          </div>
+        </Show>
+
+        <div class={styles.formFooter}>
+          <Show when={props.onShowAll}>
+            <AdvancedSettingsToggle
+              label="Show All Settings"
+              onToggle={() => props.onShowAll!()}
+            />
+          </Show>
+
+          <button class={`${submitBtnStyle.button} ${styles.footerSubmit} buttonTextSmall`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={!instanceForm.isDirty || instanceForm.isSubmitting}>
+            {instanceForm.isSubmitting ? "Saving Settings" : instanceForm.isSubmitted ? "Settings Saved" : "Save Settings"}
+          </button>
+        </div>
       </Form>
+    )
+};
+
+/** Every configurable instance setting, advanced ones included, in one dialog. */
+const InstanceSettingsModal: Component<InstanceConfigFormProps & {
+  instance: Instance,
+  onClose: () => void
+}> = (props) => {
+    const id = createUniqueId();
+
+    const handleKeydown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") props.onClose();
+    };
+
+    onMount(() => {
+        window.addEventListener("keydown", handleKeydown);
+        document.body.style.overflow = "hidden";
+    });
+
+    onCleanup(() => {
+        window.removeEventListener("keydown", handleKeydown);
+        document.body.style.overflow = "";
+    });
+
+    return (
+        <Portal>
+            <div class={styles.backdrop} onClick={() => props.onClose()}></div>
+            <div
+                class={styles.modal}
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby={`instanceSettingsTitle${id}`}
+                onClick={(e) => e.stopImmediatePropagation()}
+            >
+                <button
+                    class={styles.exit}
+                    style={`--icon: url("${iconCross.src}")`}
+                    onClick={() => props.onClose()}
+                    aria-label="Close"
+                ></button>
+
+                <div class={styles.modalBody}>
+                    <div class={styles.modalHeader}>
+                        <h6 id={`instanceSettingsTitle${id}`} class="h6">{props.instance.name} Settings</h6>
+                        <p class={`${styles.muted} bodyText`}>Everything you can configure on this instance, advanced options included.</p>
+                    </div>
+
+                    <InstanceConfigForm
+                        config={props.config}
+                        endpoint={props.endpoint}
+                        profiles={props.profiles}
+                        onSubmitted={props.onSubmitted}
+                        advanced
+                    />
+                </div>
+            </div>
+        </Portal>
+    )
+};
+
+const ManagementInstanceConfigForm: Component<InstanceConfigFormProps & { instance: Instance }> = (props) => {
+    const [isSettingsOpen, setIsSettingsOpen] = createSignal(false);
+
+    return (
+        <>
+            <InstanceConfigForm
+                config={props.config}
+                endpoint={props.endpoint}
+                profiles={props.profiles}
+                onSubmitted={props.onSubmitted}
+                onShowAll={() => setIsSettingsOpen(true)}
+            />
+
+            <Show when={isSettingsOpen()}>
+                <InstanceSettingsModal
+                    config={props.config}
+                    endpoint={props.endpoint}
+                    profiles={props.profiles}
+                    instance={props.instance}
+                    onClose={() => setIsSettingsOpen(false)}
+                    onSubmitted={() => {
+                        // Close before handing back: the panel swaps to its
+                        // skeleton while the update lands, and a dialog left
+                        // open over it would be stranded on stale values.
+                        setIsSettingsOpen(false);
+                        props.onSubmitted?.();
+                    }}
+                />
+            </Show>
+        </>
     )
 };
 

@@ -5,6 +5,130 @@
     width: 100%;
 }
 
-.instanceConfigSettings > button {
-    justify-self: end;
+/* Advanced fields — modal only, on the same track sizing as the rest of the
+   form so the two halves line up. */
+.advanced {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+
+/* Footer row at the end of the form: "Show All Settings" on the left, submit
+   pinned right whether or not the toggle is rendered. */
+.formFooter {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+}
+
+.footerSubmit {
+    margin-left: auto;
+}
+
+/* ---- All-settings modal ---- */
+
+.backdrop {
+    position: fixed;
+    inset: 0;                        /* covers full viewport */
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 50;
+    width: 100%;
+    height: 100%;
+}
+
+.modal {
+    box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 2rem;
+    gap: 1.5rem;
+
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    background: var(--colour-text-tertiary);
+    border-radius: var(--r-card);
+
+    color: var(--colour-text-primary);
+
+    width: min(680px, calc(100vw - 2rem));
+    max-height: calc(100vh - 4rem);
+    /* Kept visible so the close button can hang off the corner; the body below
+       is what scrolls when the field set outgrows a short viewport. */
+    overflow: visible;
+
+    z-index: 51;
+}
+
+.modalBody {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+
+    min-height: 0;
+    overflow-y: auto;
+}
+
+.modalHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.muted {
+    opacity: 0.6;
+}
+
+.exit {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.5rem 0;
+
+    background: #FFFFFF;
+    box-shadow: 1px 2px 22px rgba(187, 187, 187, 0.25);
+    border-radius: 24px;
+    border: 0;
+    cursor: pointer;
+
+    max-width: 40px;
+    width: 100%;
+    aspect-ratio: 1/1;
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(50%, -50%);
+
+    transition: all 0.3s;
+
+    z-index: 1;
+}
+
+.exit::after {
+    content: "";
+    width: 18px;
+    height: 18px;
+
+    background-color: var(--colour-text-primary);
+    mask: var(--icon) no-repeat center;
+    -webkit-mask: var(--icon) no-repeat center;
+}
+
+.exit:hover::after {
+    background-color: var(--colour-text-secondary);
+}
+
+.exit:active {
+    box-shadow: 1px 2px 22px rgba(187, 187, 187, 0.50);
 }

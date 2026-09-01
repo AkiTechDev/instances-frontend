@@ -103,3 +103,25 @@
 .exit:active {
     box-shadow: 1px 2px 22px rgba(187, 187, 187, 0.50);
 }
+
+/* Advanced fields — revealed by the toggle in the footer, laid out on the same
+   track sizing as the main form so the two halves line up. */
+.advanced {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+
+/* Footer row pinned to the end of the form: disclosure toggle on the left,
+   submit on the right. */
+.formFooter {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
