@@ -15,6 +15,15 @@
     
 }
 
+/* Keeps the feedback toggle grouped with the profile control against the right
+   edge, instead of space-between spreading the three items across the header. */
+.headerActions {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+}
+
 .header > p::after {
     content: var(--gameName);
     color: #95979F;

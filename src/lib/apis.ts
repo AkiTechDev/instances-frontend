@@ -269,6 +269,46 @@ export const putCreateInstance = async (game_id: string, instance_name: string, 
     return await resp.json();
 };
 
+export interface SurveyAnswer {
+    /** Stable question key from the survey definition. */
+    id: string,
+    /** The wording the rater actually saw, stored so old responses stay readable. */
+    question: string,
+    /** 0–5 inclusive. */
+    rating: number,
+}
+
+export interface SurveyResponse {
+    /** Version of the question set these answers came from. */
+    survey_id: string,
+    submitted_at: string,
+    answers: SurveyAnswer[],
+    comment?: string,
+    context: {
+        /** Route the rater was on when they opened the survey. */
+        path: string,
+        user_agent: string,
+    },
+}
+
+export const postSurvey = async (response: SurveyResponse): Promise<GenericResonse> => {
+    const token = await getToken();
+    const resp = await fetch("https://api.instances.aki-labs.com/feedback", {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(response)
+    });
+
+    if (!resp.ok) throw new Error(`Failed to submit feedback (${resp.status})`);
+
+    // A bare 200/204 with no body is a perfectly good "received"; don't turn
+    // that into a failure the rater has to retry.
+    return (await resp.json().catch(() => ({ message: "ok" }))) as GenericResonse;
+};
+
 export const getGames = query(async (): Promise<string[]> => {
     const resp = await fetch("https://api.instances.aki-labs.com/instances/types", {
         method: "GET",
