@@ -1,3 +1,10 @@
+/* Form submit button.
+
+   The green + tick is a SUCCESS state, driven by the `.submitted` class the
+   form sets from `form.isSubmitted`. It used to hang off `:focus`, which meant
+   tabbing to the button claimed the form had saved, and a failed POST left it
+   green until the button lost focus. Focus is not success. */
+
 .button {
     display: flex;
     flex-direction: row;
@@ -6,29 +13,79 @@
     padding: 0.5rem 1rem;
     gap: 0.5rem;
 
-    border-radius: 44px;
-    border: 0;
+    border-radius: var(--r-pill);
+    border: 1px solid transparent;
     background-color: var(--colour-text-secondary);
-    
-    transition: all 0.15s;
+    color: var(--colour-text-primary);
+    cursor: pointer;
+
+    transition: background-color var(--dur-fast) var(--ease-out),
+                border-color     var(--dur-fast) var(--ease-out),
+                color            var(--dur-fast) var(--ease-out),
+                transform        var(--dur-fast) var(--ease-out);
+
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
+
     max-width: min-content;
     white-space: nowrap;
 }
 
+.button:hover:not(:disabled) {
+    background-color: var(--c-purple);
+}
+
+.button:active:not(:disabled) {
+    background-color: var(--c-purple-deep);
+    color: var(--c-white);
+    transform: translateY(1px) scale(0.985);
+    transition-duration: var(--dur-press);
+}
+
+.button:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+}
+
 .button:disabled {
-    background-color: #D0D0D0;
+    background-color: var(--c-grey-400);
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
-.button:focus {
-    background-color: #80F733;
+/* In flight — the label swaps at the call site ("Saving Settings"); this stops
+   the cursor and press from implying the click didn't land. */
+.button.busy,
+.button.busy:hover {
+    cursor: progress;
+    opacity: 0.8;
 }
 
-.button:focus::before {
+.button.busy:active {
+    transform: none;
+}
+
+/* Saved. Green + tick, and it survives losing focus. */
+.button.submitted,
+.button.submitted:hover,
+.button.submitted:disabled {
+    background-color: var(--c-green-bright);
+    color: var(--colour-text-primary);
+    opacity: 1;
+}
+
+.button.submitted::before {
     content: "";
     width: 16px;
     height: 16px;
+    flex-shrink: 0;
 
     background-color: var(--colour-text-primary);
     mask: var(--icon) no-repeat center;
     -webkit-mask: var(--icon) no-repeat center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .button:active:not(:disabled) { transform: none; }
 }

@@ -1,0 +1,1699 @@
+---
+// Order matters: tokens (theme/default) before the sheets that consume them,
+// and identical on every entry point so the cascade can't diverge per page.
+import "../styles/normalise.css"
+import "../styles/global.css"
+import "../styles/theme/default.css"
+import "../styles/typography.css"
+
+import Header from "../components/astrojs/header/Header.astro";
+import Newsletter from "../components/newsletter/Newsletter.astro";
+import Footer from "../components/astrojs/Footer/Footer.astro";
+
+import button from "../styles/components/button.module.css";
+import tickIcon from "../assets/icons/tick.svg?url";
+import Banner from "../assets/images/WelcomeToInstances.png";
+
+/* ────────────────────────────────────────────────────────────────────────────
+   Values still to be confirmed before this page goes live.
+
+   Nothing here is invented. Anything unresolved renders as a loud `[bracketed]`
+   marker in the copy instead of a plausible-looking fact, and is repeated in
+   the dev-only checklist at the top of the page. A privacy policy that states
+   something untrue is worse than one that visibly admits a gap.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+const claims = {
+    /** §7 + §12. Flip to true ONLY once admin access to customer servers really
+        is individually credentialed and session-logged (e.g. SSM Session Manager
+        writing session logs to S3/CloudWatch). Until then the claim is withheld
+        rather than published unverified. */
+    auditedAdminAccess: false,
+
+    /** §7. We tell customers when we've accessed their server for any reason
+        other than a support request they raised. Strong differentiator, cheap to
+        honour — but only turn this on once the notice actually gets sent. */
+    notifyOnAdminAccess: false,
+
+    /** §7. URL of the Data Processing Terms that form part of the customer
+        agreement. Null until they exist and are accepted at signup. */
+    dataProcessingTermsUrl: null as string | null,
+
+    /** §5. The site captures newsletter signups ("Stay in the Loop"), so the
+        consent-based marketing row applies. */
+    marketingEmails: true,
+};
+
+/** Bump whenever the substance of this page changes. */
+const lastUpdated = new Date("2026-09-04T00:00:00Z");
+const lastUpdatedLabel = lastUpdated.toLocaleDateString("en-GB", {
+    day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+});
+
+/* §6 — built from the same env vars the auth client reads, so the documented
+   storage key cannot drift out of step with the one actually written. */
+const AUTHORITY = import.meta.env.PUBLIC_ZITADEL_AUTHORITY ?? "";
+const CLIENT_ID = import.meta.env.PUBLIC_ZITADEL_CLIENT_ID ?? "";
+const idpHost = AUTHORITY.replace(/^https?:\/\//, "").replace(/\/+$/, "");
+const sessionKey = AUTHORITY && CLIENT_ID
+    ? `oidc.user:${AUTHORITY}:${CLIENT_ID}`
+    : "oidc.user:[our identity provider]:[application ID]";
+
+/** Drives the dev-only checklist. Keep in step with the `.pending` markers below. */
+const outstanding = [
+    "§1 — ICO registration number (register at ico.org.uk, then paste it in)",
+    "§4.4 — confirm exactly which fields Stripe returns to us",
+    "§4.5 — confirm exactly what we meter to Metronome",
+    "§7 — Data Processing Terms: publish them, link them, accept them at signup",
+    ...(claims.auditedAdminAccess ? [] : ["§7 + §12 — verify admin access is individually credentialed and logged, then set claims.auditedAdminAccess"]),
+    ...(claims.notifyOnAdminAccess ? [] : ["§7 — decide whether to commit to notifying customers of non-support access (claims.notifyOnAdminAccess)"]),
+    "§8 — confirm the Amazon SES region",
+    "§8 — confirm whether Metronome is covered by the Stripe DPA post-acquisition",
+    "§10 — every retention period marked TBC",
+    "§12 — backup regime, incident response, vulnerability management, pen testing",
+    "§16.1 — appoint an Article 27 EU representative and name them here",
+];
+
+/* Single source of truth for the contents nav. Rendered twice (sticky sidebar +
+   mobile disclosure); the scrollspy warns in dev if it drifts from the headings. */
+const sections = [
+    { id: "who-we-are",     n: 1,  title: "Who we are" },
+    { id: "scope",          n: 2,  title: "What this policy covers" },
+    { id: "approach",       n: 3,  title: "Our approach", tag: "summary" },
+    { id: "what-we-collect", n: 4, title: "What we collect" },
+    { id: "legal-basis",    n: 5,  title: "Why we use it, and our legal basis" },
+    { id: "cookies",        n: 6,  title: "Cookies and browser storage" },
+    { id: "player-data",    n: 7,  title: "Data about players on your servers", tag: "important" },
+    { id: "sharing",        n: 8,  title: "Who we share data with" },
+    { id: "transfers",      n: 9,  title: "Where your data is stored" },
+    { id: "retention",      n: 10, title: "How long we keep it" },
+    { id: "your-rights",    n: 11, title: "Your rights" },
+    { id: "security",       n: 12, title: "How we protect your data" },
+    { id: "age",            n: 13, title: "Age requirement" },
+    { id: "changes",        n: 14, title: "Changes to this policy" },
+    { id: "contact",        n: 15, title: "Contact us" },
+    { id: "regional",       n: 16, title: "Regional disclosures" },
+];
+
+const seo_des = "How Aki Laboratories collects, uses and protects your data on Instances. We ask for an email address and a username — no analytics, no tracking cookies, and we never sell your data.";
+const domain = "instances.aki-labs.com";
+---
+<!doctype html>
+<html lang="en" class="en" prefix="og: http://ogp.me/ns#">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="author" content="Aki Laboratories Limited">
+        <meta name="referrer" content="strict-origin-when-cross-origin">
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+
+        <!-- SEO -->
+        <title>Privacy Policy - Instances</title>
+        <meta name="description" content={seo_des}>
+        <meta itemprop="description" content={seo_des}>
+        <meta name="robots" content="all" />
+        <link rel="canonical" href={`https://${domain}/privacy-policy`}>
+        <link rel="sitemap" href="/sitemap-index.xml" />
+
+        <!-- Twitter/X specific -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="Privacy Policy - Instances">
+        <meta name="twitter:description" content={seo_des}>
+        <meta name="twitter:image" content={Banner.src}>
+        <meta name="twitter:site" content="@aki_labs">
+
+        <!-- Open Graph -->
+        <meta property="og:title" content="Privacy Policy - Instances">
+        <meta property="og:description" content={seo_des}>
+        <meta property="og:type" content="article">
+        <meta property="og:url" content={`https://${domain}/privacy-policy`}>
+        <meta property="og:image" content={Banner.src}>
+        <meta property="og:site_name" content="Instances">
+        <meta property="og:locale" content="en_US">
+
+        <meta name="theme-color" content="#191C2E">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+    </head>
+    <body>
+        <Header />
+
+        <main class="page" style={`--tick: url(${tickIcon})`}>
+
+            {import.meta.env.DEV && (
+                <aside class="devChecklist" aria-label="Pre-publication checklist (development only)">
+                    <p class="bodyTextSmallSemi">Before this page goes live — {outstanding.length} items outstanding</p>
+                    <ul>
+                        {outstanding.map((item) => <li class="bodyTextSmall">{item}</li>)}
+                    </ul>
+                    <p class="bodyTextSmallest">This panel renders in <code>astro dev</code> only. Every item above also appears inline as a bracketed marker.</p>
+                </aside>
+            )}
+
+            <!-- ── Hero ───────────────────────────────────────────────────── -->
+            <header class="hero">
+                <p class="eyebrow bodyTextSmallestSemiCaps">Legal</p>
+                <h1 class="h3"><span class="gradientOne">Privacy</span> Policy</h1>
+                <p class="subTitle heroLead">
+                    We collect as little as we can: an email address and a username. No analytics,
+                    no tracking cookies, and nothing sold to anyone. This page sets out exactly what
+                    that means, in the order the law expects and in plain English.
+                </p>
+
+                <div class="heroMeta">
+                    <p class="bodyTextSmall">
+                        Last updated <time datetime={lastUpdated.toISOString().slice(0, 10)}>{lastUpdatedLabel}</time>
+                    </p>
+                    <span class="metaDot" aria-hidden="true"></span>
+                    <p class="bodyTextSmall">Aki Laboratories Limited &middot; Company no. 14904443</p>
+                </div>
+
+                <nav class="jumpTo" aria-label="Most-read sections">
+                    <a class="bodyTextSmallSemi" href="#approach">Our approach</a>
+                    <a class="bodyTextSmallSemi" href="#player-data">Players on your servers</a>
+                    <a class="bodyTextSmallSemi" href="#your-rights">Your rights</a>
+                    <a class="bodyTextSmallSemi" href="#contact">Contact us</a>
+                </nav>
+            </header>
+
+            <div class="layout">
+
+                <!-- ── Contents: sticky sidebar (desktop) ─────────────────── -->
+                <aside class="tocDesktop" data-toc>
+                    <nav aria-labelledby="tocHeading">
+                        <p id="tocHeading" class="tocTitle bodyTextSmallestSemiCaps">Contents</p>
+                        <ol>
+                            {sections.map((s) => (
+                                <li>
+                                    <a href={`#${s.id}`} class="bodyTextSmall">
+                                        <span class="tocNum">{s.n}</span>
+                                        <span class="tocText">{s.title}</span>
+                                    </a>
+                                </li>
+                            ))}
+                        </ol>
+                    </nav>
+                </aside>
+
+                <!-- ── Contents: disclosure (mobile) ──────────────────────── -->
+                <details class="tocMobile" data-toc>
+                    <summary class="bodyTextSmallSemi">Contents<span class="tocChevron" aria-hidden="true"></span></summary>
+                    <ol>
+                        {sections.map((s) => (
+                            <li>
+                                <a href={`#${s.id}`} class="bodyTextSmall">
+                                    <span class="tocNum">{s.n}</span>
+                                    <span class="tocText">{s.title}</span>
+                                </a>
+                            </li>
+                        ))}
+                    </ol>
+                </details>
+
+                <!-- ── Policy body ────────────────────────────────────────── -->
+                <article class="prose">
+
+                    <!-- 1 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="who-we-are">
+                        <h2 id="who-we-are" class="h5"><span class="sectionNum">1</span>Who we are</h2>
+                        <p class="bodyText">
+                            Aki Laboratories Limited ("we", "us", "our") operates <strong>Instances</strong>,
+                            a platform that lets you provision and manage game hosting infrastructure, at
+                            <a href="https://www.instances.aki-labs.com">www.instances.aki-labs.com</a>.
+                        </p>
+                        <p class="bodyText">We are the data controller for the personal data described in this policy.</p>
+
+                        <dl class="factGrid">
+                            <div class="fact">
+                                <dt class="bodyTextSmallestSemiCaps">Registered address</dt>
+                                <dd class="bodyTextSmall">124-128 City Road, London, England, EC1V 2NX</dd>
+                            </div>
+                            <div class="fact">
+                                <dt class="bodyTextSmallestSemiCaps">Company number</dt>
+                                <dd class="bodyTextSmall">14904443</dd>
+                            </div>
+                            <div class="fact">
+                                <dt class="bodyTextSmallestSemiCaps">Contact</dt>
+                                <dd class="bodyTextSmall"><a href="mailto:help@aki-labs.com">help@aki-labs.com</a></dd>
+                            </div>
+                            <div class="fact">
+                                <dt class="bodyTextSmallestSemiCaps">ICO registration</dt>
+                                <dd class="bodyTextSmall"><span class="pending">ICO registration number &mdash; to be added</span></dd>
+                            </div>
+                        </dl>
+
+                        <p class="bodyText">
+                            If you're in the EEA, the UK, or another region with specific rules, see
+                            <a href="#regional">section 16</a> for additional disclosures.
+                        </p>
+                    </section>
+
+                    <!-- 2 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="scope">
+                        <h2 id="scope" class="h5"><span class="sectionNum">2</span>What this policy covers</h2>
+                        <p class="bodyText">
+                            This policy covers aki-labs.com and its subdomains, including the Instances service
+                            at www.instances.aki-labs.com.
+                        </p>
+                        <p class="bodyText">
+                            It does not cover the data processed <em>inside</em> the game servers you deploy
+                            through us. Where you run servers that other people connect to, you decide what
+                            happens to that data &mdash; see <a href="#player-data">section 7</a>, which you
+                            should read carefully.
+                        </p>
+                    </section>
+
+                    <!-- 3 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="approach" class="approachSection">
+                        <h2 id="approach" class="h5"><span class="sectionNum">3</span>Our approach</h2>
+                        <p class="bodyText">We collect as little as we can. Concretely:</p>
+
+                        <ul class="approachGrid">
+                            <li class="approachCard">
+                                <p class="bodyTextMedium">We ask for an email address and a username. That's it.</p>
+                            </li>
+                            <li class="approachCard">
+                                <p class="bodyTextMedium">Everything inside our own infrastructure identifies you by a random UUID, not by your name or email.</p>
+                            </li>
+                            <li class="approachCard">
+                                <p class="bodyTextMedium">We don't run website analytics, advertising, or tracking cookies.</p>
+                            </li>
+                            <li class="approachCard">
+                                <p class="bodyTextMedium">We never sell or share your personal data for advertising, and we don't sell or share it as those terms are defined under US state privacy laws.</p>
+                            </li>
+                            <li class="approachCard">
+                                <p class="bodyTextMedium">We don't make automated decisions that produce legal or similarly significant effects about you.</p>
+                            </li>
+                            <li class="approachCard">
+                                <p class="bodyTextMedium">We don't collect special category or sensitive data &mdash; health, biometrics, political opinions, precise location &mdash; and we ask that you don't send it to us.</p>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <!-- 4 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="what-we-collect">
+                        <h2 id="what-we-collect" class="h5"><span class="sectionNum">4</span>What we collect</h2>
+
+                        <h3 class="subtitleSemi">4.1 &nbsp;Account and identity data</h3>
+                        <p class="bodyText">
+                            Your <strong>email address</strong> and <strong>username</strong>, plus your
+                            credentials and any multi-factor authentication settings.
+                        </p>
+                        <p class="bodyText">
+                            This is held by <strong>Zitadel Cloud</strong> on our behalf, in their European
+                            Union region. Our own systems only ever see the UUID that Zitadel issues for your account.
+                        </p>
+
+                        <h3 class="subtitleSemi">4.2 &nbsp;Authentication and audit records</h3>
+                        <p class="bodyText">
+                            Records of sign-ins and account activity, including timestamps, success and failure
+                            of authentication attempts, session activity, the IP address and user agent used,
+                            and a record of significant actions taken in the service.
+                        </p>
+                        <p class="bodyText">
+                            We keep these to secure accounts, investigate abuse, and answer questions like
+                            "who changed this and when".
+                        </p>
+
+                        <h3 class="subtitleSemi">4.3 &nbsp;Service and infrastructure data</h3>
+                        <p class="bodyText">
+                            Everything relating to the hosting resources you create: server and project names,
+                            regions, instance sizes, configuration, deployment history, resource state,
+                            operational logs and metrics.
+                        </p>
+                        <p class="bodyText">
+                            This is linked to your account by UUID alone. Your name, email and billing details
+                            are not stored here.
+                        </p>
+                        <p class="callout callout--note bodyText">
+                            Anything you type into a name or configuration field is stored as you entered it,
+                            so please don't put personal information in there.
+                        </p>
+
+                        <h3 class="subtitleSemi">4.4 &nbsp;Billing and payment data</h3>
+                        <p class="bodyText">
+                            Payments and subscriptions are handled by <strong>Stripe</strong>. Card details go
+                            directly to Stripe &mdash; <strong>we never receive or store your full card number</strong>.
+                        </p>
+                        <p class="bodyText">
+                            From Stripe we receive <span class="pending">your Stripe customer ID, subscription
+                            and plan status, payment history, card brand and last four digits, and billing
+                            country &mdash; to be confirmed</span>. Stripe processes payments on our behalf and
+                            also acts as a controller in its own right for fraud prevention and its regulatory
+                            obligations. See Stripe's privacy policy at
+                            <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer">stripe.com/privacy</a>.
+                        </p>
+
+                        <h3 class="subtitleSemi">4.5 &nbsp;Usage and metering data</h3>
+                        <p class="bodyText">
+                            We send usage measurements to <strong>Metronome</strong>, our billing platform, so we
+                            can calculate what you owe. This is volume data &mdash; <span class="pending">compute
+                            hours, resource counts, bandwidth, storage &mdash; to be confirmed</span> &mdash;
+                            keyed to your account identifier rather than your name.
+                        </p>
+
+                        <h3 class="subtitleSemi">4.6 &nbsp;Website and server logs</h3>
+                        <p class="bodyText">
+                            Our web servers and infrastructure automatically record IP addresses, timestamps,
+                            requested URLs, response codes, user agents and referrers.
+                        </p>
+                        <p class="bodyText">
+                            <strong>We do not currently analyse these logs, profile visitors, or run any website
+                            analytics.</strong> They exist so the service works and so we can investigate outages,
+                            abuse and attacks. If that changes, we'll update this policy and, where the law
+                            requires it, ask for your consent first.
+                        </p>
+
+                        <h3 class="subtitleSemi">4.7 &nbsp;Emails and correspondence</h3>
+                        <p class="bodyText">
+                            Automated messages &mdash; sign-in links, billing notices and service alerts &mdash;
+                            are sent from <strong>instances@aki-labs.com</strong> using
+                            <strong>Amazon Simple Email Service</strong>.
+                        </p>
+                        <p class="bodyText">
+                            If you write to us at <a href="mailto:help@aki-labs.com">help@aki-labs.com</a>, that
+                            correspondence is handled through <strong>Proton Mail</strong>, an encrypted email
+                            provider based in Switzerland. We keep your message and our reply along with whatever
+                            contact details you used.
+                        </p>
+                    </section>
+
+                    <!-- 5 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="legal-basis">
+                        <h2 id="legal-basis" class="h5"><span class="sectionNum">5</span>Why we use it, and our legal basis</h2>
+
+                        <div class="tableScroll" role="region" aria-label="Legal bases for processing" tabindex="0">
+                            <table class="dataTable">
+                                <caption class="visuallyHidden">Our purposes, the data each uses, and the legal basis under UK and EU GDPR</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">What we do</th>
+                                        <th scope="col">Data used</th>
+                                        <th scope="col">Legal basis (UK/EU GDPR)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td data-label="What we do">Create and administer your account</td>
+                                        <td data-label="Data used">Account and identity data</td>
+                                        <td data-label="Legal basis"><span class="basis basis--contract">Performance of a contract</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="What we do">Authenticate you and keep sessions secure</td>
+                                        <td data-label="Data used">Identity data, authentication records</td>
+                                        <td data-label="Legal basis"><span class="basis basis--contract">Performance of a contract</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="What we do">Provide and operate the hosting service</td>
+                                        <td data-label="Data used">Service and infrastructure data</td>
+                                        <td data-label="Legal basis"><span class="basis basis--contract">Performance of a contract</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="What we do">Send service and account emails</td>
+                                        <td data-label="Data used">Email address</td>
+                                        <td data-label="Legal basis"><span class="basis basis--contract">Performance of a contract</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="What we do">Take payment and manage subscriptions</td>
+                                        <td data-label="Data used">Billing data, account identifier</td>
+                                        <td data-label="Legal basis"><span class="basis basis--contract">Performance of a contract</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="What we do">Measure usage for billing</td>
+                                        <td data-label="Data used">Usage and metering data</td>
+                                        <td data-label="Legal basis"><span class="basis basis--contract">Performance of a contract</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="What we do">Support and respond to your queries</td>
+                                        <td data-label="Data used">Correspondence, account data</td>
+                                        <td data-label="Legal basis"><span class="basis basis--contract">Performance of a contract</span>; <span class="basis basis--interest">legitimate interests</span> in running a supported service</td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="What we do">Secure the platform, detect and investigate abuse, prevent fraud</td>
+                                        <td data-label="Data used">Audit records, server logs, IP addresses, server contents where necessary</td>
+                                        <td data-label="Legal basis"><span class="basis basis--interest">Legitimate interests</span> in protecting our service, our users and our infrastructure</td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="What we do">Keep accounting and tax records</td>
+                                        <td data-label="Data used">Billing data</td>
+                                        <td data-label="Legal basis"><span class="basis basis--obligation">Legal obligation</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="What we do">Respond to lawful requests, establish or defend legal claims</td>
+                                        <td data-label="Data used">Any of the above</td>
+                                        <td data-label="Legal basis"><span class="basis basis--obligation">Legal obligation</span>; <span class="basis basis--interest">legitimate interests</span> in defending our position</td>
+                                    </tr>
+                                    {claims.marketingEmails && (
+                                        <tr>
+                                            <td data-label="What we do">Send product or marketing emails</td>
+                                            <td data-label="Data used">Email address</td>
+                                            <td data-label="Legal basis"><span class="basis basis--consent">Consent</span>, which you can withdraw at any time</td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <p class="bodyText">
+                            Where we rely on legitimate interests, we've weighed those interests against your
+                            rights. You can object at any time &mdash; see <a href="#your-rights">section 11</a>.
+                        </p>
+                    </section>
+
+                    <!-- 6 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="cookies">
+                        <h2 id="cookies" class="h5"><span class="sectionNum">6</span>Cookies and browser storage</h2>
+
+                        <p class="callout callout--good bodyText">
+                            <strong>We don't use cookies for analytics, advertising or tracking, and we don't
+                            show a consent banner because we have nothing to ask your consent for.</strong>
+                        </p>
+
+                        <p class="bodyText">
+                            What we do use is browser storage, to keep you signed in. When you log in, our
+                            identity provider's client library saves your session in your browser's
+                            <em>session storage</em> under keys like these:
+                        </p>
+
+                        <div class="tableScroll" role="region" aria-label="Browser storage we set" tabindex="0">
+                            <table class="dataTable">
+                                <caption class="visuallyHidden">Keys written to your browser's session storage, what sets them, and when they clear</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Key</th>
+                                        <th scope="col">Set by</th>
+                                        <th scope="col">Purpose</th>
+                                        <th scope="col">Cleared</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td data-label="Key"><code>{sessionKey}</code></td>
+                                        <td data-label="Set by">Zitadel client library</td>
+                                        <td data-label="Purpose">Holds your current session and tokens so you stay signed in</td>
+                                        <td data-label="Cleared">When you close the tab, or when you sign out</td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Key"><code>oidc.[random identifier]</code></td>
+                                        <td data-label="Set by">Zitadel client library</td>
+                                        <td data-label="Purpose">Short-lived values used to complete a login redirect securely</td>
+                                        <td data-label="Cleared">As soon as login completes</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <p class="bodyText">
+                            Signing in also sets session cookies on our identity provider's own domain,
+                            {idpHost ? <code>{idpHost}</code> : <span class="pending">our identity provider's domain</span>}.
+                        </p>
+                        <p class="bodyText">
+                            All of this is strictly necessary to deliver a service you've asked for, which is why
+                            we don't need your permission for it. Clearing your browser storage will sign you
+                            out. If we ever add anything that isn't essential, we'll ask first.
+                        </p>
+                    </section>
+
+                    <!-- 7 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="player-data" class="keySection">
+                        <h2 id="player-data" class="h5"><span class="sectionNum">7</span>Data about players on your servers</h2>
+
+                        <p class="callout callout--warn bodyText">
+                            <strong>Read this section if other people connect to servers you run.</strong>
+                        </p>
+
+                        <p class="bodyText">
+                            A game server processes data about everyone who joins it: IP addresses, in-game names
+                            and account IDs, chat and event logs, and whatever else the game software records.
+                            That data sits on infrastructure we operate.
+                        </p>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">Who's responsible</h3>
+                            <p class="bodyText">
+                                You decide what your server runs, who can join, and what it logs, so you are the
+                                controller of that data. We act as your processor for the infrastructure
+                                underneath it.
+                                {claims.dataProcessingTermsUrl
+                                    ? <Fragment>Our <a href={claims.dataProcessingTermsUrl}>Data Processing Terms</a> form part of your agreement with us and set out how we handle it.</Fragment>
+                                    : <span class="pending">Data Processing Terms &mdash; to be published and linked here</span>}
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">Where it lives</h3>
+                            <p class="bodyText">
+                                You choose which of our ten hosting regions your server runs in, and that
+                                determines where your server's data &mdash; including data about your players
+                                &mdash; is stored. See <a href="#transfers">section 9</a>.
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">How it's protected</h3>
+                            <p class="bodyText">
+                                Your server's storage is encrypted at rest using AWS-managed keys, and traffic
+                                between you and our platform is encrypted in transit. That protects your data
+                                against theft of physical storage media and against access below the level of our
+                                own AWS account.
+                            </p>
+                            <p class="bodyText">
+                                It does not mean we're unable to read it. Encryption at rest is transparent to
+                                authorised access &mdash; a member of our team with the right permissions can read
+                                your server's contents, and we'd rather tell you that than imply a protection that
+                                isn't there.
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock labelledBlock--emphasis">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">Our access &mdash; please read</h3>
+                            <p class="bodyText">
+                                We are able to access the contents of your servers, including files, world data,
+                                logs and chat records. We only do so where:
+                            </p>
+                            <ul class="markerList bodyText">
+                                <li>you ask us to, as part of a support request you've raised;</li>
+                                <li>we're investigating a security incident, or a report of abuse or illegal content;</li>
+                                <li>we need to protect our infrastructure or other customers from harm; or</li>
+                                <li>we're legally required to.</li>
+                            </ul>
+
+                            {claims.auditedAdminAccess ? (
+                                <p class="bodyText">
+                                    Access of this kind is limited to staff who need it, requires individually
+                                    issued credentials, and is recorded in an audit log.
+                                </p>
+                            ) : (
+                                <p class="bodyText">
+                                    <span class="pending">Access controls and audit logging for staff access to
+                                    customer servers &mdash; to be verified before this claim is published</span>
+                                </p>
+                            )}
+
+                            {claims.notifyOnAdminAccess && (
+                                <p class="bodyText">
+                                    Where we've accessed your server for any reason other than a support request
+                                    you raised with us, we'll tell you &mdash; unless an active abuse investigation
+                                    or a legal restriction prevents us from doing so.
+                                </p>
+                            )}
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">Your responsibilities</h3>
+                            <p class="bodyText">
+                                If people outside your own household connect to your server, data protection law
+                                applies to you as well as to us. That means telling players what's collected,
+                                having a lawful basis for it, responding to their requests, and keeping the server
+                                secure. If children are likely to play on your server, further rules apply to you.
+                                We can't take these obligations on for you, and this policy doesn't cover them.
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">Reporting</h3>
+                            <p class="bodyText">
+                                If you believe a server hosted with us is mishandling your data, contact us at
+                                <a href="mailto:help@aki-labs.com">help@aki-labs.com</a> and we'll investigate.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- 8 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="sharing">
+                        <h2 id="sharing" class="h5"><span class="sectionNum">8</span>Who we share data with</h2>
+                        <p class="bodyText">
+                            We don't sell your data. We share it with the following service providers, who process
+                            it on our instructions:
+                        </p>
+
+                        <div class="tableScroll" role="region" aria-label="Our service providers" tabindex="0">
+                            <table class="dataTable">
+                                <caption class="visuallyHidden">Service providers, what each handles, and where they process it</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Provider</th>
+                                        <th scope="col">What they handle</th>
+                                        <th scope="col">Where</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td data-label="Provider"><strong>Zitadel Cloud</strong> <span class="muted">(Zitadel, Switzerland)</span></td>
+                                        <td data-label="What they handle">Identity, authentication, account records</td>
+                                        <td data-label="Where">European Union (Frankfurt, Germany)</td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Provider"><strong>Amazon Web Services</strong></td>
+                                        <td data-label="What they handle">Platform hosting and infrastructure</td>
+                                        <td data-label="Where">United States (us-east-1)</td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Provider"><strong>Amazon Web Services</strong></td>
+                                        <td data-label="What they handle">Hosting regions for your servers</td>
+                                        <td data-label="Where">Ten regions worldwide &mdash; you choose</td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Provider"><strong>Amazon Simple Email Service</strong></td>
+                                        <td data-label="What they handle">Automated and transactional email</td>
+                                        <td data-label="Where"><span class="pending">region &mdash; to be confirmed</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Provider"><strong>Stripe</strong></td>
+                                        <td data-label="What they handle">Payments and subscriptions</td>
+                                        <td data-label="Where">Ireland / United States</td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Provider"><strong>Metronome</strong></td>
+                                        <td data-label="What they handle">Usage metering and billing</td>
+                                        <td data-label="Where">United States</td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Provider"><strong>Proton AG</strong></td>
+                                        <td data-label="What they handle">Email correspondence with our team</td>
+                                        <td data-label="Where">Switzerland</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <p class="bodyText">
+                            We may also disclose data to professional advisers such as lawyers and accountants; to
+                            regulators, courts or law enforcement where we're legally required to; and to a buyer
+                            or successor if we're involved in a merger, acquisition or sale of assets, in which
+                            case we'll tell you beforehand.
+                        </p>
+                    </section>
+
+                    <!-- 9 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="transfers">
+                        <h2 id="transfers" class="h5"><span class="sectionNum">9</span>Where your data is stored, and international transfers</h2>
+                        <p class="bodyText">
+                            We're a UK company, and we operate globally. Different parts of your data sit in
+                            different places, so it's worth being precise.
+                        </p>
+
+                        <ul class="whereList">
+                            <li>
+                                <p class="bodyTextMedium whereWhat">Your account and login details</p>
+                                <p class="bodyText">are stored by Zitadel in the <strong>European Union</strong>.</p>
+                            </li>
+                            <li>
+                                <p class="bodyTextMedium whereWhat">Our platform</p>
+                                <p class="bodyText">
+                                    &mdash; audit logs, infrastructure metadata, usage measurements and web server
+                                    logs &mdash; runs in AWS's <strong>us-east-1 region in the United States</strong>.
+                                    If you're in the UK or EEA, this means your data is transferred to the US.
+                                </p>
+                            </li>
+                            <li>
+                                <p class="bodyTextMedium whereWhat">Your game servers</p>
+                                <p class="bodyText">
+                                    run in whichever of our ten regions you select. That choice determines where
+                                    your server's contents, logs and player data are stored. Selecting a European
+                                    region for your server does not change where our platform data sits.
+                                </p>
+                            </li>
+                            <li>
+                                <p class="bodyTextMedium whereWhat">Correspondence with our team</p>
+                                <p class="bodyText">is handled in Switzerland.</p>
+                            </li>
+                        </ul>
+
+                        <p class="bodyText">
+                            Where we transfer personal data out of the UK or EEA, we rely on:
+                        </p>
+                        <ul class="markerList bodyText">
+                            <li><strong>Adequacy regulations.</strong> Switzerland is recognised by both the UK and the EU as offering equivalent protection, which covers our email correspondence and Zitadel's Swiss corporate operations.</li>
+                            <li><strong>The EU&ndash;US Data Privacy Framework and its UK Extension.</strong> Amazon and Stripe are certified under the Framework, which permits transfers to their US operations without additional safeguards.</li>
+                            <li><strong>Standard Contractual Clauses</strong>, together with the <strong>UK International Data Transfer Addendum</strong>, which our providers' data processing agreements incorporate as a fallback.</li>
+                        </ul>
+                        <p class="bodyText">
+                            You can request a copy of the safeguards we use by emailing
+                            <a href="mailto:help@aki-labs.com">help@aki-labs.com</a>.
+                        </p>
+                    </section>
+
+                    <!-- 10 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="retention">
+                        <h2 id="retention" class="h5"><span class="sectionNum">10</span>How long we keep it</h2>
+
+                        <div class="tableScroll" role="region" aria-label="Retention periods" tabindex="0">
+                            <table class="dataTable">
+                                <caption class="visuallyHidden">How long we keep each category of data</caption>
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Data</th>
+                                        <th scope="col">Retention</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td data-label="Data">Account and identity data</td>
+                                        <td data-label="Retention">For as long as your account is open, then deleted within <span class="pending">TBC</span> days of closure</td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Data">Authentication and audit records</td>
+                                        <td data-label="Retention"><span class="pending">TBC</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Data">Service and infrastructure data</td>
+                                        <td data-label="Retention">For the life of the resource, then deleted within <span class="pending">TBC</span> days, allowing up to <span class="pending">TBC</span> days for backups to expire</td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Data">Billing and payment records</td>
+                                        <td data-label="Retention">Six years from the end of the relevant financial year, to meet UK tax and accounting requirements</td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Data">Usage and metering data</td>
+                                        <td data-label="Retention"><span class="pending">TBC</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Data">Web and server logs</td>
+                                        <td data-label="Retention"><span class="pending">TBC</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Data">Correspondence</td>
+                                        <td data-label="Retention"><span class="pending">TBC</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td data-label="Data">Records of admin access to customer servers</td>
+                                        <td data-label="Retention"><span class="pending">TBC</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <p class="bodyText">
+                            Where we're required to keep billing records, we'll retain them after you close your
+                            account and won't use them for anything else.
+                        </p>
+                    </section>
+
+                    <!-- 11 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="your-rights">
+                        <h2 id="your-rights" class="h5"><span class="sectionNum">11</span>Your rights</h2>
+                        <p class="bodyText">Wherever you live, you can ask us to:</p>
+
+                        <ul class="rightsGrid">
+                            <li class="rightCard">
+                                <p class="rightName subtitleSemi">Access</p>
+                                <p class="bodyTextSmall">the personal data we hold about you, and get a copy</p>
+                            </li>
+                            <li class="rightCard">
+                                <p class="rightName subtitleSemi">Correct</p>
+                                <p class="bodyTextSmall">data that's wrong or incomplete</p>
+                            </li>
+                            <li class="rightCard">
+                                <p class="rightName subtitleSemi">Delete</p>
+                                <p class="bodyTextSmall">your data, where we don't have an overriding reason to keep it</p>
+                            </li>
+                            <li class="rightCard">
+                                <p class="rightName subtitleSemi">Restrict</p>
+                                <p class="bodyTextSmall">how we use your data while a concern is being resolved</p>
+                            </li>
+                            <li class="rightCard">
+                                <p class="rightName subtitleSemi">Port</p>
+                                <p class="bodyTextSmall">the data you gave us to another provider, in a machine-readable format</p>
+                            </li>
+                            <li class="rightCard">
+                                <p class="rightName subtitleSemi">Object</p>
+                                <p class="bodyTextSmall">to processing we base on legitimate interests</p>
+                            </li>
+                            <li class="rightCard">
+                                <p class="rightName subtitleSemi">Withdraw consent</p>
+                                <p class="bodyTextSmall">at any time, where we rely on it</p>
+                            </li>
+                        </ul>
+
+                        <p class="callout callout--good bodyText">
+                            You won't be treated differently or charged more for exercising any of these.
+                        </p>
+
+                        <p class="bodyText">
+                            To make a request, email <a href="mailto:help@aki-labs.com">help@aki-labs.com</a> from
+                            the address on your account. If we can't verify it's you, we may ask for more
+                            information &mdash; we won't use anything you send for verification for any other
+                            purpose. We respond within <strong>one month</strong>, or within <strong>45 days</strong>
+                            where US state law applies. Complex requests may take longer, and we'll tell you if so.
+                        </p>
+                        <p class="bodyText">
+                            You can also authorise someone else to make a request for you, in which case we'll need
+                            proof of their authority.
+                        </p>
+                    </section>
+
+                    <!-- 12 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="security">
+                        <h2 id="security" class="h5"><span class="sectionNum">12</span>How we protect your data</h2>
+
+                        <ul class="tickList">
+                            <li class="bodyText">Traffic is encrypted in transit using TLS, and data is encrypted at rest using AWS-managed keys</li>
+                            <li class="bodyText">Multi-factor authentication is available on all accounts via our identity provider</li>
+                            {claims.auditedAdminAccess && (
+                                <li class="bodyText">Access to production systems and to customer servers is limited to staff who need it, and is logged</li>
+                            )}
+                            <li class="bodyText">Accounts are isolated from one another, and our internal systems reference you only by UUID</li>
+                        </ul>
+
+                        {!claims.auditedAdminAccess && (
+                            <p class="bodyText">
+                                <span class="pending">Access control and logging for production systems and customer
+                                servers &mdash; to be verified before this claim is published</span>
+                            </p>
+                        )}
+                        <p class="bodyText">
+                            <span class="pending">Backup regime, incident response process, vulnerability management
+                            and penetration testing &mdash; to be documented here</span>
+                        </p>
+
+                        <p class="bodyText">
+                            No system is perfectly secure. If a breach occurs that puts your rights at risk, we'll
+                            notify the ICO within 72 hours and tell you directly where we're required to.
+                        </p>
+                    </section>
+
+                    <!-- 13 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="age">
+                        <h2 id="age" class="h5"><span class="sectionNum">13</span>Age requirement</h2>
+
+                        <p class="callout callout--warn bodyText">
+                            <strong>You must be 18 or over to use Instances.</strong> We don't knowingly collect
+                            data from anyone under 18, and we don't allow under-18s to hold accounts.
+                        </p>
+
+                        <p class="bodyText">
+                            If we learn that an account belongs to someone under 18, we'll close it and delete the
+                            associated data. If you believe a child has created an account, email
+                            <a href="mailto:help@aki-labs.com">help@aki-labs.com</a>.
+                        </p>
+                        <p class="bodyText">
+                            This requirement applies to account holders. If children play on a server you host,
+                            that's between you and them &mdash; see <a href="#player-data">section 7</a> &mdash; but
+                            you should be aware that hosting a service used by children brings obligations of its own.
+                        </p>
+                    </section>
+
+                    <!-- 14 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="changes">
+                        <h2 id="changes" class="h5"><span class="sectionNum">14</span>Changes to this policy</h2>
+                        <p class="bodyText">
+                            We'll update this page when our practices change and revise the date at the top. For
+                            significant changes &mdash; new categories of data, new purposes, or new third parties
+                            &mdash; we'll notify you by email or in the product before they take effect.
+                        </p>
+                    </section>
+
+                    <!-- 15 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="contact">
+                        <h2 id="contact" class="h5"><span class="sectionNum">15</span>Contact us</h2>
+                        <p class="bodyText">
+                            Email <a href="mailto:help@aki-labs.com">help@aki-labs.com</a>, or write to
+                            Aki Laboratories Limited, 124-128 City Road, London, England, EC1V 2NX.
+                        </p>
+                        <p class="contactCta">
+                            <a class={`${button.btn} ${button.outline}`} href="mailto:help@aki-labs.com">
+                                <span class="buttonText">Email help@aki-labs.com</span>
+                            </a>
+                        </p>
+                    </section>
+
+                    <!-- 16 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="regional">
+                        <h2 id="regional" class="h5"><span class="sectionNum">16</span>Regional disclosures</h2>
+
+                        <h3 class="subtitleSemi">16.1 &nbsp;United Kingdom and European Economic Area</h3>
+                        <p class="bodyText">
+                            Our legal bases are set out in <a href="#legal-basis">section 5</a>. You have the rights
+                            in <a href="#your-rights">section 11</a>, plus the right to lodge a complaint with a
+                            supervisory authority.
+                        </p>
+                        <ul class="markerList bodyText">
+                            <li><strong>UK:</strong> the Information Commissioner's Office &mdash; <a href="https://ico.org.uk" target="_blank" rel="noopener noreferrer">ico.org.uk</a>, 0303 123 1113</li>
+                            <li><strong>EEA:</strong> your national data protection authority, listed at <a href="https://edpb.europa.eu" target="_blank" rel="noopener noreferrer">edpb.europa.eu</a></li>
+                        </ul>
+                        <p class="bodyText">
+                            Our representative in the EU under Article 27 GDPR is
+                            <span class="pending">name and address &mdash; representative to be appointed</span>.
+                        </p>
+                        <p class="bodyText">
+                            We'd appreciate the chance to resolve things directly first &mdash; email
+                            <a href="mailto:help@aki-labs.com">help@aki-labs.com</a>.
+                        </p>
+
+                        <h3 class="subtitleSemi">16.2 &nbsp;United States</h3>
+                        <p class="bodyText">
+                            For residents of California, Virginia, Colorado, Connecticut, Texas, Utah and other
+                            states with comparable laws.
+                        </p>
+                        <p class="bodyText">
+                            <strong>Categories of personal information we collect:</strong> identifiers (email
+                            address, username, account ID, IP address); commercial information (subscription and
+                            payment history); and internet or network activity (server and audit logs, usage
+                            metrics). Sources, purposes and recipients are described in
+                            <a href="#what-we-collect">sections 4</a>, <a href="#legal-basis">5</a> and
+                            <a href="#sharing">8</a>.
+                        </p>
+                        <p class="callout callout--good bodyText">
+                            <strong>We do not sell or share personal information</strong> as those terms are defined
+                            under the California Consumer Privacy Act, and we haven't in the preceding 12 months.
+                            We don't use or disclose sensitive personal information for purposes requiring a right
+                            to limit.
+                        </p>
+                        <p class="bodyText">
+                            <strong>We do not knowingly collect personal information from anyone under 18</strong>,
+                            and therefore do not sell or share the information of minors.
+                        </p>
+                        <p class="bodyText">
+                            Your rights to know, delete, correct, and to non-discrimination are described in
+                            <a href="#your-rights">section 11</a>. Some states also give you the right to appeal a
+                            refused request: if we decline, email
+                            <a href="mailto:help@aki-labs.com?subject=Appeal">help@aki-labs.com</a> with "Appeal"
+                            in the subject line and we'll respond within 45 days with our reasons.
+                        </p>
+
+                        <h3 class="subtitleSemi">16.3 &nbsp;Other regions</h3>
+                        <ul class="regionGrid">
+                            <li class="regionCard">
+                                <p class="regionName subtitleSemi">Canada</p>
+                                <p class="bodyTextSmall">
+                                    We handle personal information in line with PIPEDA. You may complain to the
+                                    Office of the Privacy Commissioner of Canada at
+                                    <a href="https://priv.gc.ca" target="_blank" rel="noopener noreferrer">priv.gc.ca</a>.
+                                    Quebec residents have additional rights under Law 25, including in relation to
+                                    automated decisions &mdash; we don't make any.
+                                </p>
+                            </li>
+                            <li class="regionCard">
+                                <p class="regionName subtitleSemi">Australia</p>
+                                <p class="bodyTextSmall">
+                                    We handle personal information in line with the Australian Privacy Principles.
+                                    You may complain to the Office of the Australian Information Commissioner at
+                                    <a href="https://oaic.gov.au" target="_blank" rel="noopener noreferrer">oaic.gov.au</a>.
+                                </p>
+                            </li>
+                            <li class="regionCard">
+                                <p class="regionName subtitleSemi">Brazil</p>
+                                <p class="bodyTextSmall">
+                                    We handle personal data in line with the LGPD. You may contact the Autoridade
+                                    Nacional de Proteção de Dados at
+                                    <a href="https://gov.br/anpd" target="_blank" rel="noopener noreferrer">gov.br/anpd</a>.
+                                </p>
+                            </li>
+                            <li class="regionCard">
+                                <p class="regionName subtitleSemi">Switzerland</p>
+                                <p class="bodyTextSmall">
+                                    We handle personal data in line with the revised Federal Act on Data Protection.
+                                    You may contact the Federal Data Protection and Information Commissioner at
+                                    <a href="https://edoeb.admin.ch" target="_blank" rel="noopener noreferrer">edoeb.admin.ch</a>.
+                                </p>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <footer class="proseFooter">
+                        <p class="bodyTextSmall">
+                            Last updated <time datetime={lastUpdated.toISOString().slice(0, 10)}>{lastUpdatedLabel}</time>.
+                            Questions about anything on this page? Email
+                            <a href="mailto:help@aki-labs.com">help@aki-labs.com</a>.
+                        </p>
+                        <a class="backToTop bodyTextSmallSemi" href="#top">Back to top</a>
+                    </footer>
+                </article>
+            </div>
+        </main>
+
+        <Newsletter />
+        <Footer />
+    </body>
+</html>
+
+<!-- Smooth anchor scrolling is a document-level concern, so it can't live in
+     the scoped block below. -->
+<style is:global>
+    @media (prefers-reduced-motion: no-preference) {
+        html { scroll-behavior: smooth; }
+    }
+</style>
+
+<style>
+    /* Long-form legal reading on the dark brand background.
+
+       Three things drive every decision here:
+       1. Findability — a 16-section policy is scanned, not read start to end,
+          so the contents nav is sticky and every heading is a stable anchor.
+       2. Measure — the design system's 130% body line-height is tuned for UI
+          labels, not prose. The article relaxes it to 1.7 and caps the column
+          width; anything wider becomes hard to track back across.
+       3. Honesty — `.pending` is deliberately loud. An unfilled value must be
+          impossible to miss in review and embarrassing (not invisible) if it
+          ever ships. */
+
+    .page {
+        /* The site Header is `position: sticky; top: 0`, so anything else that
+           sticks — and every anchor target — has to clear it or it lands
+           underneath. 94px at desktop widths, taller once its nav wraps, so the
+           script below measures it; this value is the pre-hydration fallback. */
+        --header-h: 5.875rem;
+
+        --hairline:      rgba(239, 241, 255, 0.12);
+        --hairline-soft: rgba(239, 241, 255, 0.07);
+        --ink-body:      rgba(255, 255, 255, 0.82);
+        --ink-muted:     rgba(255, 255, 255, 0.55);
+
+        /* The landing page's card recipe, kept identical so legal pages sit in
+           the same material as the rest of the site. */
+        --surface: linear-gradient(295.31deg, rgba(14, 19, 44, 0.2) 4.75%, rgba(48, 58, 106, 0.2) 86.61%);
+        --surface-inset: inset 1px 1px 2px rgba(255, 255, 255, 0.05);
+
+        width: min(100% - 2rem, 96rem); /* 1536px */
+        margin-inline: auto;
+        padding: 3.5rem var(--padding-sm) 5rem;
+        box-sizing: border-box;
+
+        color: var(--text-colour-light);
+    }
+
+    /* ── Dev-only pre-publication checklist ──────────────────────────────── */
+
+    .devChecklist {
+        margin-bottom: 3rem;
+        padding: 1.25rem 1.5rem;
+        border: 1px dashed var(--c-orange);
+        border-radius: var(--r-card);
+        background: rgba(235, 164, 57, 0.08);
+    }
+
+    .devChecklist > p:first-child { color: var(--c-orange); margin: 0 0 0.75rem; }
+    .devChecklist ul { margin: 0; padding-left: 1.25rem; display: grid; gap: 0.375rem; }
+    .devChecklist li { color: var(--ink-body); }
+    .devChecklist li::marker { color: var(--c-orange); }
+    .devChecklist > p:last-child { margin: 0.875rem 0 0; color: var(--ink-muted); }
+    .devChecklist code { font-size: 0.9em; }
+
+    /* ── Hero ────────────────────────────────────────────────────────────── */
+
+    .hero {
+        max-width: 46rem;
+        padding-bottom: 3.5rem;
+        border-bottom: 1px solid var(--hairline);
+        margin-bottom: 3.5rem;
+    }
+
+    .eyebrow { color: var(--c-orange); margin: 0 0 0.75rem; }
+    .hero h1 { margin: 0 0 1.25rem; }
+    .heroLead { margin: 0; color: var(--ink-body); line-height: 1.6; }
+
+    .heroMeta {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 1.75rem;
+        color: var(--ink-muted);
+    }
+
+    .heroMeta p { margin: 0; }
+    .metaDot { width: 3px; height: 3px; border-radius: 50%; background: var(--ink-muted); }
+
+    .jumpTo { display: flex; flex-wrap: wrap; gap: 0.625rem; margin-top: 1.75rem; }
+
+    .jumpTo a {
+        padding: 0.5rem 1rem;
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-pill);
+        color: var(--text-colour-light);
+        text-decoration: none;
+        transition: border-color var(--dur-fast) var(--ease-out),
+                    color        var(--dur-fast) var(--ease-out),
+                    background   var(--dur-fast) var(--ease-out);
+    }
+
+    .jumpTo a:hover { border-color: var(--c-orange); color: var(--c-orange); background: rgba(235, 164, 57, 0.08); }
+
+    /* ── Two-column layout ───────────────────────────────────────────────── */
+
+    .layout {
+        display: grid;
+        grid-template-columns: 15rem minmax(0, 1fr);
+        gap: 4rem;
+        align-items: start;
+    }
+
+    /* ── Contents ────────────────────────────────────────────────────────── */
+
+    .tocDesktop {
+        position: sticky;
+        top: calc(var(--header-h) + 1.5rem);
+        max-height: calc(100vh - var(--header-h) - 3rem);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .tocTitle { color: var(--ink-muted); margin: 0 0 1rem; }
+
+    .tocDesktop ol,
+    .tocMobile ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.125rem; }
+
+    .tocDesktop a,
+    .tocMobile a {
+        display: grid;
+        grid-template-columns: 1.5rem 1fr;
+        gap: 0.5rem;
+        padding: 0.4375rem 0.625rem;
+        border-radius: var(--r-sm);
+        border-left: 2px solid transparent;
+        color: var(--ink-muted);
+        text-decoration: none;
+        transition: color var(--dur-fast) var(--ease-out),
+                    background var(--dur-fast) var(--ease-out);
+    }
+
+    .tocDesktop a:hover,
+    .tocMobile a:hover { color: var(--text-colour-light); background: rgba(255, 255, 255, 0.04); }
+
+    .tocDesktop a[aria-current="true"],
+    .tocMobile a[aria-current="true"] {
+        color: var(--c-orange);
+        border-left-color: var(--c-orange);
+        background: rgba(235, 164, 57, 0.08);
+    }
+
+    .tocNum { color: var(--ink-muted); font-variant-numeric: tabular-nums; }
+    .tocDesktop a[aria-current="true"] .tocNum { color: var(--c-orange); }
+    .tocText { text-wrap: balance; }
+
+    .tocMobile { display: none; }
+
+    .tocMobile {
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-card);
+        background: var(--surface);
+        box-shadow: var(--surface-inset);
+        margin-bottom: 2.5rem;
+    }
+
+    .tocMobile summary {
+        list-style: none;
+        cursor: pointer;
+        padding: 1rem 1.25rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .tocMobile summary::-webkit-details-marker { display: none; }
+
+    .tocChevron {
+        width: 0.5rem; height: 0.5rem;
+        border-right: 2px solid var(--c-orange);
+        border-bottom: 2px solid var(--c-orange);
+        transform: rotate(45deg) translate(-2px, -2px);
+        transition: transform var(--dur-normal) var(--ease-out);
+    }
+
+    .tocMobile[open] .tocChevron { transform: rotate(-135deg) translate(-2px, -2px); }
+    .tocMobile ol { padding: 0 0.625rem 1rem; }
+
+    /* ── Prose ───────────────────────────────────────────────────────────── */
+
+    .prose { max-width: 50rem; }
+
+    .prose section { margin-bottom: 3.5rem; }
+
+    .prose h2 {
+        display: flex;
+        align-items: baseline;
+        gap: 0.875rem;
+        margin: 0 0 1.25rem;
+        scroll-margin-top: calc(var(--header-h) + 1rem);
+        text-wrap: balance;
+    }
+
+    .sectionNum {
+        flex: none;
+        color: var(--c-orange);
+        font-size: 1.125rem;
+        font-weight: 600;
+        font-variant-numeric: tabular-nums;
+    }
+
+    .prose h3 { margin: 2.25rem 0 0.875rem; color: var(--text-colour-light); }
+
+    /* The design system's body line-height (130%) is set for UI labels. Prose
+       needs the extra leading to stay readable across a 50rem column. */
+    .prose p,
+    .prose li,
+    .prose td,
+    .prose dd { line-height: 1.7; color: var(--ink-body); }
+
+    .prose p { margin: 0 0 1rem; }
+    .prose strong { color: var(--text-colour-light); font-weight: 600; }
+
+    .prose a {
+        color: var(--c-orange);
+        text-decoration: underline;
+        text-underline-offset: 3px;
+        text-decoration-thickness: 1px;
+        transition: color var(--dur-fast) var(--ease-out);
+    }
+
+    .prose a:hover { color: var(--c-purple); }
+
+    .prose code {
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.8125rem;
+        padding: 0.125rem 0.375rem;
+        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.07);
+        overflow-wrap: anywhere;
+    }
+
+    .muted { color: var(--ink-muted); }
+
+    /* ── Unresolved values ───────────────────────────────────────────────── */
+
+    .pending {
+        display: inline;
+        padding: 0.0625rem 0.375rem;
+        border: 1px dashed var(--c-orange);
+        border-radius: 4px;
+        background: rgba(235, 164, 57, 0.12);
+        color: var(--c-orange);
+        font-weight: 500;
+    }
+
+    .pending::before { content: "["; }
+    .pending::after  { content: "]"; }
+
+    /* ── Callouts ────────────────────────────────────────────────────────── */
+
+    .callout {
+        margin: 1.5rem 0;
+        padding: 1rem 1.25rem;
+        border-left: 3px solid var(--c-purple);
+        border-radius: 0 var(--r-sm) var(--r-sm) 0;
+        background: rgba(197, 137, 244, 0.08);
+    }
+
+    .callout--warn { border-left-color: var(--c-orange); background: rgba(235, 164, 57, 0.09); }
+    .callout--good { border-left-color: var(--c-green-bright); background: rgba(128, 247, 51, 0.07); }
+
+    /* ── §1 company facts ────────────────────────────────────────────────── */
+
+    .factGrid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1px;
+        margin: 1.5rem 0;
+        padding: 0;
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-card);
+        background: var(--hairline-soft);
+        overflow: hidden;
+    }
+
+    .fact { padding: 1rem 1.25rem; background: #1E2237; }
+    .fact dt { color: var(--ink-muted); margin-bottom: 0.375rem; }
+    .fact dd { margin: 0; }
+
+    /* ── §3 approach ─────────────────────────────────────────────────────── */
+
+    .approachGrid {
+        list-style: none;
+        margin: 1.5rem 0 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr));
+        gap: 1rem;
+    }
+
+    .approachCard {
+        position: relative;
+        padding: 1.25rem 1.25rem 1.25rem 3.25rem;
+        border-radius: var(--r-card);
+        background: var(--surface);
+        box-shadow: var(--surface-inset);
+    }
+
+    .approachCard::before {
+        content: "";
+        position: absolute;
+        top: 1.375rem;
+        left: 1.25rem;
+        width: 1.125rem;
+        height: 1.125rem;
+        background-color: var(--c-green-bright);
+        -webkit-mask: var(--tick) no-repeat center / contain;
+        mask: var(--tick) no-repeat center / contain;
+    }
+
+    .approachCard p { margin: 0; }
+
+    /* ── Tables ──────────────────────────────────────────────────────────── */
+
+    .tableScroll {
+        margin: 1.5rem 0;
+        overflow-x: auto;
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-card);
+    }
+
+    .tableScroll:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-ring-offset); }
+
+    .dataTable { width: 100%; border-collapse: collapse; text-align: left; }
+
+    .dataTable th {
+        padding: 0.875rem 1.125rem;
+        border-bottom: 1px solid var(--hairline);
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--ink-muted);
+        font-family: var(--font-bodyTextSmallestSemiCaps-family);
+        font-weight: var(--font-bodyTextSmallestSemiCaps-weight);
+        font-size: var(--font-bodyTextSmallestSemiCaps-size);
+        text-transform: uppercase;
+        white-space: nowrap;
+    }
+
+    .dataTable td {
+        padding: 0.875rem 1.125rem;
+        border-bottom: 1px solid var(--hairline-soft);
+        font-size: var(--font-bodyTextSmall-size);
+        vertical-align: top;
+    }
+
+    .dataTable tbody tr:last-child td { border-bottom: none; }
+    .dataTable tbody tr:nth-child(even) { background: rgba(255, 255, 255, 0.02); }
+
+    /* Legal-basis pills — colour-coded so the table can be skimmed by basis. */
+    .basis {
+        display: inline-block;
+        padding: 0.1875rem 0.5rem;
+        border-radius: var(--r-pill);
+        font-size: var(--font-bodyTextSmallest-size);
+        font-weight: 600;
+        white-space: nowrap;
+    }
+
+    .basis--contract   { background: rgba(133, 182, 255, 0.15); color: var(--c-blue-sky); }
+    .basis--interest   { background: rgba(197, 137, 244, 0.15); color: var(--c-purple); }
+    .basis--obligation { background: rgba(235, 164, 57, 0.15);  color: var(--c-orange); }
+    .basis--consent    { background: rgba(128, 247, 51, 0.15);  color: var(--c-green-bright); }
+
+    /* ── §7 — the section customers most need to read ────────────────────── */
+
+    .keySection {
+        padding: 2rem;
+        border-radius: var(--r-card);
+        background: rgba(235, 164, 57, 0.04);
+        box-shadow: inset 0 0 0 1px rgba(235, 164, 57, 0.18);
+    }
+
+    .keySection > :last-child { margin-bottom: 0; }
+
+    .labelledBlock {
+        margin: 1.5rem 0;
+        padding-left: 1.25rem;
+        border-left: 2px solid var(--hairline);
+    }
+
+    .labelledBlock--emphasis { border-left-color: var(--c-orange); }
+    .labelledBlock .blockLabel { margin: 0 0 0.625rem; color: var(--c-orange); }
+    .labelledBlock > :last-child { margin-bottom: 0; }
+
+    /* ── Lists ───────────────────────────────────────────────────────────── */
+
+    .markerList { margin: 0 0 1rem; padding-left: 1.25rem; display: grid; gap: 0.5rem; }
+    .markerList li::marker { color: var(--c-orange); }
+
+    .tickList { list-style: none; margin: 1.5rem 0; padding: 0; display: grid; gap: 0.75rem; }
+
+    .tickList li { position: relative; padding-left: 2rem; }
+
+    .tickList li::before {
+        content: "";
+        position: absolute;
+        top: 0.3125rem;
+        left: 0;
+        width: 1.125rem;
+        height: 1.125rem;
+        background-color: var(--c-green-bright);
+        -webkit-mask: var(--tick) no-repeat center / contain;
+        mask: var(--tick) no-repeat center / contain;
+    }
+
+    /* §9 — term and explanation read as one sentence, so they flow inline. */
+    .whereList { list-style: none; margin: 1.5rem 0; padding: 0; display: grid; gap: 1rem; }
+
+    .whereList li {
+        padding: 1rem 1.25rem;
+        border-radius: var(--r-sm);
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .whereList p { display: inline; margin: 0; }
+    .whereWhat { color: var(--text-colour-light); font-weight: 600; }
+
+    /* ── §11 rights ──────────────────────────────────────────────────────── */
+
+    .rightsGrid {
+        list-style: none;
+        margin: 1.5rem 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+        gap: 1rem;
+    }
+
+    .rightCard {
+        padding: 1.125rem 1.25rem;
+        border-radius: var(--r-card);
+        background: var(--surface);
+        box-shadow: var(--surface-inset);
+    }
+
+    .rightCard .rightName { margin: 0 0 0.375rem; color: var(--c-orange); }
+    .rightCard p:last-child { margin: 0; color: var(--ink-body); }
+
+    /* ── §16 regions ─────────────────────────────────────────────────────── */
+
+    .regionGrid {
+        list-style: none;
+        margin: 1.5rem 0;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+        gap: 1rem;
+    }
+
+    .regionCard {
+        padding: 1.25rem;
+        border-radius: var(--r-card);
+        background: var(--surface);
+        box-shadow: var(--surface-inset);
+    }
+
+    .regionCard .regionName { margin: 0 0 0.5rem; color: var(--text-colour-light); }
+    .regionCard p:last-child { margin: 0; }
+
+    /* ── §15 CTA + article footer ────────────────────────────────────────── */
+
+    .contactCta { margin-top: 1.5rem; }
+    .contactCta a { text-decoration: none; }
+
+    .proseFooter {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--hairline);
+    }
+
+    .proseFooter p { margin: 0; color: var(--ink-muted); }
+
+    .backToTop {
+        color: var(--c-orange);
+        text-decoration: none;
+        white-space: nowrap;
+    }
+
+    .backToTop:hover { color: var(--c-purple); }
+
+    /* ── Shared ──────────────────────────────────────────────────────────── */
+
+    .visuallyHidden {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .prose a:focus-visible,
+    .jumpTo a:focus-visible,
+    .tocDesktop a:focus-visible,
+    .tocMobile a:focus-visible,
+    .tocMobile summary:focus-visible {
+        outline: var(--focus-ring);
+        outline-offset: var(--focus-ring-offset);
+        border-radius: 4px;
+    }
+
+    /* ── Responsive ──────────────────────────────────────────────────────── */
+
+    @media screen and (max-width: 1100px) {
+        .page { padding: 2.5rem 2rem 4rem; }
+        .layout { grid-template-columns: minmax(0, 1fr); gap: 0; }
+        .tocDesktop { display: none; }
+        .tocMobile { display: block; }
+        .prose { max-width: none; }
+    }
+
+    @media screen and (max-width: 760px) {
+        .page { padding: 2rem 1.25rem 3rem; }
+        .hero h1 { font-size: 2.5rem; }
+        .hero { padding-bottom: 2.5rem; margin-bottom: 2.5rem; }
+        .prose h2 { font-size: 1.5rem; line-height: 1.3; }
+        .factGrid { grid-template-columns: minmax(0, 1fr); }
+        .prose h3 { font-size: 1.125rem; }
+        .prose section { margin-bottom: 2.5rem; }
+        .keySection { padding: 1.25rem; }
+
+        /* Stack table rows into labelled cards — a four-column table on a phone
+           is unreadable either scrolled or squeezed. */
+        .tableScroll { border: none; overflow-x: visible; }
+        .dataTable thead { display: none; }
+        .dataTable, .dataTable tbody, .dataTable tr, .dataTable td { display: block; width: 100%; }
+
+        .dataTable tbody tr {
+            margin-bottom: 0.875rem;
+            padding: 0.25rem 1rem;
+            border: 1px solid var(--hairline);
+            border-radius: var(--r-sm);
+            box-sizing: border-box;
+        }
+
+        .dataTable tbody tr:nth-child(even) { background: none; }
+
+        .dataTable td {
+            padding: 0.6875rem 0;
+            border-bottom: 1px solid var(--hairline-soft);
+        }
+
+        .dataTable tbody tr td:last-child { border-bottom: none; }
+
+        /* The label is a block above the value rather than a grid column: a cell
+           can hold several inline children (a muted qualifier, two basis pills),
+           and each would otherwise become its own grid item and wrap into the
+           label column. */
+        .dataTable td::before {
+            content: attr(data-label);
+            display: block;
+            margin-bottom: 0.25rem;
+            color: var(--ink-muted);
+            font-size: var(--font-bodyTextSmallest-size);
+            text-transform: uppercase;
+        }
+    }
+
+    /* ── Print ───────────────────────────────────────────────────────────── */
+
+    @media print {
+        .page { padding: 0; width: auto; color: #000; }
+        .devChecklist, .tocDesktop, .tocMobile, .jumpTo, .contactCta, .backToTop { display: none; }
+        .layout { display: block; }
+        .prose { max-width: none; }
+        .prose p, .prose li, .prose td, .prose dd, .heroLead { color: #000; }
+        .prose a { color: #000; }
+        .prose section { break-inside: avoid-page; margin-bottom: 2rem; }
+        .prose h2, .prose h3 { break-after: avoid-page; color: #000; }
+        .approachCard, .rightCard, .regionCard, .fact, .keySection, .whereList li {
+            background: none; box-shadow: none; border: 1px solid #999;
+        }
+        .callout { background: none; border-left-color: #000; }
+        .dataTable th, .dataTable td { border-color: #999; color: #000; }
+    }
+</style>
+
+<script>
+    /* Contents scrollspy.
+
+       rootMargin pins the "active" band to the upper third of the viewport, so
+       the highlighted entry is the heading you are actually reading rather than
+       whichever one happens to be closest to the fold. Both copies of the nav
+       (sticky sidebar + mobile disclosure) are updated together. */
+
+    const links = Array.from(
+        document.querySelectorAll<HTMLAnchorElement>("[data-toc] a[href^='#']"),
+    );
+    const headings = Array.from(document.querySelectorAll<HTMLElement>(".prose h2[id]"));
+
+    if (import.meta.env.DEV) {
+        const linked = new Set(links.map((a) => a.hash.slice(1)));
+        const missing = headings.filter((h) => !linked.has(h.id)).map((h) => h.id);
+        const dangling = [...linked].filter((id) => !document.getElementById(id));
+        if (missing.length || dangling.length) {
+            console.warn(
+                "[privacy-policy] contents nav is out of step with the headings.",
+                { headingsNotInNav: missing, navEntriesWithNoHeading: dangling },
+            );
+        }
+    }
+
+    if (links.length && headings.length) {
+        const setActive = (id: string) => {
+            for (const link of links) {
+                if (link.hash.slice(1) === id) link.setAttribute("aria-current", "true");
+                else link.removeAttribute("aria-current");
+            }
+        };
+
+        const visible = new Set<string>();
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                for (const entry of entries) {
+                    if (entry.isIntersecting) visible.add(entry.target.id);
+                    else visible.delete(entry.target.id);
+                }
+
+                // Document order wins, so scrolling up lands on the heading you
+                // scrolled back into rather than the last one to leave the band.
+                const first = headings.find((h) => visible.has(h.id));
+                if (first) setActive(first.id);
+            },
+            { rootMargin: "0px 0px -66% 0px", threshold: 0 },
+        );
+
+        for (const heading of headings) observer.observe(heading);
+
+        // Clicking an entry should highlight it immediately, before the scroll
+        // animation has moved the heading into the observed band.
+        for (const link of links) {
+            link.addEventListener("click", () => setActive(link.hash.slice(1)));
+        }
+    }
+
+    /* Keep --header-h in step with the sticky Header's real height: it grows
+       when the nav wraps, and a stale value parks jumped-to headings behind it. */
+    const page = document.querySelector<HTMLElement>(".page");
+    const siteHeader = document.querySelector<HTMLElement>("body > header");
+
+    if (page && siteHeader) {
+        const syncHeaderHeight = () => {
+            const h = siteHeader.getBoundingClientRect().height;
+            if (h > 0) page.style.setProperty("--header-h", `${h}px`);
+        };
+        syncHeaderHeight();
+        new ResizeObserver(syncHeaderHeight).observe(siteHeader);
+    }
+
+    // Collapse the mobile contents once a destination is chosen.
+    const mobileToc = document.querySelector<HTMLDetailsElement>(".tocMobile");
+    mobileToc?.addEventListener("click", (event) => {
+        if ((event.target as HTMLElement).closest("a")) mobileToc.open = false;
+    });
+</script>

@@ -7,6 +7,8 @@ interface ImportMetaEnv {
     readonly PUBLIC_ZITADEL_CLIENT_ID: string;
     /** Project owning the Instances API — added to the access token audience. */
     readonly PUBLIC_ZITADEL_PROJECT_ID: string;
+    /** Control-plane base URL. Defaults to production when unset. */
+    readonly PUBLIC_API_BASE?: string;
 }
 
 interface ImportMeta {

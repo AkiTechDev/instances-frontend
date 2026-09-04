@@ -169,6 +169,10 @@
     }
 
     .toggleView {
+        /* One number drives the icon box, the thumb and the travel distance, so
+           the orange circle always lands centred on an icon. */
+        --view-icon-size: 32px;
+
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
@@ -197,8 +201,8 @@
     }
 
     .viewIcon {
-        width: 32px;
-        height: 32px;
+        width: var(--view-icon-size);
+        height: var(--view-icon-size);
         background-color: var(--colour-text-primary);
         mask: var(--icon) no-repeat center;
         -webkit-mask: var(--icon) no-repeat center;
@@ -215,22 +219,57 @@
         cursor: pointer;
     }
 
+    /* The thumb is exactly one icon wide and travels exactly one icon across,
+       so it is centred on the grid icon at rest and on the list icon when
+       checked. `top` is deliberately left alone: the static position of an
+       abspos child of this flex row is already vertically centred by the
+       label's `align-items: center`. */
     .toggleView label::before {
         display: block;
-        transform: all 0.3s ease;
-        border-radius: 2em;
-        transform: 0.3s ease;
+        border-radius: 50%;
 
-        border:none;
-        width: 2em;
-        height: 2em;
-        background: #EBA439;
+        /* Was `transform: all 0.3s ease` twice — both invalid, so the thumb
+           snapped between positions instead of sliding. */
+        transition: left var(--dur-normal) var(--ease-out),
+                    transform var(--dur-fast) var(--ease-out);
+
+        border: none;
+        left: 0;
+        width: var(--view-icon-size);
+        height: var(--view-icon-size);
+        background: var(--c-orange);
     }
 
     .toggleView input[type="checkbox"]:checked + label::before {
-        left: 50%;
+        left: var(--view-icon-size);
+    }
+
+    /* Keyboard focus — the input is invisible, so the ring goes on the track. */
+    .toggleView input:focus-visible + label {
+        outline: var(--focus-ring);
+        outline-offset: var(--focus-ring-offset);
+        border-radius: 50px;
+    }
+
+    /* Scales about its own centre, so the press can't nudge the thumb off the
+       icon — the width change this replaced only ever grew it rightward. */
+    .toggleView input:active + label::before {
+        transform: scale(0.9);
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .toggleView label::before { transition: none; }
+        .toggleView input:active + label::before { transform: none; }
     }
 
     .active {
         background-color: var(--c-orange);
+    }
+    /* Empty state for a search / filter combination that matches nothing.
+       Previously the grid just rendered blank, which reads as a load failure. */
+    .noMatches {
+        grid-column: 1 / -1;
+        padding: var(--margin-el-sm) 0;
+        text-align: center;
+        opacity: 0.7;
     }

@@ -1,9 +1,23 @@
 import { query } from "@solidjs/router";
 import { getToken } from "./auth";
+import { createLimiter } from "./concurrency";
 
-interface GenericResonse {
+/**
+ * Control-plane base URL. Overridable via `PUBLIC_API_BASE` so a staging build
+ * can point elsewhere without editing source; per-instance calls use the
+ * gateway endpoint the control plane hands back instead.
+ */
+const API_BASE = import.meta.env.PUBLIC_API_BASE ?? "https://api.instances.aki-labs.com";
+
+interface GenericResponse {
     message: string
 }
+
+/** Bearer-auth headers, optionally with a JSON content type. */
+const authHeaders = async (json = false): Promise<Record<string, string>> => ({
+    "Authorization": `Bearer ${await getToken()}`,
+    ...(json ? { "Content-Type": "application/json" } : {}),
+});
 
 export interface Instance {
     user_id: string,
@@ -12,13 +26,10 @@ export interface Instance {
 }
 
 export const getInstances = query(async (): Promise<Instance[]> => {
-    const token = await getToken();
-    const resp = await fetch("https://api.instances.aki-labs.com/instances/list", {
+    const resp = await fetch(`${API_BASE}/instances/list`, {
         method: "GET",
         cache: "no-store", // disk-cache the list and a delete + recreate looks stale to the user
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
+        headers: await authHeaders(),
     });
 
     if (!resp.ok) throw new Error("Failed to fetch list of Instances");
@@ -67,13 +78,10 @@ export type InstanceState =
     | (ProvisioningEnvelope & { status: "unknown";      note: string });
 
 export const getInstanceState = query(async (instance: Instance): Promise<InstanceState> => {
-    const token = await getToken();
-    const resp = await fetch(`https://api.instances.aki-labs.com/${instance.game}/${instance.name}`, {
+    const resp = await fetch(`${API_BASE}/${instance.game}/${instance.name}`, {
         method: "GET",
         cache: "no-store", // 401 response when instance is delete, if created on same name, browser will return cache rather than ping pong
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
+        headers: await authHeaders(),
     });
 
     // 200/202/409/410 all carry a structured InstanceState body. Only auth/server errors throw.
@@ -91,17 +99,13 @@ export const endpointOf = (s: InstanceState | undefined): string | undefined => 
 };
 
 export const getInstanceConfig = query(async (endpoint: string): Promise<InstanceConfig> => {
-    const token = await getToken();
-
     if (endpoint === undefined) {
         throw new Error("Invalid endpoint");
     };
 
     const resp = await fetch(`${endpoint}/config`, {
         method: "GET",
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
+        headers: await authHeaders(),
     });
 
     if (!resp.ok) throw new Error("Failed to fetch Instance configuration");
@@ -129,45 +133,50 @@ export type InstanceRuntimeStatus =
     | { state: "forbidden"; error: StatusError }                                             // 403
     | { state: "error";     error: StatusError };                                            // 500 / unexpected
 
-export const getInstanceStatus = async (endpoint: string): Promise<InstanceRuntimeStatus> => {
-    const token = await getToken();
+/**
+ * Every dashboard card polls its own instance, so an account with a dozen
+ * servers would otherwise open a dozen simultaneous status requests the moment
+ * the list renders. Cap the burst — the queue drains in arrival order, and a
+ * toggle's follow-up poll waits behind at most a few idle cards.
+ *
+ * The real fix is a batch status endpoint on the gateway; this bounds the
+ * damage until that exists.
+ */
+const statusLimit = createLimiter(4);
 
-    let resp: Response;
-    try {
-        resp = await fetch(`${endpoint}/status`, {
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        });
-    } catch {
-        return { state: "error", error: { message: "Couldn't reach the instance" } };
-    }
+export const getInstanceStatus = (endpoint: string): Promise<InstanceRuntimeStatus> =>
+    statusLimit(async () => {
+        let resp: Response;
+        try {
+            resp = await fetch(`${endpoint}/status`, {
+                method: "GET",
+                headers: await authHeaders(),
+            });
+        } catch {
+            return { state: "error", error: { message: "Couldn't reach the instance" } };
+        }
 
-    const data = await resp.json().catch(() => null);
+        const data = await resp.json().catch(() => null);
 
-    switch (resp.status) {
-        case 200: // running — body carries health + ipv6/ipv4?/domain?
-        case 202: // starting — body carries phase
-            return data as InstanceRuntimeStatus;
-        case 409: return { state: "stopped" };
-        case 503: return { state: "stopping" };
-        case 403: return { state: "forbidden", error: (data ?? {}) as StatusError };
-        default:  return { state: "error", error: (data ?? {}) as StatusError };
-    }
-};
+        switch (resp.status) {
+            case 200: // running — body carries health + ipv6/ipv4?/domain?
+            case 202: // starting — body carries phase
+                return data as InstanceRuntimeStatus;
+            case 409: return { state: "stopped" };
+            case 503: return { state: "stopping" };
+            case 403: return { state: "forbidden", error: (data ?? {}) as StatusError };
+            default:  return { state: "error", error: (data ?? {}) as StatusError };
+        }
+    });
 
-export const toggleInstance = async (endpoint: string, isRunning: boolean): Promise<GenericResonse> => {
-    const token = await getToken();
+export const toggleInstance = async (endpoint: string, isRunning: boolean): Promise<GenericResponse> => {
     const uri = isRunning ? "stop" : "start";
 
     const resp = await fetch(`${endpoint}/${uri}`, {
         method: "GET",
-        headers: {
-            "Authorization": `Bearer ${token}`
-        }
+        headers: await authHeaders(),
     });
-    return await resp.json() as GenericResonse;
+    return await resp.json() as GenericResponse;
 };
 
 
@@ -179,32 +188,24 @@ export interface PostInstanceConfig {
     webhook_url?: string
 }
 
-export const postInstanceConfig = async (endpoint: string, config: PostInstanceConfig): Promise<GenericResonse> => {
-    const token = await getToken();
+export const postInstanceConfig = async (endpoint: string, config: PostInstanceConfig): Promise<GenericResponse> => {
     const resp = await fetch(`${endpoint}/config/instance`, {
         method: "POST",
-        headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-        },
+        headers: await authHeaders(true),
         body: JSON.stringify(config)
     });
 
-    if (!resp.ok) throw new Error("Failed to fetch Instance configuration");
+    if (!resp.ok) throw new Error(`Failed to save Instance configuration (${resp.status})`);
 
     return await resp.json();
 
 };
 
 
-export const postGameConfig = async (endpoint: string, config: any): Promise<GenericResonse> => {
-    const token = await getToken();
+export const postGameConfig = async (endpoint: string, config: any): Promise<GenericResponse> => {
     const resp = await fetch(`${endpoint}/config/game`, {
         method: "POST",
-        headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-        },
+        headers: await authHeaders(true),
         body: JSON.stringify(config)
     });
 
@@ -214,13 +215,10 @@ export const postGameConfig = async (endpoint: string, config: any): Promise<Gen
 };
 
 
-export const postDownloadGameData = async (endpoint: string): Promise<GenericResonse> => {
-    const token = await getToken();
+export const postDownloadGameData = async (endpoint: string): Promise<GenericResponse> => {
     const resp = await fetch(`${endpoint}/download`, {
         method: "POST",
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        },
+        headers: await authHeaders(),
     });
 
     if (!resp.ok) throw new Error("Failed to request game data download");
@@ -228,13 +226,10 @@ export const postDownloadGameData = async (endpoint: string): Promise<GenericRes
     return await resp.json();
 };
 
-export const deleteInstance = async (instance: Instance): Promise<GenericResonse> => {
-    const token = await getToken();
-    const resp = await fetch(`https://api.instances.aki-labs.com/${instance.game}/${instance.name}`, {
+export const deleteInstance = async (instance: Instance): Promise<GenericResponse> => {
+    const resp = await fetch(`${API_BASE}/${instance.game}/${instance.name}`, {
         method: "DELETE",
-        headers: {
-            "Authorization": `Bearer ${token}`,
-        },
+        headers: await authHeaders(),
     });
 
     if (!resp.ok) throw new Error("Failed to delete instance");
@@ -253,14 +248,10 @@ export interface PutCreateInstance {
     webhook_url?: string
 };
 
-export const putCreateInstance = async (game_id: string, instance_name: string, config: any): Promise<GenericResonse> => {
-    const token = await getToken();
-    const resp = await fetch(`https://api.instances.aki-labs.com/${game_id}/${instance_name}`, {
+export const putCreateInstance = async (game_id: string, instance_name: string, config: any): Promise<GenericResponse> => {
+    const resp = await fetch(`${API_BASE}/${game_id}/${instance_name}`, {
         method: "PUT",
-        headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-        },
+        headers: await authHeaders(true),
         body: JSON.stringify(config)
     });
 
@@ -291,14 +282,10 @@ export interface SurveyResponse {
     },
 }
 
-export const postSurvey = async (response: SurveyResponse): Promise<GenericResonse> => {
-    const token = await getToken();
-    const resp = await fetch("https://api.instances.aki-labs.com/feedback", {
+export const postSurvey = async (response: SurveyResponse): Promise<GenericResponse> => {
+    const resp = await fetch(`${API_BASE}/feedback`, {
         method: "POST",
-        headers: {
-            "Authorization": `Bearer ${token}`,
-            "Content-Type": "application/json"
-        },
+        headers: await authHeaders(true),
         body: JSON.stringify(response)
     });
 
@@ -306,11 +293,11 @@ export const postSurvey = async (response: SurveyResponse): Promise<GenericReson
 
     // A bare 200/204 with no body is a perfectly good "received"; don't turn
     // that into a failure the rater has to retry.
-    return (await resp.json().catch(() => ({ message: "ok" }))) as GenericResonse;
+    return (await resp.json().catch(() => ({ message: "ok" }))) as GenericResponse;
 };
 
 export const getGames = query(async (): Promise<string[]> => {
-    const resp = await fetch("https://api.instances.aki-labs.com/instances/types", {
+    const resp = await fetch(`${API_BASE}/instances/types`, {
         method: "GET",
     });
 

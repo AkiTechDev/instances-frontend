@@ -13,13 +13,28 @@
 
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.15s;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    transition: color var(--dur-fast) var(--ease-out),
+                opacity var(--dur-fast) var(--ease-out);
 }
 
 .toggle:hover {
     color: var(--c-purple);
     text-decoration: underline;
     text-underline-offset: 3px;
+}
+
+.toggle:active {
+    color: var(--c-purple-deep);
+    opacity: 0.8;
+    transition-duration: var(--dur-press);
+}
+
+.toggle:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+    border-radius: 4px;
 }
 
 .toggle::after {

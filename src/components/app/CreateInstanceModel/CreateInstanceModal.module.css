@@ -81,7 +81,12 @@
     position: absolute;
     transform: translateX(50%) translateY(-50%);
 
-    transition: all 0.3s;
+    cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: box-shadow var(--dur-normal) var(--ease-out),
+                transform var(--dur-fast) var(--ease-out);
 
     z-index: 1;
 }
@@ -100,8 +105,36 @@
     background-color: var(--colour-text-secondary);
 }
 
-.exit:active {
+.exit:active:not(:disabled) {
     box-shadow: 1px 2px 22px rgba(187, 187, 187, 0.50);
+    transform: translateX(50%) translateY(-50%) scale(0.92);
+    transition-duration: var(--dur-press);
+}
+
+.exit:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+}
+
+.exit:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Create failed — the modal stays open with the form intact so the user can
+   fix the name and retry rather than starting over. */
+.error {
+    grid-column: 1 / -1;
+    color: var(--c-red-deep);
+    background: var(--c-red-soft);
+    border-radius: var(--r-sm);
+    padding: 0.75rem 1rem;
+    margin: 0;
+}
+
+.loading {
+    color: var(--c-grey-700);
+    margin: 0;
 }
 
 /* Advanced fields — revealed by the toggle in the footer, laid out on the same

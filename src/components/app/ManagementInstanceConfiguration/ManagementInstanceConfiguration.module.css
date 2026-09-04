@@ -109,8 +109,11 @@
     top: 0;
     right: 0;
     transform: translate(50%, -50%);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 
-    transition: all 0.3s;
+    transition: box-shadow var(--dur-normal) var(--ease-out),
+                transform var(--dur-fast) var(--ease-out);
 
     z-index: 1;
 }
@@ -129,6 +132,13 @@
     background-color: var(--colour-text-secondary);
 }
 
-.exit:active {
+.exit:active:not(:disabled) {
     box-shadow: 1px 2px 22px rgba(187, 187, 187, 0.50);
+    transform: translate(50%, -50%) scale(0.92);
+    transition-duration: var(--dur-press);
+}
+
+.exit:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
 }

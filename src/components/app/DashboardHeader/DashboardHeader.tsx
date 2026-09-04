@@ -7,8 +7,6 @@ import FeedbackButton from '../SurveyModal/FeedbackButton';
 const DashboardHeader = () => {
     const { account } = useAuth();
 
-    console.log(account());
-
     return (
     <header class={styles.header}>
         <h2 class="statsText">Welcome back, {account().name}. Ready to play?</h2>

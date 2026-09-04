@@ -12,9 +12,13 @@ const Explore = () => {
     const [openModal, setOpenModal] = createSignal(false)
     const [modalOptions, setModalOptions] = createSignal<ModalOptions>({game_id: null, allow_game_change: true})
 
+    // Deferred until the modal opens — ranking regions pings all 14 of them,
+    // and browsing the game list doesn't need that. Cached for an hour, so
+    // re-opening the modal costs nothing.
     const regionsByLatency = createAsync(async () => {
-        let ordered_regions = getBestRegion();
-        return Object.fromEntries((await ordered_regions).map(({ region }) => [region, regions[region]]));
+        if (!openModal()) return undefined;
+        const ordered = await getBestRegion();
+        return Object.fromEntries(ordered.map(({ region }) => [region, regions[region]]));
     })
 
     const OpenCreateInstanceModal = (options: ModalOptions) => {

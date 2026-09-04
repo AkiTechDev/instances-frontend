@@ -1,4 +1,4 @@
-import type { Component } from "solid-js"
+import { createUniqueId, type Component } from "solid-js"
 
 import styles from "./Profile.module.css";
 
@@ -13,20 +13,30 @@ import ProfileJPG from "../../../assets/images/profile.jpg?responsive";
 
 const Profile: Component<{}> = () => {
     const { logout } = useAuth();
+    const id = createUniqueId();
+    const popoverId = `profile-${id}`;
 
+    // No onMouseLeave close: `popover` already light-dismisses on an outside
+    // click or Escape, and closing on pointer-exit made the menu unusable on
+    // touch (open and gone in one gesture) and for keyboard traversal.
     return (
-        <div
-            class={styles.container}
-            onMouseLeave={() => document.getElementById("profile")?.hidePopover()}
-        >
-            <button popoverTarget="profile" aria-haspopup="true" style={`--icon: url("${iconArrow.src}")`}>
-                <ResponsiveImage src={ProfileJPG} alt="Default profile picture of a crab" />
+        <div class={styles.container}>
+            <button
+                type="button"
+                popoverTarget={popoverId}
+                aria-haspopup="menu"
+                aria-label="Account menu"
+                style={`--icon: url("${iconArrow.src}")`}
+            >
+                <ResponsiveImage src={ProfileJPG} alt="" />
             </button>
 
-            <ul id="profile" popover role="menu">
-                <li><a href={accountSettingsUrl()} role="menuitem" class="bodyTextMedium" target="_blank" rel="noopener noreferrer" style={`--iconUrl: url(${profileIcon.src})`}>Account Settings</a></li>
-                <li><a href="/" rel="external" role="menuitem" class="bodyTextMedium" style={`--iconUrl: url(${helpIcon.src})`}>Help</a></li>
-                <li><a role="menuitem" class="bodyTextMedium" style={`--iconUrl: url(${logoutIcon.src})`} onclick={() => logout()}>Log Out</a></li>
+            <ul id={popoverId} popover role="menu">
+                <li role="none"><a href={accountSettingsUrl()} role="menuitem" class="bodyTextMedium" target="_blank" rel="noopener noreferrer" style={`--iconUrl: url(${profileIcon.src})`}>Account Settings</a></li>
+                <li role="none"><a href="/" rel="external" role="menuitem" class="bodyTextMedium" style={`--iconUrl: url(${helpIcon.src})`}>Help</a></li>
+                {/* A real button: it performs an action rather than navigating,
+                    and an <a> with no href isn't keyboard-reachable. */}
+                <li role="none"><button type="button" role="menuitem" class="bodyTextMedium" style={`--iconUrl: url(${logoutIcon.src})`} onClick={() => logout()}>Log Out</button></li>
             </ul>
         </div>
     )

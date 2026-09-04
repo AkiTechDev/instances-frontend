@@ -1,4 +1,4 @@
-import { createSignal, createUniqueId, onCleanup, Show, type Component } from "solid-js";
+import { createSignal, createUniqueId, onCleanup, onMount, Show, type Component } from "solid-js";
 
 import styles from "./InstanceOptions.module.css";
 import { revalidate, useNavigate } from "@solidjs/router";
@@ -12,7 +12,7 @@ import {
 import { sleep } from "../../../lib/utils";
 import DeleteInstanceModal from "../DeleteInstanceModal/DeleteInstanceModal";
 
-const InstanceOptions: Component<{ endpoint: string, instance: Instance }> = (props) => {
+const InstanceOptions: Component<{ endpoint: string, instance: Instance, class?: string }> = (props) => {
     const navigate = useNavigate();
     const id = createUniqueId();
     const [confirmingDelete, setConfirmingDelete] = createSignal(false);
@@ -30,10 +30,21 @@ const InstanceOptions: Component<{ endpoint: string, instance: Instance }> = (pr
         }
     };
 
-    document.body.addEventListener("click", handleBodyClick);
+    const handleKeydown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") closeMenu();
+    };
+
+    // Registered in onMount rather than during render. One card renders one of
+    // these, so attaching as a render side effect meant a document-level
+    // listener per card, added before the menu was even in the DOM.
+    onMount(() => {
+        document.body.addEventListener("click", handleBodyClick);
+        document.addEventListener("keydown", handleKeydown);
+    });
 
     onCleanup(() => {
         document.body.removeEventListener("click", handleBodyClick);
+        document.removeEventListener("keydown", handleKeydown);
     });
 
     // Re-send the current config to the per-server gateway, which re-triggers
@@ -74,18 +85,18 @@ const InstanceOptions: Component<{ endpoint: string, instance: Instance }> = (pr
                 }}
             />
         </Show>
-        <details ref={elRef} name="Instance Settings" class={styles.container} onclick={(e) => e.stopImmediatePropagation()}>
-            <summary id={`options${id}`}>
+        <details ref={elRef} name="Instance Settings" class={`${styles.container} ${props.class ?? ""}`} onclick={(e) => e.stopImmediatePropagation()}>
+            <summary id={`options${id}`} role="button" aria-label={`Options for ${props.instance.name}`}>
                 <span class={styles.dot}></span>
                 <span class={styles.dot}></span>
                 <span class={styles.dot}></span>
             </summary>
-            <div class={styles.options}>
-                <button class="bodyTextMedium" onclick={updateInstance} disabled={!props.endpoint}>Update Instance</button>
-                <button class="bodyTextMedium" onclick={async () => {await postDownloadGameData(props.endpoint); await sleep(1000); closeMenu() }}>Download Game Data</button>
-                <button class="bodyTextMedium" disabled>Transfer Ownership</button>
-                <button class="bodyTextMedium" disabled>Change Instance Location</button>
-                <button class={`bodyTextMedium ${styles.destructive}`} onclick={() => { setConfirmingDelete(true); closeMenu(); }}>Delete Instance</button>
+            <div class={styles.options} role="menu">
+                <button type="button" role="menuitem" class="bodyTextMedium" onclick={updateInstance} disabled={!props.endpoint}>Update Instance</button>
+                <button type="button" role="menuitem" class="bodyTextMedium" disabled={!props.endpoint} onclick={async () => {await postDownloadGameData(props.endpoint); await sleep(1000); closeMenu() }}>Download Game Data</button>
+                <button type="button" role="menuitem" class="bodyTextMedium" disabled title="Coming soon">Transfer Ownership</button>
+                <button type="button" role="menuitem" class="bodyTextMedium" disabled title="Coming soon">Change Instance Location</button>
+                <button type="button" role="menuitem" class={`bodyTextMedium ${styles.destructive}`} onclick={() => { setConfirmingDelete(true); closeMenu(); }}>Delete Instance</button>
             </div>
         </details>
         </>

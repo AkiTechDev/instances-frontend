@@ -6,7 +6,6 @@
 import "../styles/normalise.css"
 import "../styles/global.css"
 import "../styles/theme/default.css"
-import "../styles/variables.css"
 import "../styles/typography.css"
 
 import Newsletter from "../components/newsletter/Newsletter.astro";
@@ -56,7 +55,7 @@ const domain = "instances.aki-labs.com"
         <link rel="sitemap" href="/sitemap-index.xml" />
 	</head>
     <body class="grid-container">
-        <AppRouter client:only />
+        <AppRouter client:only="solid-js" />
 
         <div class="full">
             <Newsletter class="full"  />

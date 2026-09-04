@@ -103,7 +103,18 @@ const ManagementGameConfiguration: Component<{ schema: v.ObjectSchema<any, undef
                     )
                 }}
             </For>
-            <button class={`${submitBtnStyle.button} buttonTextSmall`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={!gameForm.isDirty || gameForm.isSubmitting}>
+            {/* The green + tick is driven by `isSubmitted`, not by `:focus` —
+                tabbing to this button used to claim the settings had saved. */}
+            <button
+                class={`${submitBtnStyle.button} buttonTextSmall`}
+                classList={{
+                    [submitBtnStyle.busy]: gameForm.isSubmitting,
+                    [submitBtnStyle.submitted]: gameForm.isSubmitted && !gameForm.isDirty && !gameForm.isSubmitting,
+                }}
+                style={`--icon: url("${iconTick.src}")`}
+                type="submit"
+                disabled={!gameForm.isDirty || gameForm.isSubmitting}
+            >
                 {gameForm.isSubmitting ? "Saving Settings" : gameForm.isSubmitted ? "Settings Saved" : "Save Settings"}
             </button>
         </Form>

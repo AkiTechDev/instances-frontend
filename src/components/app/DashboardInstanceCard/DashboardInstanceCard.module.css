@@ -2,6 +2,38 @@
         display: flex; flex-direction: column; align-items: center;
         gap: 0.5rem; text-decoration: none;
         color: var(--c-ink);
+
+        position: relative;   /* anchors .cardLink */
+    }
+
+    /* Stretched link.
+
+       The card used to BE an <a> wrapping everything, which put the options
+       <details> and the on/off switch inside a link — invalid HTML (interactive
+       content isn't allowed in <a>), and clicking either one navigated: Solid
+       delegates `click` to the document, so stopping propagation on the control
+       ran too late to cancel the browser's own link activation.
+
+       Now the link is a sibling overlay. Clicking anywhere on the card still
+       opens it, but the real controls are layered above and get their clicks. */
+    .cardLink {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        border-radius: calc(var(--r-sm) + 3px);
+        text-decoration: none;
+    }
+
+    .cardLink:focus-visible {
+        outline: var(--focus-ring);
+        outline-offset: var(--focus-ring-offset);
+    }
+
+    /* Anything interactive sits above the stretched link. */
+    .raised {
+        position: relative;
+        z-index: 3;
+        pointer-events: auto;
     }
 
     /* Image Styling */
@@ -68,6 +100,12 @@
         padding: 1rem 1rem;
         color: var(--c-white);
         display: flex; flex-direction: column; justify-content: space-between;
+
+        /* This overlay covers the whole banner, so it would otherwise swallow
+           every click meant for the stretched link beneath it. The badge and
+           game name aren't interactive — let their clicks fall through, and
+           re-enable pointer events only on the controls (.raised). */
+        pointer-events: none;
     }
 
     .metadata > div {
@@ -185,102 +223,18 @@
         66%, 100% { content: "..."; }
     }
 
-    /* Toggle Switch */
+    /* Toggle Switch — the control itself lives in the shared
+       styles/components/toggleSwitch.module.css module (which already provides
+       the flex row + positioning). Only the list-row layout slot stays here:
+       it holds space whether or not the instance is currently toggleable, so
+       the row doesn't reflow as state resolves. */
 
-    .toggleContainer label::before, .toggleContainer label::after {
-        content: "";
-        position: absolute;
-    }
-
-    .toggleContainer {
-        display: flex; flex-direction: row; align-items: center;
+    .toggleSlot {
+        margin: 0 1rem;
         position: relative;
-
-        color: var(--c-ink);
+        z-index: 3;          /* above the stretched link */
+        min-width: 50px;
     }
-
-    .toggleContainer input {
-        position: absolute; width: 100%; height: 100%;
-        opacity: 0; z-index: 2;
-        box-sizing: border-box;
-
-        cursor: pointer;
-    }
-
-    .toggleContainer input:disabled {
-        cursor: progress;
-    }
-
-    .toggleContainer input:disabled + label {
-        opacity: 0.7;
-    }
-
-    .toggleContainer label {
-        width: 50px;
-        height: 22px;
-        display: flex;
-        position: relative;
-
-        transition: all 0.3s ease;
-        transform-origin: 20% center;
-        cursor: pointer;
-
-        background: var(--c-grey-500);
-        border: 0.5px solid rgba(117, 117, 117, 0.31);
-        box-shadow: inset 0px 0px 4px 0px rgba(0, 0, 0, 0.2), 0 -3px 4px rgba(0, 0, 0, 0.15);
-
-        border-radius: 30px;
-
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .toggleContainer label :nth-child(1) {
-        position: relative;
-        opacity: 0;
-        transition: all 0.15s ease;
-        margin-left: 0.5rem;
-    }
-
-    .toggleContainer label :nth-child(2) {
-        position: relative;
-        margin-right: 0.5rem;
-        transition: all 0.15s ease;
-    }
-
-    .toggleContainer label::before {
-        display: block;
-        transition: all 0.2s ease;
-        border-radius: 2em;
-        top: 0.125rem;
-        left: 2px;
-        border: 2px solid #88cf8f;
-        transition: 0.3s ease;
-
-        border: none;
-        width: 18px;
-        height: 18px;
-        background: var(--c-white);
-        transform: rotate(-40deg);
-    }
-
-    .toggleContainer input[type="checkbox"]:checked + label {
-        background: var(--c-orange);
-    }
-
-    .toggleContainer input[type="checkbox"]:checked + label :nth-child(1) {
-        opacity: 1;
-    }
-
-    .toggleContainer input[type="checkbox"]:checked + label :nth-child(2) {
-        opacity: 0;
-    }
-
-    .toggleContainer input[type="checkbox"]:checked + label::before {
-        left: 30px;
-    }
-
-
 
 
     /* List View */
@@ -295,6 +249,15 @@
         border-radius: var(--r-sm);
         background-color: var(--colour);
         width: 100%;
+        color: var(--c-ink);
+
+        position: relative;   /* anchors .cardLink */
+    }
+
+    /* The overlay link is the last child so it can't win `:first-child` off the
+       instance name; being absolutely positioned it stays out of the flex flow. */
+    .instanceList > .cardLink {
+        border-radius: var(--r-sm);
     }
 
     .instanceList > :first-child {
@@ -316,12 +279,10 @@
         margin: 0 1rem;
     }
 
-    .instanceList > .toggleContainer {
-        margin: 0 1rem;
-        position: relative;
-    }
-
-    .instanceList button {
+    /* Direct children only. As a descendant selector this also matched every
+       button inside the options dropdown, squashing the menu items to 22px
+       icons whenever it won the cascade against `.options button`. */
+    .instanceList > button {
         width: 22px;
         height: 22px;
         background: var(--icon) no-repeat center;

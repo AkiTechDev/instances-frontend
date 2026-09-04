@@ -149,7 +149,18 @@ const InstanceConfigForm: Component<InstanceConfigFormProps & {
             />
           </Show>
 
-          <button class={`${submitBtnStyle.button} ${styles.footerSubmit} buttonTextSmall`} style={`--icon: url("${iconTick.src}")`} type="submit" disabled={!instanceForm.isDirty || instanceForm.isSubmitting}>
+          {/* The green + tick is driven by `isSubmitted`, not by `:focus` —
+              tabbing to this button used to claim the settings had saved. */}
+          <button
+            class={`${submitBtnStyle.button} ${styles.footerSubmit} buttonTextSmall`}
+            classList={{
+              [submitBtnStyle.busy]: instanceForm.isSubmitting,
+              [submitBtnStyle.submitted]: instanceForm.isSubmitted && !instanceForm.isDirty && !instanceForm.isSubmitting,
+            }}
+            style={`--icon: url("${iconTick.src}")`}
+            type="submit"
+            disabled={!instanceForm.isDirty || instanceForm.isSubmitting}
+          >
             {instanceForm.isSubmitting ? "Saving Settings" : instanceForm.isSubmitted ? "Settings Saved" : "Save Settings"}
           </button>
         </div>

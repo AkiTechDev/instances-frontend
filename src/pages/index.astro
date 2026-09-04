@@ -1,12 +1,12 @@
 ---
 // Welcome to Astro! Everything between these triple-dash code fences
 // is your "component frontmatter". It never runs in the browser.
+// Order matters: tokens (theme/default) before the sheets that consume them,
+// and identical on every entry point so the cascade can't diverge per page.
 import "../styles/normalise.css"
 import "../styles/global.css"
-import "../styles/variables.css"
-import "../styles/typography.css"
-
 import "../styles/theme/default.css"
+import "../styles/typography.css"
 
 import LogoIcon from "../assets/icons/logos/icon.svg";
 

@@ -29,7 +29,29 @@
     justify-content: center;
     align-items: center;
 
+    /* It's a <button> now — strip the native chrome back to the pill. */
+    border: 0;
+    padding: 0;
     cursor: pointer;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+
+    transition: background-color var(--dur-fast) var(--ease-out),
+                transform var(--dur-fast) var(--ease-out);
+}
+
+.sidebarCollapser:hover {
+    background-color: var(--c-grey-300);
+}
+
+.sidebarCollapser:active {
+    transform: translateX(50%) translateY(-25%) scale(0.92);
+    transition-duration: var(--dur-press);
+}
+
+.sidebarCollapser:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
 }
 
 .sidebarCollapser::after {

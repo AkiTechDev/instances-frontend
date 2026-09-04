@@ -67,6 +67,9 @@
     --gradient-brand-orb:    linear-gradient(180deg, #BB6DF8 0%, #F9CE62 100%);
     --gradient-card-fade:    linear-gradient(180deg, rgba(255,255,255,0) 0%, #1F1E1E 100%);
 
+    /* -------- Layout -------- */
+    --max-width: 1440px;
+
     /* Edge padding */
     --padding-sm: 5rem;
     --padding-md: 7.5rem;
@@ -74,11 +77,38 @@
     --padding-outer-sides: 7.5rem;
     --padding-outer-tops: 1.75rem;
 
+    /* Spacing scale — `space` for gaps, `margin-text` between copy,
+       `margin-el` between sections/elements. */
+    --space-sm: 1rem;
+    --space-md: 1.875rem;
+
+    --margin-text-sm: 1rem;
+    --margin-text-nm: 1.5rem;
+    --margin-text-md: 2rem;
+    --margin-text-lg: 2.5rem;
+
+    --margin-el-sm: 2rem;
+    --margin-el-nm: 2.5rem;
+    --margin-el-md: 3rem;
+    --margin-el-lg: 3.5rem;
+
     /* Radii */
     --r-pill:   44px;   /* primary buttons */
     --r-card:   10px;   /* cards, modals, banners */
     --r-chip:   24px;   /* search input, filter pills */
     --r-sm:     8px;    /* sidebar games, list rows */
+
+    /* -------- Motion --------
+       Presses are deliberately faster than releases: the snap on the way down
+       is what reads as tactile, the ease on the way back up as responsive. */
+    --dur-press:   0.04s;
+    --dur-fast:    0.12s;
+    --dur-normal:  0.2s;
+    --ease-out:    cubic-bezier(0.2, 0, 0, 1);
+
+    /* Shared focus ring — one definition so every control matches. */
+    --focus-ring:        2px solid var(--c-green-bright);
+    --focus-ring-offset: 2px;
 
     
     /* Typography */

@@ -1,44 +1,98 @@
+/* Primary button system.
+
+   Feel: pressing snaps (--dur-press) and releasing eases (--dur-fast). The
+   asymmetry is what reads as tactile — a single uniform duration in both
+   directions feels mushy. Only the properties that actually change are
+   transitioned; `all` forces the compositor to watch every animatable
+   property and makes hover feel laggy.
+
+   Every variant defines hover AND active. The pressed shade is always one
+   step deeper than the hover shade, so the button visibly "goes down". */
+
 .btn {
     font-family: Lexend; font-weight: 600; font-size: 16px; line-height: normal;
     border-radius: var(--r-pill); padding: 1rem 1.5rem; border: 1px solid transparent;
     display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer;
-    transition: all 0.15s;
+
+    transition: background-color var(--dur-fast) var(--ease-out),
+                border-color     var(--dur-fast) var(--ease-out),
+                color            var(--dur-fast) var(--ease-out),
+                transform        var(--dur-fast) var(--ease-out),
+                box-shadow       var(--dur-fast) var(--ease-out);
+
+    /* Kills the ~300ms tap delay and double-tap-zoom on touch devices. */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
 .btn.sm { padding: 0.5rem 1.5rem; font-size: 14px; gap: 0.25rem;}
 
+/* ---------- Press ----------
+   Applied once for every variant: the travel is the same, only the colour
+   below differs. `:not(:disabled)` so a disabled button stays inert. */
+.btn:active:not(:disabled) {
+    transform: translateY(1px) scale(0.985);
+    transition-duration: var(--dur-press);
+}
+
+/* ---------- Focus ----------
+   Keyboard only. The ring is the same token every other control uses. */
+.btn:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+}
+
+/* ---------- Variants ---------- */
+
 .btn.vibrant { background: var(--c-orange); border-color: var(--c-orange); color: var(--text-colour-dark); }
-.btn.vibrant:hover { background: var(--c-purple); border-color: var(--c-purple); }
+.btn.vibrant:hover:not(:disabled) { background: var(--c-purple); border-color: var(--c-purple); }
+.btn.vibrant:active:not(:disabled) { background: var(--c-purple-deep); border-color: var(--c-purple-deep); color: var(--c-white); }
 
 .btn.outline { background: transparent; border-color: var(--c-orange); color: var(--text-colour-vibrant); }
-.btn.outline:hover { background: var(--c-white); border-color: var(--c-white); color: var(--text-colour-dark); }
+.btn.outline:hover:not(:disabled) { background: var(--c-white); border-color: var(--c-white); color: var(--text-colour-dark); }
+.btn.outline:active:not(:disabled) { background: var(--c-grey-200); border-color: var(--c-grey-200); color: var(--text-colour-dark); }
 
 .btn.outlineLight { background: transparent; border-color: var(--c-white); color: var(--c-white); }
-.btn.outlineLight:hover { background: var(--c-white); color: var(--text-colour-dark); }
+.btn.outlineLight:hover:not(:disabled) { background: var(--c-white); color: var(--text-colour-dark); }
+.btn.outlineLight:active:not(:disabled) { background: var(--c-grey-200); border-color: var(--c-grey-200); color: var(--text-colour-dark); }
 
 .btn.outlineDark { background: transparent; border-color: var(--text-colour-dark); color: var(--text-colour-dark); }
-.btn.outlineDark:hover { background: var(--text-colour-dark); border-color: var(--text-colour-dark); color: var(--text-colour-light); }
+.btn.outlineDark:hover:not(:disabled) { background: var(--text-colour-dark); border-color: var(--text-colour-dark); color: var(--text-colour-light); }
+.btn.outlineDark:active:not(:disabled) { background: var(--c-ink-grad-top); border-color: var(--c-ink-grad-top); color: var(--text-colour-light); }
 
 .btn.secondary { background: var(--colour-text-secondary); border-color: var(--colour-text-secondary); color: var(--colour-text-primary); }
-.btn.secondary:hover { background: #C589F4; border-color: #C589F4; }
+.btn.secondary:hover:not(:disabled) { background: var(--c-purple); border-color: var(--c-purple); }
+.btn.secondary:active:not(:disabled) { background: var(--c-purple-deep); border-color: var(--c-purple-deep); color: var(--c-white); }
 
 .btn.danger { background: var(--c-red); border-color: var(--c-red); color: var(--text-colour-light); }
-.btn.danger:hover { background: var(--c-red-deep); border-color: var(--c-red-deep); }
+.btn.danger:hover:not(:disabled) { background: var(--c-red-deep); border-color: var(--c-red-deep); }
+.btn.danger:active:not(:disabled) { background: var(--c-red-deep); border-color: var(--c-red-deep); filter: brightness(0.9); }
 
-.btn.link { background: transparent; border: 0; color: #EBA439; padding: 4px 0; font-weight: 700; font-size: 14px; }
+.btn.link { background: transparent; border: 0; color: var(--c-orange); padding: 4px 0; font-weight: 700; font-size: 14px; }
+.btn.link:hover:not(:disabled) { color: var(--c-purple); }
+/* A link-styled button has no surface to sink, so it shifts colour instead of
+   travelling. */
+.btn.link:active:not(:disabled) { color: var(--c-purple-deep); transform: none; }
 
 .btn:disabled, .btn:disabled:hover {
-    background: #D0D0D0; border-color: #D0D0D0; color: #191C2E;
+    background: var(--c-grey-400); border-color: var(--c-grey-400); color: var(--c-ink);
     opacity: 0.6; cursor: not-allowed;
 }
 
-.vibrant { background: #EBA439; border-color: #EBA439; color: #191C2E; }
-.hover   { background: #C589F4; border-color: #C589F4; color: #191C2E; }
-.out     { background: transparent; border-color: #EBA439; color: #EBA439; }
-.dark    { background: #191C2E; color: #fff; border-color: #191C2E; }
-.dark:hover {background: #C589F4; border-color: #C589F4; color: #191C2E;}
-.disabled{ background: #D0D0D0; color: #191C2E; border-color: #D0D0D0; }
-.link    { background: transparent; color: #EBA439; border: 0; padding: 4px 0; font-weight: 700; font-size: 14px; }
+/* ---------- Busy ----------
+   For a button whose action is in flight: the label already swaps at the call
+   site, this stops the press/hover reading as "nothing happened". */
+.btn.busy, .btn.busy:hover {
+    cursor: progress;
+    opacity: 0.75;
+}
+
+.btn.busy:active {
+    transform: none;
+}
+
+/* ---------- Icon ---------- */
 
 .icon::before {
     content:""; width: 16px; height: 16px;
@@ -50,3 +104,10 @@
 }
 
 .rotate45::before { transform: rotate(45deg); }
+
+@media (prefers-reduced-motion: reduce) {
+    .btn { transition: background-color var(--dur-fast) var(--ease-out),
+                       border-color var(--dur-fast) var(--ease-out),
+                       color var(--dur-fast) var(--ease-out); }
+    .btn:active:not(:disabled) { transform: none; }
+}

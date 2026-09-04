@@ -50,9 +50,16 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
 
     return (
         <aside class={`${styles.sidebar} ${collapsed() && styles.collapsed}`}>
-            <a id="btnCollapse" class={styles.sidebarCollapser} style={`--icon: url("${sidebarIcon.src}")`} onClick={() => {
-                setCollapsed(!collapsed())
-            }}></a>
+            {/* A button, not an <a> with a click handler: it toggles UI state
+                rather than navigating, and needs to be keyboard-reachable. */}
+            <button
+                type="button"
+                class={styles.sidebarCollapser}
+                style={`--icon: url("${sidebarIcon.src}")`}
+                aria-label={collapsed() ? "Expand sidebar" : "Collapse sidebar"}
+                aria-expanded={!collapsed()}
+                onClick={() => setCollapsed(!collapsed())}
+            ></button>
             <div class={styles.sidebarHeader}>
                 <p class={`${styles.title} subtitleSemi`}>My Games</p>
                 <button class={`${button.btn} ${button.secondary} ${button.icon} ${button.rotate45}`} style={`--icon: url(${iconCross.src})`} onClick={() => { setCollapsed(false); props.openCreateIntanceModal({game_id: null, allow_game_change: true})}}><p class="buttonTextSmall">Create New Game</p></button>
@@ -64,11 +71,12 @@ const DashboardSidebarNav = (props: { filter: any, setFilter: any, openCreateInt
                     <input
                         id="gameSearch"
                         type="search"
+                        aria-label="Find your game"
                         placeholder="Find your game"
                         value={searchText()}
-                        onInput={(e) => setSearchText(e.currentTarget.value)} 
+                        onInput={(e) => setSearchText(e.currentTarget.value)}
                     />
-                    <button onClick={() => (setSearchText(""))} class={`${search.clearBtn} ${searchText() ? search.visible : ""}`} style={`--icon: url("${crossIcon.src}")`}></button>
+                    <button type="button" aria-label="Clear game search" onClick={() => setSearchText("")} class={`${search.clearBtn} ${searchText() ? search.visible : ""}`} style={`--icon: url("${crossIcon.src}")`}></button>
                 </label>
             </div>
             <div class={styles.sidebarGamesContainer}>

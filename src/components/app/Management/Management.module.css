@@ -35,27 +35,64 @@
 }
 
 
-.instanceContainer > p {
+/* Back — a real <button>, so it is keyboard-reachable and announced as an
+   action rather than as a paragraph that happens to respond to clicks. */
+.back {
     display: flex;
     flex-direction: row;
     align-items: center;
+    gap: 0.25rem;
 
     cursor: pointer;
+    background: none;
+    border: 0;
+    padding: 0.25rem 0.5rem;
+    margin-left: -0.5rem;   /* keeps the label optically flush with the grid */
+    border-radius: var(--r-sm);
+    color: inherit;
+    /* No `font: inherit` — nothing up the tree sets a family, so the shorthand
+       would reset this off Lexend. The element's typography class (buttonText)
+       owns the font. */
+
+    transition: color var(--dur-fast) var(--ease-out),
+                transform var(--dur-fast) var(--ease-out);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.instanceContainer > p::before {
+.back::before {
     content: "";
     display: flex;
     width: 24px;
     height: 24px;
+    flex-shrink: 0;
 
     transform: rotate(90deg);
 
-
-    background-color: black;
+    background-color: currentColor;
     mask: var(--icon) no-repeat center;
     -webkit-mask: var(--icon) no-repeat center;
 
+    transition: transform var(--dur-fast) var(--ease-out);
+}
+
+.back:hover { color: var(--c-purple); }
+.back:hover::before { transform: rotate(90deg) translateY(3px); }
+
+.back:active {
+    transform: translateX(-2px);
+    transition-duration: var(--dur-press);
+}
+
+.back:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .back, .back::before { transition: none; }
+    .back:active { transform: none; }
+    .back:hover::before { transform: rotate(90deg); }
 }
 
 .controlsContainer {
@@ -178,10 +215,26 @@
     opacity: 0.6;
 }
 
+/* A real <button> so it is keyboard-reachable and announced as an action —
+   the styles below strip the native chrome back to the surrounding text. */
 .copy {
     display: flex;
     justify-content: center;
+    align-items: center;
+    gap: 0.25rem;
     cursor: pointer;
+
+    background: none;
+    border: 0;
+    padding: 0;
+    color: inherit;
+    text-align: inherit;
+    /* No `font: inherit` — see .back above; the statsText class owns the font. */
+
+    transition: color var(--dur-fast) var(--ease-out),
+                transform var(--dur-fast) var(--ease-out);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .copy::after {
@@ -189,15 +242,42 @@
     width: 20px;
     height: 20px;
     display: flex;
+    flex-shrink: 0;
 
-    background-color: #1F1E1E;
+    background-color: var(--c-ink);
     mask: var(--icon) no-repeat center;
     -webkit-mask: var(--icon) no-repeat center;
+
+    transition: background-color var(--dur-fast) var(--ease-out),
+                transform var(--dur-fast) var(--ease-out);
 }
 
+.copy:hover { color: var(--c-purple); }
+
 .copy:hover::after {
-    transform: translate(1.15);
-    background-color: #C589F4;
+    transform: scale(1.15);
+    background-color: var(--c-purple);
+}
+
+.copy:active {
+    transform: scale(0.97);
+    transition-duration: var(--dur-press);
+}
+
+.copy:active::after {
+    transform: scale(0.9);
+    background-color: var(--c-purple-deep);
+}
+
+.copy:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+    border-radius: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .copy, .copy::after { transition: none; }
+    .copy:active, .copy:active::after, .copy:hover::after { transform: none; }
 }
 
 
@@ -255,7 +335,10 @@
     white-space: nowrap;
 }
 
-.statsControl > a {
+/* Spans, not links — these tabs aren't built yet, and an <a> with no href
+   reads as navigable to a screen reader and offers a pointer it can't honour.
+   They become buttons when the panels behind them exist. */
+.statsControl > span {
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -264,11 +347,9 @@
     border: none;
     padding: 0.5rem 2.5rem;
 
-}
-
-.statsControl > a:active {
-    background: var(--colour-text-primary);
-    color: var(--colour-text-tertiary);
+    opacity: 0.45;
+    cursor: not-allowed;
+    user-select: none;
 }
 
 .statsOutput {

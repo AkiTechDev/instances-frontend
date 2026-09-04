@@ -25,12 +25,24 @@
     content: "";
     width: 24px;
     height: 24px;
+    flex-shrink: 0;
 
     background-color: var(--colour-text-primary);
     mask: var(--icon) no-repeat center;
     -webkit-mask: var(--icon) no-repeat center;
 
-    transition: transform 0.15s;
+    transition: transform var(--dur-normal) var(--ease-out);
+}
+
+.container > button:active {
+    transform: scale(0.95);
+    transition-duration: var(--dur-press);
+}
+
+.container > button:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+    border-radius: 50px;
 }
 
 .container > button > picture {
@@ -91,9 +103,12 @@
     padding: 0.25rem 0.5rem;
 }
 
-.container > ul > li a {
+/* Log Out is a <button> (it acts rather than navigates), the rest are links —
+   both are styled as one menu item. */
+.container > ul > li a,
+.container > ul > li button {
     white-space: nowrap;
-    cursor: none;
+    cursor: pointer;
     color: var(--colour-text-primary);
 
     display: flex;
@@ -104,25 +119,58 @@
     gap: 0.5rem;
 
     width: 100%;
-    cursor: pointer;
+
+    background: none;
+    border: 0;
+    padding: 0.25rem;
+    margin: -0.25rem;
+    border-radius: 4px;
+    text-align: left;
+    text-decoration: none;
+    /* No `font: inherit` — nothing up the tree sets a family, so the shorthand
+       would reset these off Lexend. The bodyTextMedium class on each item owns
+       the font. */
+
+    transition: color var(--dur-fast) var(--ease-out),
+                background-color var(--dur-fast) var(--ease-out);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.container > ul > li a:before {
+.container > ul > li a::before,
+.container > ul > li button::before {
     content: "";
     height: 20px;
     width: 20px;
+    flex-shrink: 0;
     background-color: var(--colour-text-primary);
     mask: var(--iconUrl) no-repeat center;
     -webkit-mask: var(--iconUrl) no-repeat center;
 
     display: flex;
+
+    transition: background-color var(--dur-fast) var(--ease-out);
 }
 
-.container > ul > li a:hover {
+.container > ul > li a:hover,
+.container > ul > li button:hover {
     color: var(--colour-text-secondary);
-    text-decoration: underline;
+    background-color: var(--c-cream-grey);
 }
 
-.container > ul > li a:hover::before {
+.container > ul > li a:hover::before,
+.container > ul > li button:hover::before {
     background-color: var(--colour-text-secondary);
+}
+
+.container > ul > li a:active,
+.container > ul > li button:active {
+    background-color: var(--c-grey-200);
+    transition-duration: var(--dur-press);
+}
+
+.container > ul > li a:focus-visible,
+.container > ul > li button:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: -1px;
 }
