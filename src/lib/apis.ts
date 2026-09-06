@@ -25,6 +25,32 @@ export interface Instance {
     game: string,
 }
 
+/**
+ * The list arrives as "user_id/game/name" strings. Accepts a bare array or one
+ * wrapped in the usual envelope keys; returns null only for a shape we don't
+ * recognise at all.
+ */
+const asInstanceList = (data: unknown): string[] | null => {
+    if (data === null || data === undefined) return [];
+    if (Array.isArray(data)) return data;
+    if (typeof data === "object") {
+        for (const key of ["instances", "items", "Items", "data"]) {
+            const value = (data as Record<string, unknown>)[key];
+            if (Array.isArray(value)) return value;
+        }
+    }
+    return null;
+};
+
+/** Drops anything that isn't a full user/game/name triple — a partial entry
+ *  would render as a card linking to a route that doesn't exist. */
+const parseInstance = (entry: unknown): Instance[] => {
+    if (typeof entry !== "string") return [];
+    const [user_id, game, name] = entry.split("/");
+    if (!user_id || !game || !name) return [];
+    return [{ user_id, game, name }];
+};
+
 export const getInstances = query(async (): Promise<Instance[]> => {
     const resp = await fetch(`${API_BASE}/instances/list`, {
         method: "GET",
@@ -32,16 +58,37 @@ export const getInstances = query(async (): Promise<Instance[]> => {
         headers: await authHeaders(),
     });
 
-    if (!resp.ok) throw new Error("Failed to fetch list of Instances");
+    // "You don't have any yet" is not a failure, and it doesn't only arrive as
+    // `[]`: a brand-new account can come back as 404 (nothing to list), as 204
+    // or an empty body, or as a JSON null. Every one of those has to reach the
+    // dashboard's get-started screen, so none of them may throw — only a real
+    // failure (auth, server, transport) does.
+    if (resp.status === 404 || resp.status === 204) return [];
 
-    return (await resp.json() as string[]).map((instance: string) => {
-        const parts = instance.split("/");
-        return {
-            user_id: parts[0],
-            game: parts[1],
-            name: parts[2]
-        }
-    })}, "instances");
+    if (!resp.ok) throw new Error(`Failed to fetch list of Instances (${resp.status})`);
+
+    const raw = (await resp.text()).trim();
+    if (!raw) return [];
+
+    let data: unknown;
+    try {
+        data = JSON.parse(raw);
+    } catch {
+        throw new Error("Instance list response was not valid JSON");
+    }
+
+    const list = asInstanceList(data);
+    if (!list) {
+        // A 200 we can't read. An account with nothing in it is far likelier
+        // than a broken control plane, and the get-started screen is the safe
+        // thing to show — but leave a breadcrumb, since a contract change would
+        // look exactly like this.
+        console.warn("Unexpected instance list payload; treating as empty", data);
+        return [];
+    }
+
+    return list.flatMap(parseInstance);
+}, "instances");
 
 
 export interface InstanceConfig {

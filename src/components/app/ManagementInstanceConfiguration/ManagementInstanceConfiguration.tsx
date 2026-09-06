@@ -21,6 +21,9 @@ import { postInstanceConfig, type Instance, type InstanceConfig, type PostInstan
 import type { InstanceProfile } from "../../../lib/games/types";
 
 
+/** Shown in the size picker when the saved cpu/memory pair matches no profile. */
+const CUSTOM_PROFILE = "Custom";
+
 interface InstanceConfigFormProps {
   config: InstanceConfig,
   endpoint: string,
@@ -39,7 +42,30 @@ const InstanceConfigForm: Component<InstanceConfigFormProps & {
   advanced?: boolean,
   onShowAll?: () => void
 }> = (props) => {
-    const [currentProfile, setCurrentProfile] = createSignal(Object.keys(props.profiles).find(k => props.profiles[k]["cpu"] === props.config["cpu"] && props.profiles[k]["memory"] === props.config["memory"]) || "ERR")
+    // Reverse-lookup of the saved cpu/memory pair. Compute profiles are
+    // researched and re-tuned per game, so an instance sized against an older
+    // table matches nothing — that case is `undefined` and shows as "Custom".
+    // It must never be a sentinel string: this value indexes props.profiles
+    // further down, and a missing key there used to throw mid-render and take
+    // the whole settings page with it (no error boundary to catch it).
+    const [currentProfile, setCurrentProfile] = createSignal<string | undefined>(
+      Object.keys(props.profiles).find(k =>
+        props.profiles[k]["cpu"] === props.config["cpu"] &&
+        props.profiles[k]["memory"] === props.config["memory"])
+    )
+
+    /** What the picker shows for the saved size — a profile name, or "Custom". */
+    const selectedProfileLabel = () => currentProfile() ?? CUSTOM_PROFILE;
+
+    // "Custom" is offered only while the saved size matches no profile, so the
+    // picker reflects what the instance actually is instead of silently
+    // displaying the first profile in the list. It is deliberately absent from
+    // the schema's picklist, so it can't be saved back as a size.
+    const profileOptions = () => currentProfile()
+      ? Object.keys(props.profiles)
+      : [CUSTOM_PROFILE, ...Object.keys(props.profiles)];
+
+    const regionLabel = () => regions[props.config["region"]] ?? props.config["region"];
 
     const InstanceConfigurationSchema = v.object({
       plan: v.picklist(instance_tiers),
@@ -54,7 +80,7 @@ const InstanceConfigForm: Component<InstanceConfigFormProps & {
       initialInput: {
         "auto_start": false,
         "plan": props.config["plan"],
-        "profile": currentProfile(),
+        "profile": selectedProfileLabel(),
         "webhook_url": props.config["webhook_url"] ?? ""
       }
     })
@@ -62,18 +88,40 @@ const InstanceConfigForm: Component<InstanceConfigFormProps & {
     const formProfile = useField(instanceForm, { path: ["profile"] })
     const formTier = useField(instanceForm, { path: ["plan"] })
 
+    /**
+     * Hourly price of the selected profile in *this instance's* region — the
+     * region is fixed for the life of an instance, and quoting us-east-1 to
+     * everyone under-charged every other one.
+     *
+     * Undefined when there's nothing honest to quote: the size matches no
+     * profile ("Custom"), or we hold no price table for the region. The row is
+     * dropped in that case rather than showing a made-up number.
+     */
+    const hourlyCost = () => {
+        const profile = props.profiles[formProfile.input ?? ""];
+        if (!profile) return undefined;
+        return fgCalc(props.config["region"], profile.memory, profile.cpu, formTier.input || props.config["plan"]) ?? undefined;
+    };
+
     const submitForm: SubmitHandler<typeof InstanceConfigurationSchema> = async (values) => {
           if (instanceForm.isValid) {
+              const profile = props.profiles[values["profile"]];
+              // Nothing to send for a size we don't have cpu/memory for —
+              // "Custom" is a label for the current state, not a choice.
+              if (!profile) return;
+
               const new_config: PostInstanceConfig = {
-                cpu: props.profiles[values["profile"]]["cpu"],
-                memory: props.profiles[values["profile"]]["memory"],
+                cpu: profile["cpu"],
+                memory: profile["memory"],
                 plan: values["plan"],
                 auto_start: values["auto_start"],
                 // Always sent — a blank value is how the user clears a webhook.
                 webhook_url: (values["webhook_url"] ?? "").trim()
               };
-              setCurrentProfile(values["profile"])
               await postInstanceConfig(props.endpoint, new_config)
+              // Only once it's saved: a failed POST leaves the picker showing
+              // what the instance still actually is.
+              setCurrentProfile(values["profile"])
               props.onSubmitted?.()
           }
       }
@@ -96,25 +144,29 @@ const InstanceConfigForm: Component<InstanceConfigFormProps & {
             <FormSelect field={field}
               field_id="profile"
               field_label="PLAYER_COUNT"
-              field_placeholder={currentProfile()}
-              field_options={Object.keys(props.profiles)}
+              field_placeholder={selectedProfileLabel()}
+              field_options={profileOptions()}
             />
           )}
         </Field>
 
         <div class={selectStyles.instanceConfigSettingsContainer}>
             <label class="bodyTextSmall">REGION</label>
-            <select value={regions[props.config["region"]]} class={`${selectStyles.select} bodyText`} disabled>
-              <option class="bodyText" value={regions[props.config["region"]]} selected>{regions[props.config["region"]]}</option>
+            <select value={regionLabel()} class={`${selectStyles.select} bodyText`} disabled>
+              <option class="bodyText" value={regionLabel()} selected>{regionLabel()}</option>
             </select>
         </div>
 
-        <div class={selectStyles.instanceConfigSettingsContainer}>
-            <label class="bodyTextSmall">COST</label>
-            <select value="Cost" class={`${selectStyles.select} bodyText`} disabled>
-              <option class="bodyText" value="$00/hour" selected>${fgCalc("us-east-1", props.profiles[formProfile.input || ""].memory, props.profiles[formProfile.input || ""].cpu, formTier.input || "")}/hour</option>
-            </select>
-        </div>
+        <Show when={hourlyCost()}>
+          {(cost) => (
+            <div class={selectStyles.instanceConfigSettingsContainer}>
+                <label class="bodyTextSmall">COST</label>
+                <select class={`${selectStyles.select} bodyText`} disabled>
+                  <option class="bodyText" selected>${cost()}/hour</option>
+                </select>
+            </div>
+          )}
+        </Show>
 
         {/* <Field of={instanceForm} path={["auto_start"]}>
           {(field) => (

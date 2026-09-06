@@ -3,8 +3,17 @@ interface Pricing {
   memoryGbPerHour: number
 }
 
-export const fgCalc = (region: string, memory: number, cpu: number, tier: string) => {
+/**
+ * Hourly Fargate cost for a size, in a given region.
+ *
+ * Returns null when we hold no price table for the region (unknown id, or one
+ * AWS added since this table was last refreshed) — the caller decides how to
+ * render "we don't know" rather than this throwing part-way through a render.
+ */
+export const fgCalc = (region: string, memory: number, cpu: number, tier: string): string | null => {
     const costs = pricing[region];
+    if (!costs) return null;
+
     const commission = tier === "Premium" ? 1.3 : 1.2;
  
     const vcpu_cost = (cpu / 1024) * costs.vCpuPerHour;

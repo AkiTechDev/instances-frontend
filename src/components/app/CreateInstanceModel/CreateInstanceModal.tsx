@@ -140,7 +140,9 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
         const p = profiles();
         const selected = formProfile()?.input;
         if (!p || !selected || !p[selected]) return "0.00";
-        return fgCalc(formRegion()?.input || "", p[selected].memory, p[selected].cpu, formTier()?.input || "");
+        // null when we have no price table for the region — the picker only
+        // offers regions we price, so this is belt-and-braces.
+        return fgCalc(formRegion()?.input || "", p[selected].memory, p[selected].cpu, formTier()?.input || "") ?? "0.00";
     });
 
     const submitForm = createMemo(() => {
