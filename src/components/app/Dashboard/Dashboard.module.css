@@ -13,7 +13,15 @@
 
         color: var(--colour-text-primary);
         position: relative;
+    }
 
+    /* The sidebar column animating between 0 and 290px is the collapse toggle's
+       animation — but the column also changes when the instance list lands and
+       the sidebar first appears, and animating *that* is what reads as the page
+       sliding around on login. So the transition is only armed once the first
+       load has settled: arrival relayouts happen in a single frame, and the
+       collapse toggle still animates. */
+    .gridContainer.settled {
         transition: all 0.5s ease, clip-path 0.3s ease;
     }
 
@@ -407,4 +415,38 @@
         width: 120px;
         height: 0.875rem;
         border-radius: 6px;
+    }
+
+    /* Empty-account loading state — traces NoInstances so the get-started
+       screen lands exactly where the skeleton was. */
+    .skeletonEmptyArt {
+        width: 144px;
+        height: 144px;
+        border-radius: var(--r-sm);
+    }
+
+    .skeletonEmptyTitle {
+        width: 220px;
+        height: 1.75rem;
+        border-radius: 6px;
+    }
+
+    .skeletonEmptyLine {
+        width: 340px;
+        max-width: 80vw;
+        height: 1rem;
+        border-radius: 6px;
+    }
+
+    .skeletonEmptyLineShort {
+        width: 260px;
+        max-width: 70vw;
+        height: 1rem;
+        border-radius: 6px;
+    }
+
+    .skeletonEmptyButton {
+        width: 200px;
+        height: 48px;
+        border-radius: var(--r-chip);
     }

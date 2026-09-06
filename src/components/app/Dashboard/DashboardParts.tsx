@@ -36,14 +36,40 @@ const InstanceRowSkeleton: Component = () => (
 );
 
 /**
+ * Loading state for an account we expect to be empty — mirrors NoInstances
+ * (art, two lines, button) inside the same centred container, so the
+ * get-started screen lands exactly where the skeleton was.
+ */
+const EmptyStateSkeleton: Component = () => (
+    <div class={styles.noInstancesContainer} aria-busy="true">
+        <div class={`${effects.skeleton} ${styles.skeletonEmptyArt}`} />
+        <div class={styles.noContent}>
+            <div class={`${effects.skeleton} ${styles.skeletonEmptyTitle}`} />
+            <div class={`${effects.skeleton} ${styles.skeletonEmptyLine}`} />
+            <div class={`${effects.skeleton} ${styles.skeletonEmptyLineShort}`} />
+        </div>
+        <div class={`${effects.skeleton} ${styles.skeletonEmptyButton}`} />
+    </div>
+);
+
+/**
  * Loading state for the instance list.
  *
  * Holds the page's real layout — sidebar column, list header, filter row, card
  * grid — so nothing jumps when the instances resolve, and so a returning user
  * is never told they have no servers while their servers are still on the wire.
+ *
+ * The two layouts are far apart (the sidebar column is 290px and animates in
+ * and out), so `shape` picks the one the caller expects; guessing wrong is what
+ * slides the whole page sideways when the data lands.
  */
-export const DashboardSkeleton: Component<{ listView?: boolean; cards?: number }> = (props) => (
-    <>
+export const DashboardSkeleton: Component<{
+    /** Which layout the resolved list is expected to produce. */
+    shape?: "list" | "empty";
+    listView?: boolean;
+    cards?: number;
+}> = (props) => (
+    <Show when={props.shape !== "empty"} fallback={<EmptyStateSkeleton />}>
         {/* Carries Dashboard's own .sidebar class: the grid's `:has(.sidebar)`
             rule is what opens the sidebar column, so the skeleton has to claim
             it too or the content shifts sideways once the real nav mounts. */}
@@ -76,7 +102,7 @@ export const DashboardSkeleton: Component<{ listView?: boolean; cards?: number }
                 </Index>
             </div>
         </div>
-    </>
+    </Show>
 );
 
 /**

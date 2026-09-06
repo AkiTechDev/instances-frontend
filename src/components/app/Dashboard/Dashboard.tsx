@@ -21,11 +21,37 @@ import { DashboardSkeleton, InstanceListError, NoInstances } from "./DashboardPa
 import { getBestRegion, regions } from "../../../lib/regions";
 import { getInstances } from "../../../lib/apis";
 import { gameRegistry } from "../../../lib/games/index";
+import { useAuth } from "../Auth/AuthProvider";
 
 import button from "../../../styles/components/button.module.css";
 import search from "../../../styles/components/search.module.css";
 
+/* Which layout this account resolved to last time, remembered per browser.
+   The two dashboard layouts are 290px apart — a list gets the sidebar column,
+   an empty account gets the centred get-started screen — so a skeleton in the
+   wrong shape shunts the whole page sideways the moment the data lands. An
+   account that has never loaded here has no answer, and "empty" is the right
+   guess for it: that is exactly what a brand-new account is, and a new user's
+   first impression is the one worth getting right. A wrong guess costs a single
+   relayout, and the next load has the answer. */
+const layoutHintKey = (sub: string) => `dashboard:hasInstances:${sub}`;
+
+const readLayoutHint = (sub: string): "list" | "empty" => {
+    try {
+        return localStorage.getItem(layoutHintKey(sub)) === "1" ? "list" : "empty";
+    } catch {
+        return "empty"; // storage blocked — fall back to the safer first-visit guess
+    }
+};
+
+const writeLayoutHint = (sub: string, hasInstances: boolean) => {
+    try {
+        localStorage.setItem(layoutHintKey(sub), hasInstances ? "1" : "0");
+    } catch { /* private mode or quota — the skeleton just guesses again next time */ }
+};
+
 const Dashboard = () => {
+    const { account } = useAuth();
     // No `initialValue`: with one, `instances()` was an empty array until the
     // fetch resolved, and the zero-state below greeted every returning user
     // with "No Games Added Yet!" before their servers appeared. Undefined means
@@ -92,13 +118,25 @@ const Dashboard = () => {
     /** Resolved and non-empty — undefined (still loading) is not "empty". */
     const hasInstances = () => (loadedInstances()?.length ?? 0) > 0;
 
+    // Read once: the skeleton's shape mustn't change under the user mid-load.
+    const expectedShape = readLayoutHint(account().sub);
+    createEffect(() => {
+        const list = loadedInstances();
+        if (list) writeLayoutHint(account().sub, list.length > 0);
+    });
+
     const headingText = () =>
         gameFilter() === "all"
             ? "All Instances"
             : gameRegistry[gameFilter()]?.name ?? gameFilter();
 
+    // `settled` arms the grid's column transition only after the first load, so
+    // the sidebar appearing doesn't animate the page sideways. Reads the guarded
+    // accessor — the raw one throws out here, outside the error boundary.
+    const gridClass = () => `${styles.gridContainer} ${loadedInstances() ? styles.settled : ""}`;
+
     return (
-        <section class={styles.gridContainer}>
+        <section class={gridClass()}>
             <Show when={openModal()}>
                 <CreateInstanceModal setIsOpen={setOpenModal} game_id={modalOptions()["game_id"]} allow_game_change={modalOptions()["allow_game_change"]} regions={regionsByLatency()} />
             </Show>
@@ -114,7 +152,7 @@ const Dashboard = () => {
                 {/* `instances()` stays undefined until the list resolves, so the
                     skeleton covers loading and the zero-state below can only be
                     reached by a resolved — genuinely empty — list. */}
-                <Show when={instances()} fallback={<DashboardSkeleton listView={isListView()} />}>
+                <Show when={instances()} fallback={<DashboardSkeleton shape={expectedShape} listView={isListView()} />}>
                     <Show when={hasInstances()} fallback={<NoInstances onCreate={() => OpenCreateInstanceModal({game_id: null, allow_game_change: true})} />}>
                         <DashboardSidebarNav filter={gameFilter} setFilter={setGameFilter} openCreateIntanceModal={OpenCreateInstanceModal}/>
                         <div class={styles.gamesContainer}>
