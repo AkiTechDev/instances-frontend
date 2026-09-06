@@ -68,6 +68,12 @@
         background: var(--icon) no-repeat center;
     }
 
+    /* The icon here is 14px where the zero-state's is 16px, and the shared
+       ::before box is a fixed 20px — scale it so both buttons read the same. */
+    .noInstancesContainer .retryIcon::before {
+        background-size: contain;
+    }
+
     .noContent {
         display: flex;
         flex-direction: column;
@@ -272,4 +278,133 @@
         padding: var(--margin-el-sm) 0;
         text-align: center;
         opacity: 0.7;
+    }
+
+    /* Loading skeletons — shapes only; the shimmer paint comes from the shared
+       effects module (.skeleton), applied alongside. Rendered by
+       DashboardParts.tsx while the instance list is still on the wire. */
+
+    /* Pairs with .sidebar (applied alongside in the markup) — this half only
+       carries the nav's own padding + surface so the column looks identical. */
+    .skeletonSidebar {
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 12px;
+
+        padding: 28px 24px;
+        background: #F3F4F4;
+        border-radius: 0px 0px 0px 20px;
+    }
+
+    /* Heights and offsets here trace the real controls they stand in for, so
+       the swap to live content doesn't shunt the page around. */
+    .skeletonSidebarTitle {
+        width: 45%;
+        height: 1.5rem;
+        border-radius: 6px;
+        margin-bottom: 28px;
+    }
+
+    .skeletonSidebarPill {
+        height: 40px;
+        border-radius: var(--r-chip);
+    }
+
+    .skeletonSidebarItem {
+        height: 32px;
+        border-radius: var(--r-sm);
+    }
+
+    .skeletonHeading {
+        width: min(280px, 45%);
+        height: 2.75rem;
+        border-radius: var(--r-sm);
+    }
+
+    .skeletonHeaderButton {
+        width: 180px;
+        height: 44px;
+        border-radius: var(--r-chip);
+    }
+
+    .skeletonSearch {
+        width: min(400px, 45%);
+        height: 48px;
+        border-radius: var(--r-chip);
+    }
+
+    .skeletonFilter {
+        width: 140px;
+        height: 48px;
+        border-radius: var(--r-chip);
+    }
+
+    /* Grid view — mirrors DashboardInstanceCard's banner + name + meta stack. */
+    .skeletonCard {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        width: 100%;
+        max-width: 260px;
+    }
+
+    .skeletonCardBanner {
+        width: 100%;
+        aspect-ratio: 5 / 4;
+        border-radius: calc(var(--r-sm) + 3px);
+    }
+
+    .skeletonCardText {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.4rem;
+        width: 100%;
+        padding: 0rem 0.5rem;
+        box-sizing: border-box;
+    }
+
+    .skeletonCardTitle {
+        width: 65%;
+        height: 1rem;
+        border-radius: 6px;
+    }
+
+    .skeletonCardMeta {
+        width: 40%;
+        height: 0.75rem;
+        border-radius: 6px;
+    }
+
+    /* List view — mirrors .instanceList's row. */
+    .skeletonRow {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 12px 16px;
+        gap: 12px;
+        width: 100%;
+    }
+
+    .skeletonRowName {
+        flex: 1;
+        max-width: 70%;
+        height: 1rem;
+        border-radius: 6px;
+    }
+
+    .skeletonRowStatus {
+        width: 130px;
+        height: 22px;
+        margin: 0 1rem;
+        border-radius: 16px;
+    }
+
+    .skeletonRowMeta {
+        width: 120px;
+        height: 0.875rem;
+        border-radius: 6px;
     }
