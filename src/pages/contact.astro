@@ -1,0 +1,918 @@
+---
+// Order matters: tokens (theme/default) before the sheets that consume them,
+// and identical on every entry point so the cascade can't diverge per page.
+import "../styles/normalise.css"
+import "../styles/global.css"
+import "../styles/theme/default.css"
+import "../styles/typography.css"
+
+import button from "../styles/components/button.module.css";
+import colourStyles from "../styles/theme/colours.module.css";
+
+import Header from "../components/astrojs/header/Header.astro";
+import Newsletter from "../components/newsletter/Newsletter.astro";
+import Footer from "../components/astrojs/Footer/Footer.astro";
+
+import Banner from "../assets/images/WelcomeToInstances.png";
+
+import { gameRegistry } from "../lib/games";
+import {
+    DISCORD_INVITE,
+    SUPPORT_EMAIL,
+    fieldKey,
+    responseTargets,
+    submitMode,
+    topicGroups,
+    topics,
+    type SupportField,
+} from "../lib/support";
+
+const seo_des = "Get help with your game server, report a bug, request a game, or just ask a question. Reach the Instances team by form, email or Discord.";
+const domain = "instances.aki-labs.com";
+const title = "Contact Instances — support, bugs and requests";
+
+/* The game list comes straight from the registry the platform actually runs,
+   so the dropdown can't drift out of step with what we host. */
+const gameOptions = ["Not game-specific", ...Object.values(gameRegistry).map((game) => game.name)];
+const optionsFor = (field: SupportField): string[] =>
+    field.optionsFrom === "games" ? gameOptions : field.options ?? [];
+
+const groups = topicGroups();
+const submitLabel = submitMode === "post" ? "Send to support" : "Open in your email app";
+---
+<!doctype html>
+<html lang="en" class="en" prefix="og: http://ogp.me/ns#">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="author" content="Aki Laboratories Limited">
+        <meta name="referrer" content="strict-origin-when-cross-origin">
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+
+        <!-- SEO -->
+        <title>{title}</title>
+        <meta name="description" content={seo_des}>
+        <meta itemprop="description" content={seo_des}>
+        <meta name="robots" content="all" />
+        <link rel="canonical" href={`https://${domain}/contact`}>
+        <link rel="sitemap" href="/sitemap-index.xml" />
+
+        <!-- Twitter/X specific -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content={title}>
+        <meta name="twitter:description" content={seo_des}>
+        <meta name="twitter:image" content={Banner.src}>
+        <meta name="twitter:site" content="@aki_labs">
+
+        <!-- Open Graph -->
+        <meta property="og:title" content={title}>
+        <meta property="og:description" content={seo_des}>
+        <meta property="og:type" content="website">
+        <meta property="og:url" content={`https://${domain}/contact`}>
+        <meta property="og:image" content={Banner.src}>
+        <meta property="og:site_name" content="Instances">
+        <meta property="og:locale" content="en_US">
+
+        <!-- Mobile / Browser theming -->
+        <meta name="theme-color" content="#191C2E">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+    </head>
+    <body>
+        <Header />
+
+        <main class="page">
+            {import.meta.env.DEV && (
+                <aside class="devChecklist" aria-label="Pre-publication checklist">
+                    <p class="bodyTextSmallestSemiCaps">Dev only — not in the production build</p>
+                    <ul>
+                        <li>
+                            Submission is in <strong>{submitMode}</strong> mode. Set
+                            <code>PUBLIC_SUPPORT_ENDPOINT</code> to POST tickets instead of handing
+                            them to the visitor's mail client.
+                        </li>
+                        <li>
+                            First-response targets are <strong>{responseTargets.published ? "published" : "hidden"}</strong>.
+                            Turn on <code>responseTargets.published</code> in <code>src/lib/support.ts</code>
+                            once they're times we'd stand behind.
+                        </li>
+                        <li>Confirm the Discord invite is permanent and doesn't expire: <code>{DISCORD_INVITE}</code></li>
+                        <li>Confirm <code>{SUPPORT_EMAIL}</code> is monitored by everyone named as a desk above.</li>
+                        <li>Decide whether Header should link /contact — it currently only carries landing-page anchors.</li>
+                    </ul>
+                </aside>
+            )}
+
+            <!-- ── Masthead + the three routes in ───────────────────────── -->
+            <section class="masthead" aria-labelledby="contact-title">
+                <div class="mastheadIntro">
+                    <p class="eyebrow bodyTextSmallestSemiCaps">Support</p>
+                    <h1 id="contact-title" class="h2">
+                        Tell us what's <span class={colourStyles.gradientOne}>going on</span>.
+                    </h1>
+                    <p class="lead subTitle">
+                        Three ways through, all staffed by the same small team. Pick whichever
+                        suits you &mdash; nothing here is a queue you get stuck in.
+                    </p>
+                </div>
+
+                <ul class="channels">
+                    <li class="channel channelDiscord">
+                        <span class="channelIcon" aria-hidden="true"></span>
+                        <h2 class="h6">Discord</h2>
+                        <p class="bodyText">
+                            The fastest route by a wide margin. Open a support ticket, ask the
+                            community, or catch us in the open channels.
+                        </p>
+                        <a class="channelLink bodyTextSmallSemi" href={DISCORD_INVITE} target="_blank" rel="noopener">
+                            Join the server
+                        </a>
+                    </li>
+
+                    <li class="channel channelEmail">
+                        <span class="channelIcon" aria-hidden="true"></span>
+                        <h2 class="h6">Email</h2>
+                        <p class="bodyText">
+                            Write to us directly if you'd rather use your own mail client, or need
+                            a paper trail.
+                        </p>
+                        <a class="channelLink bodyTextSmallSemi" href={`mailto:${SUPPORT_EMAIL}`}>
+                            {SUPPORT_EMAIL}
+                        </a>
+                    </li>
+
+                    <li class="channel channelForm">
+                        <span class="channelIcon" aria-hidden="true"></span>
+                        <h2 class="h6">The form below</h2>
+                        <p class="bodyText">
+                            Asks the questions we'd otherwise have to email you back about. Best
+                            when something's broken.
+                        </p>
+                        <a class="channelLink bodyTextSmallSemi" href="#composer">Start writing</a>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- ── The composer ─────────────────────────────────────────── -->
+            <section id="composer" class="composer" aria-labelledby="composer-title">
+                <div class="composerHead">
+                    <h2 id="composer-title" class="h5">Write us a ticket</h2>
+                    <p class="bodyText composerLead">
+                        Pick a topic and the form asks for exactly what that team needs &mdash; no
+                        more, no less. Everything you type is assembled into the message on the
+                        right, so you can read it before it goes anywhere.
+                    </p>
+                </div>
+
+                <div class="composerGrid">
+                    <form class="form" data-contact-form>
+                        <!-- Topic -->
+                        <fieldset class="group" aria-labelledby="grp-topic">
+                            <p id="grp-topic" class="groupLabel bodyTextSmallestSemiCaps">Topic</p>
+                            <div class="field fieldWide">
+                                <label class="fieldLabel bodyTextSmallSemi" for="topic">
+                                    What's this about?
+                                </label>
+                                <div class="selectWrap">
+                                    <select id="topic" name="topic" class="control select" required>
+                                        {groups.map((group) => (
+                                            <optgroup label={group.group}>
+                                                {group.topics.map((topic) => (
+                                                    <option value={topic.id}>{topic.label}</option>
+                                                ))}
+                                            </optgroup>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <aside class="route" data-route data-accent="orange" aria-live="polite">
+                                <p class="routeLabel bodyTextSmallestSemiCaps">Goes to</p>
+                                <p class="routeDesk subtitleSemi" data-route-desk></p>
+                                <p class="routeBlurb bodyTextSmall" data-route-blurb></p>
+                                <p class="routeResponse bodyTextSmall" data-route-response hidden></p>
+                                <p class="routeCaution bodyTextSmall" data-route-caution hidden></p>
+                                <p class="routeDiscord bodyTextSmall" data-route-discord hidden>
+                                    Honestly? <a href={DISCORD_INVITE} target="_blank" rel="noopener">Ask in Discord</a>
+                                    &mdash; you'll have an answer before we've read this.
+                                </p>
+                            </aside>
+                        </fieldset>
+
+                        <!-- Topic-specific details. Every topic gets a block so the
+                             script's drift check can find one; empty topics render an
+                             empty block that never shows. -->
+                        {topics.map((topic) => (
+                            <fieldset class="group details" data-topic-fields={topic.id} aria-labelledby={`grp-details-${topic.id}`} hidden>
+                                {topic.fields.length > 0 && (
+                                    <>
+                                        <p id={`grp-details-${topic.id}`} class="groupLabel bodyTextSmallestSemiCaps">Details</p>
+                                        <div class="detailsGrid">
+                                            {topic.fields.map((field) => (
+                                                <div class:list={["field", field.wide && "fieldWide"]}>
+                                                    <label
+                                                        class="fieldLabel bodyTextSmallSemi"
+                                                        for={`${topic.id}-${fieldKey(field)}`}
+                                                    >
+                                                        {field.label}
+                                                    </label>
+
+                                                    {field.kind === "select" ? (
+                                                        <div class="selectWrap">
+                                                            <select
+                                                                id={`${topic.id}-${fieldKey(field)}`}
+                                                                name={field.name}
+                                                                data-field={fieldKey(field)}
+                                                                class="control select"
+                                                            >
+                                                                <option value="">Choose one&hellip;</option>
+                                                                {optionsFor(field).map((option) => (
+                                                                    <option value={option}>{option}</option>
+                                                                ))}
+                                                            </select>
+                                                        </div>
+                                                    ) : field.kind === "textarea" ? (
+                                                        <textarea
+                                                            id={`${topic.id}-${fieldKey(field)}`}
+                                                            name={field.name}
+                                                            data-field={fieldKey(field)}
+                                                            class="control area"
+                                                            rows="4"
+                                                            placeholder={field.placeholder}
+                                                        ></textarea>
+                                                    ) : (
+                                                        <input
+                                                            id={`${topic.id}-${fieldKey(field)}`}
+                                                            name={field.name}
+                                                            data-field={fieldKey(field)}
+                                                            class="control"
+                                                            type={field.kind}
+                                                            placeholder={field.placeholder}
+                                                        />
+                                                    )}
+
+                                                    {field.hint && <p class="hint bodyTextSmallest">{field.hint}</p>}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </>
+                                )}
+                            </fieldset>
+                        ))}
+
+                        <!-- Message -->
+                        <fieldset class="group" aria-labelledby="grp-message">
+                            <p id="grp-message" class="groupLabel bodyTextSmallestSemiCaps">Your message</p>
+                            <div class="detailsGrid">
+                                <div class="field fieldWide">
+                                    <label class="fieldLabel bodyTextSmallSemi" for="summary">
+                                        One line: what's happened?
+                                    </label>
+                                    <input
+                                        id="summary"
+                                        name="summary"
+                                        class="control"
+                                        type="text"
+                                        maxlength="120"
+                                        required
+                                        placeholder="e.g. Valheim server stops a few minutes after it starts"
+                                    />
+                                    <p class="hint bodyTextSmallest">This becomes the subject line.</p>
+                                </div>
+
+                                <div class="field fieldWide">
+                                    <label class="fieldLabel bodyTextSmallSemi" for="message">
+                                        And the rest
+                                    </label>
+                                    <textarea
+                                        id="message"
+                                        name="message"
+                                        class="control area areaTall"
+                                        rows="7"
+                                        required
+                                        placeholder="What you expected, what happened instead, and anything you've already tried."
+                                    ></textarea>
+                                    <p class="nudge bodyTextSmallest" data-nudge hidden></p>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <!-- Reply-to -->
+                        <fieldset class="group" aria-labelledby="grp-reply">
+                            <p id="grp-reply" class="groupLabel bodyTextSmallestSemiCaps">Where to reply</p>
+                            <div class="detailsGrid">
+                                <div class="field">
+                                    <label class="fieldLabel bodyTextSmallSemi" for="name">
+                                        What should we call you?
+                                    </label>
+                                    <input id="name" name="name" class="control" type="text" autocomplete="name" placeholder="Optional" />
+                                </div>
+                                <div class="field">
+                                    <label class="fieldLabel bodyTextSmallSemi" for="email">Email</label>
+                                    <input
+                                        id="email"
+                                        name="email"
+                                        class="control"
+                                        type="email"
+                                        autocomplete="email"
+                                        required
+                                        placeholder="you@example.com"
+                                    />
+                                </div>
+                            </div>
+
+                            <label class="checkRow" for="diagnostics">
+                                <input id="diagnostics" name="diagnostics" type="checkbox" />
+                                <span>
+                                    <span class="bodyTextSmallSemi">Attach browser diagnostics</span>
+                                    <span class="hint bodyTextSmallest">
+                                        Your browser, screen size, language and time zone. Tick it and
+                                        it appears in the preview &mdash; nothing is attached that you
+                                        can't see there first.
+                                    </span>
+                                </span>
+                            </label>
+                        </fieldset>
+
+                        <div class="actions">
+                            <button type="submit" class:list={[button.btn, button.vibrant]} data-submit>
+                                <span class="buttonText">{submitLabel}</span>
+                            </button>
+                            <p class="actionsNote bodyTextSmallest">
+                                {submitMode === "post"
+                                    ? "Sent straight to the desk shown above."
+                                    : `We don't have a send button yet, so this hands the finished message to your email app, addressed to ${SUPPORT_EMAIL}. Nothing is transmitted from this page.`}
+                            </p>
+                        </div>
+
+                        <p class="status bodyText" data-status role="status" hidden></p>
+                    </form>
+
+                    <!-- Live ticket -->
+                    <aside class="rail" aria-labelledby="preview-title">
+                        <div class="previewCard">
+                            <div class="previewHead">
+                                <h3 id="preview-title" class="bodyTextSmallestSemiCaps">What we'll see</h3>
+                                <button type="button" class="copyBtn bodyTextSmallSemi" data-copy>Copy</button>
+                            </div>
+                            <pre
+                                class="preview"
+                                data-preview
+                                tabindex="0"
+                                role="region"
+                                aria-label="Preview of the message that will be sent"
+                            >Your ticket will appear here as you fill the form in.</pre>
+                            <p class="previewFoot bodyTextSmallest">
+                                The whole message, subject line included, exactly as it leaves your browser.
+                            </p>
+                        </div>
+                    </aside>
+                </div>
+            </section>
+
+            <!-- ── The small print people actually want ─────────────────── -->
+            <section class="closing" aria-labelledby="closing-title">
+                <h2 id="closing-title" class="h6">What happens to what you send</h2>
+                <div class="closingGrid">
+                    <p class="bodyText">
+                        Messages to {SUPPORT_EMAIL} are handled through Proton Mail. We keep your
+                        message and our reply for as long as it's useful to support you, and we
+                        don't use it for anything else. The detail is in
+                        <a href="/privacy-policy#what-we-collect">our privacy policy</a>.
+                    </p>
+                    <dl class="postal">
+                        <div>
+                            <dt class="bodyTextSmallestSemiCaps">Post</dt>
+                            <dd class="bodyTextSmall">
+                                Aki Laboratories Limited<br />
+                                124&ndash;128 City Road<br />
+                                London EC1V 2NX<br />
+                                England
+                            </dd>
+                        </div>
+                        <div>
+                            <dt class="bodyTextSmallestSemiCaps">Company number</dt>
+                            <dd class="bodyTextSmall">14904443</dd>
+                        </div>
+                    </dl>
+                </div>
+            </section>
+        </main>
+
+        <Newsletter />
+        <Footer />
+
+        <script>
+            import { initContactForm } from "../lib/contactForm";
+            initContactForm();
+        </script>
+    </body>
+</html>
+
+<style>
+    /* Scoped to this page. If a second page ever needs the control set below,
+       lift `.control` / `.field` / `.group` into a shared sheet the way
+       legal.css was lifted out of the privacy page — not before. */
+
+    .page {
+        /* The site Header is `position: sticky; top: 0` and grows from ~94px to
+           ~118px once its nav wraps, so the sticky rail and every anchor target
+           has to clear it. src/lib/stickyHeader.ts corrects this at runtime;
+           this is the pre-hydration fallback. */
+        --header-h: 5.875rem;
+
+        --control-bg:        rgba(255, 255, 255, 0.04);
+        --control-bg-focus:  rgba(255, 255, 255, 0.07);
+
+        width: min(100% - 2rem, 96rem); /* 1536px */
+        margin-inline: auto;
+        padding: 3.5rem var(--padding-sm) 5rem;
+        box-sizing: border-box;
+
+        color: var(--text-colour-light);
+    }
+
+    /* Several elements here are toggled with the `hidden` attribute and also
+       carry a display from a layout rule, which would otherwise win. */
+    [hidden] { display: none !important; }
+
+    /* ── Dev-only pre-publication checklist ───────────────────────────── */
+
+    .devChecklist {
+        margin-bottom: 3rem;
+        padding: 1.25rem 1.5rem;
+        border: 1px dashed var(--c-orange);
+        border-radius: var(--r-card);
+        background: rgba(235, 164, 57, 0.08);
+    }
+
+    .devChecklist > p { color: var(--c-orange); margin: 0 0 0.75rem; }
+    .devChecklist ul { margin: 0; padding-left: 1.25rem; display: grid; gap: 0.375rem; }
+    .devChecklist li { color: var(--ink-body); line-height: 1.6; }
+    .devChecklist li::marker { color: var(--c-orange); }
+    .devChecklist code {
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.9em;
+    }
+
+    /* ── Masthead ─────────────────────────────────────────────────────── */
+
+    .masthead {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 26rem);
+        gap: 4rem;
+        /* The intro is short and the channel stack is tall; centring keeps the
+           left column from trailing several hundred pixels of dead space. */
+        align-items: center;
+
+        padding-bottom: 4rem;
+        border-bottom: 1px solid var(--hairline);
+        margin-bottom: 4rem;
+    }
+
+    .eyebrow { color: var(--c-orange); margin: 0 0 0.75rem; }
+    .mastheadIntro h1 { margin: 0 0 1.25rem; text-wrap: balance; }
+    .lead { margin: 0; color: var(--ink-body); max-width: 34rem; }
+
+    /* ── The three routes in ──────────────────────────────────────────── */
+
+    .channels {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 0.75rem;
+    }
+
+    .channel {
+        display: grid;
+        grid-template-columns: 2.25rem minmax(0, 1fr);
+        grid-template-areas:
+            "icon title"
+            ".    body"
+            ".    link";
+        column-gap: 1rem;
+        row-gap: 0.375rem;
+        align-items: start;
+
+        padding: 1.25rem 1.5rem;
+        border-radius: var(--r-card);
+        background: var(--surface-card);
+        box-shadow: var(--surface-card-inset);
+
+        transition: box-shadow var(--dur-normal) var(--ease-out);
+    }
+
+    .channel:hover {
+        box-shadow: var(--surface-card-inset), 0 0 0 1px var(--hairline);
+    }
+
+    .channelIcon {
+        grid-area: icon;
+        width: 1.75rem;
+        height: 1.75rem;
+        margin-top: 0.125rem;
+        background-color: var(--channel-accent, var(--c-orange));
+        /* The url() lives here rather than in an inline custom property: Vite
+           inlines small SVGs as data URIs whose single quotes an unquoted CSS
+           url() token cannot hold, and the whole declaration is dropped. */
+        -webkit-mask: var(--channel-icon) no-repeat center / contain;
+        mask: var(--channel-icon) no-repeat center / contain;
+    }
+
+    .channelDiscord {
+        --channel-accent: var(--c-purple);
+        --channel-icon: url("../assets/icons/socials/discord.svg");
+    }
+    .channelEmail {
+        --channel-accent: var(--c-blue-sky);
+        --channel-icon: url("../assets/icons/feedback.svg");
+    }
+    .channelForm {
+        --channel-accent: var(--c-orange);
+        --channel-icon: url("../assets/icons/chevron.svg");
+    }
+
+    .channel h2 { grid-area: title; margin: 0; font-size: 1.25rem; line-height: 1.3; }
+    .channel p { grid-area: body; margin: 0; color: var(--ink-muted); line-height: 1.55; }
+
+    .channelLink {
+        grid-area: link;
+        margin-top: 0.375rem;
+        justify-self: start;
+        color: var(--channel-accent, var(--c-orange));
+        text-decoration: none;
+        border-bottom: 1.5px solid transparent;
+        transition: border-color var(--dur-fast) var(--ease-out);
+    }
+
+    .channelLink:hover { border-bottom-color: currentColor; }
+    .channelLink:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-ring-offset); }
+
+    /* ── Composer ─────────────────────────────────────────────────────── */
+
+    .composer { scroll-margin-top: calc(var(--header-h) + 1rem); }
+
+    .composerHead { max-width: 44rem; margin-bottom: 2.5rem; }
+    .composerHead h2 { margin: 0 0 0.875rem; }
+    .composerLead { margin: 0; color: var(--ink-body); line-height: 1.7; }
+
+    .composerGrid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 27rem);
+        gap: 3rem;
+        align-items: start;
+    }
+
+    /* ── Form scaffolding ─────────────────────────────────────────────── */
+
+    .form { display: grid; gap: 2.75rem; min-width: 0; }
+
+    .group {
+        border: 0;
+        margin: 0;
+        padding: 0;
+        min-width: 0;   /* a fieldset defaults to min-content and won't shrink */
+        display: grid;
+        gap: 1.25rem;
+    }
+
+    /* Named via aria-labelledby rather than <legend>: a legend renders as
+       `display: table` outside the fieldset's grid flow, so `gap` never applies
+       to it and the group heading ends up flush against the first field. */
+    .groupLabel {
+        margin: 0;
+        color: var(--c-orange);
+        letter-spacing: 0.06em;
+    }
+
+    .detailsGrid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.25rem;
+    }
+
+    /* `align-content: start` matters: grid rows stretch their items, so a field
+       with no hint line under it would absorb the height of a neighbour that
+       has one — and that slack lands in the control, making the select visibly
+       taller than the input beside it. */
+    .field { display: grid; gap: 0.4375rem; min-width: 0; align-content: start; }
+    .fieldWide { grid-column: 1 / -1; }
+
+    .fieldLabel { color: var(--text-colour-light); padding-left: 1rem; }
+
+    .hint { color: var(--ink-muted); margin: 0; padding-left: 1rem; line-height: 1.5; }
+
+    /* ── Controls ─────────────────────────────────────────────────────── */
+
+    .control {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 0.75rem 1rem;
+
+        font-family: Lexend, sans-serif;
+        font-size: 1rem;
+        line-height: 1.4;
+        color: var(--text-colour-light);
+
+        background: var(--control-bg);
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-chip);
+
+        transition: border-color var(--dur-fast) var(--ease-out),
+                    background-color var(--dur-fast) var(--ease-out);
+    }
+
+    /* One height for every single-line control. Left to themselves a select, a
+       text input and a datetime-local all resolve to different intrinsic
+       heights (49 / 48 / 50px here), which reads as a misaligned form. */
+    .control:not(.area) {
+        height: 3rem;
+        padding-block: 0;
+    }
+
+    .control::placeholder { color: rgba(255, 255, 255, 0.38); }
+    .control:hover { border-color: var(--c-purple); }
+
+    .control:focus {
+        outline: var(--focus-ring);
+        outline-offset: var(--focus-ring-offset);
+        border-color: var(--c-orange);
+        background: var(--control-bg-focus);
+    }
+
+    .area {
+        border-radius: var(--r-card);
+        resize: vertical;
+        min-height: 6rem;
+        line-height: 1.6;
+    }
+
+    .areaTall { min-height: 11rem; }
+
+    .select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        padding-right: 3rem;
+        cursor: pointer;
+    }
+
+    /* A native option list is painted by the OS, so it inherits the page's
+       white-on-dark not at all — set both explicitly or Windows renders white
+       text on a white menu. */
+    .select option,
+    .select optgroup { background: var(--c-ink); color: var(--text-colour-light); }
+
+    .selectWrap { position: relative; display: grid; }
+
+    .selectWrap::after {
+        content: "";
+        position: absolute;
+        right: 1.125rem;
+        top: 50%;
+        width: 1rem;
+        height: 1rem;
+        transform: translateY(-50%);
+        pointer-events: none;
+
+        background-color: var(--ink-muted);
+        -webkit-mask: url("../assets/icons/chevron.svg") no-repeat center / contain;
+        mask: url("../assets/icons/chevron.svg") no-repeat center / contain;
+    }
+
+    .checkRow {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr);
+        gap: 0.75rem;
+        align-items: start;
+
+        padding: 0.875rem 1.125rem;
+        border: 1px solid var(--hairline-soft);
+        border-radius: var(--r-card);
+        cursor: pointer;
+    }
+
+    .checkRow:hover { border-color: var(--hairline); }
+    .checkRow > span { display: grid; gap: 0.3125rem; }
+    .checkRow .hint { padding-left: 0; }
+
+    .checkRow input {
+        width: 1.125rem;
+        height: 1.125rem;
+        margin-top: 0.125rem;
+        accent-color: var(--c-orange);
+        cursor: pointer;
+    }
+
+    .checkRow input:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-ring-offset); }
+
+    /* ── Routing card ─────────────────────────────────────────────────── */
+
+    .route {
+        display: grid;
+        gap: 0.375rem;
+
+        padding: 1rem 1.25rem;
+        border-left: 3px solid var(--route-accent, var(--c-orange));
+        border-radius: 0 var(--r-sm) var(--r-sm) 0;
+        background: color-mix(in srgb, var(--route-accent, var(--c-orange)) 9%, transparent);
+    }
+
+    .route[data-accent="orange"] { --route-accent: var(--c-orange); }
+    .route[data-accent="purple"] { --route-accent: var(--c-purple); }
+    .route[data-accent="sky"]    { --route-accent: var(--c-blue-sky); }
+    .route[data-accent="green"]  { --route-accent: var(--c-green-bright); }
+    .route[data-accent="red"]    { --route-accent: var(--c-red); }
+
+    .route p { margin: 0; }
+    .routeLabel { color: var(--route-accent, var(--c-orange)); letter-spacing: 0.06em; }
+    .routeDesk { color: var(--text-colour-light); }
+    .routeBlurb,
+    .routeResponse,
+    .routeCaution,
+    .routeDiscord { color: var(--ink-body); line-height: 1.6; }
+
+    .routeResponse { color: var(--ink-muted); }
+
+    .routeCaution {
+        margin-top: 0.375rem !important;
+        padding-top: 0.625rem;
+        border-top: 1px solid var(--hairline-soft);
+        color: var(--c-orange);
+    }
+
+    .route a { color: var(--route-accent, var(--c-orange)); }
+    .route a:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-ring-offset); }
+
+    /* The details block swaps in when the topic changes; without the movement
+       the form appears to have silently rewritten itself. */
+    .details:not([hidden]) { animation: revealDetails var(--dur-normal) var(--ease-out) both; }
+
+    @keyframes revealDetails {
+        from { opacity: 0; transform: translateY(-0.375rem); }
+        to   { opacity: 1; transform: none; }
+    }
+
+    /* ── Actions and status ───────────────────────────────────────────── */
+
+    .actions { display: grid; gap: 0.875rem; justify-items: start; }
+    .actions button { cursor: pointer; }
+    .actionsNote { margin: 0; color: var(--ink-muted); max-width: 38rem; line-height: 1.6; }
+
+    [data-submit][aria-busy="true"] { cursor: progress; opacity: 0.75; }
+
+    .nudge { margin: 0; padding-left: 1rem; color: var(--c-blue-sky); line-height: 1.5; }
+
+    .status {
+        margin: 0;
+        padding: 1rem 1.25rem;
+        border-left: 3px solid var(--status-accent, var(--c-blue-sky));
+        border-radius: 0 var(--r-sm) var(--r-sm) 0;
+        background: color-mix(in srgb, var(--status-accent, var(--c-blue-sky)) 9%, transparent);
+        color: var(--ink-body);
+        line-height: 1.6;
+    }
+
+    .status[data-tone="ok"]   { --status-accent: var(--c-green-bright); }
+    .status[data-tone="warn"] { --status-accent: var(--c-orange); }
+    .status[data-tone="bad"]  { --status-accent: var(--c-red); }
+
+    /* ── Live ticket ──────────────────────────────────────────────────── */
+
+    .rail { position: sticky; top: calc(var(--header-h) + 1.5rem); min-width: 0; }
+
+    .previewCard {
+        display: grid;
+        gap: 0.875rem;
+        padding: 1.25rem;
+        border-radius: var(--r-card);
+        background: var(--surface-card);
+        box-shadow: var(--surface-card-inset);
+    }
+
+    .previewHead {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+    }
+
+    .previewHead h3 { margin: 0; color: var(--ink-muted); letter-spacing: 0.06em; }
+
+    .copyBtn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4375rem;
+
+        padding: 0.375rem 0.875rem;
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-pill);
+        background: transparent;
+        color: var(--ink-body);
+        cursor: pointer;
+        font-family: Lexend, sans-serif;
+
+        transition: border-color var(--dur-fast) var(--ease-out),
+                    color var(--dur-fast) var(--ease-out);
+    }
+
+    .copyBtn::before {
+        content: "";
+        width: 0.875rem;
+        height: 0.875rem;
+        flex-shrink: 0;
+        background-color: currentColor;
+        -webkit-mask: url("../assets/icons/clipboard.svg") no-repeat center / contain;
+        mask: url("../assets/icons/clipboard.svg") no-repeat center / contain;
+    }
+
+    .copyBtn:hover { border-color: var(--c-purple); color: var(--c-purple); }
+    .copyBtn:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-ring-offset); }
+
+    .copyBtn[data-copied] { border-color: var(--c-green-bright); color: var(--c-green-bright); }
+    .copyBtn[data-copied]::before {
+        -webkit-mask: url("../assets/icons/tick.svg") no-repeat center / contain;
+        mask: url("../assets/icons/tick.svg") no-repeat center / contain;
+    }
+
+    .preview {
+        margin: 0;
+        padding: 1rem;
+        max-height: min(28rem, 55vh);
+        overflow: auto;
+
+        border: 1px solid var(--hairline-soft);
+        border-radius: var(--r-sm);
+        background: rgba(0, 0, 0, 0.28);
+
+        font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+        font-size: 0.8125rem;
+        line-height: 1.65;
+        color: var(--ink-body);
+
+        /* User agent strings and URLs have no break opportunities, and one of
+           them must not widen the whole rail. */
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+    }
+
+    .preview:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-ring-offset); }
+
+    .previewFoot { margin: 0; color: var(--ink-muted); line-height: 1.5; }
+
+    /* ── Closing ──────────────────────────────────────────────────────── */
+
+    .closing {
+        margin-top: 5rem;
+        padding-top: 3rem;
+        border-top: 1px solid var(--hairline);
+    }
+
+    .closing h2 { margin: 0 0 1.5rem; font-size: 1.375rem; line-height: 1.3; }
+
+    .closingGrid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 20rem);
+        gap: 3rem;
+        align-items: start;
+    }
+
+    .closingGrid > p { margin: 0; max-width: 44rem; color: var(--ink-body); line-height: 1.7; }
+    .closingGrid a { color: var(--c-orange); text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    .closingGrid a:hover { color: var(--c-purple); }
+    .closingGrid a:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-ring-offset); }
+
+    .postal { display: grid; gap: 1.25rem; margin: 0; }
+    .postal dt { color: var(--c-orange); letter-spacing: 0.06em; margin-bottom: 0.375rem; }
+    .postal dd { margin: 0; color: var(--ink-body); line-height: 1.6; }
+
+    /* ── Responsive ───────────────────────────────────────────────────── */
+
+    /* The rail stops earning its column before the form does, so it drops
+       under the form rather than both halves shrinking together. */
+    @media (max-width: 1100px) {
+        .page { padding-left: var(--space-md); padding-right: var(--space-md); }
+        .masthead { grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
+        .composerGrid { grid-template-columns: minmax(0, 1fr); gap: 2.5rem; }
+        .rail { position: static; }
+        .preview { max-height: 22rem; }
+        .closingGrid { grid-template-columns: minmax(0, 1fr); gap: 2rem; }
+    }
+
+    @media (max-width: 760px) {
+        .page { padding: 2.5rem 1.25rem 3.5rem; }
+        .detailsGrid { grid-template-columns: minmax(0, 1fr); }
+        .channel { padding: 1.125rem 1.25rem; }
+        .actions { justify-items: stretch; }
+        .actions button { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .details:not([hidden]) { animation: none; }
+        .channel,
+        .control,
+        .copyBtn,
+        .channelLink { transition: none; }
+    }
+</style>

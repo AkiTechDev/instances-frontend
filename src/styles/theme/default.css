@@ -59,6 +59,22 @@
     --colour-filterBtn:         var(--c-cream-grey);
     --colour-filterBtn-border:  var(--c-grey-200);
 
+    /* -------- Dark-surface ink & hairlines --------
+       The body gradient is dark on every marketing page, so full-white body
+       copy glares. These are the four values that dark surfaces actually need:
+       two text weights and two rule weights. */
+    --ink-body:      rgba(255, 255, 255, 0.82);
+    --ink-muted:     rgba(255, 255, 255, 0.55);
+    --hairline:      rgba(239, 241, 255, 0.12);
+    --hairline-soft: rgba(239, 241, 255, 0.07);
+
+    /* -------- Card surface --------
+       The landing page's card recipe. A near-transparent tilted gradient plus a
+       1px inset highlight, so cards read as glass over the body gradient rather
+       than as flat panels. Used by every card on the marketing site. */
+    --surface-card:       linear-gradient(295.31deg, rgba(14, 19, 44, 0.2) 4.75%, rgba(48, 58, 106, 0.2) 86.61%);
+    --surface-card-inset: inset 1px 1px 2px rgba(255, 255, 255, 0.05);
+
     /* -------- Body gradient (the global background) -------- */
     --bg-body: linear-gradient(180deg, #22263E 0%, #191C2E 100%);
 

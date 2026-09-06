@@ -1,0 +1,1124 @@
+---
+// Order matters: tokens (theme/default) before the sheets that consume them,
+// and identical on every entry point so the cascade can't diverge per page.
+import "../styles/normalise.css"
+import "../styles/global.css"
+import "../styles/theme/default.css"
+import "../styles/typography.css"
+import "../styles/legal.css"
+
+import Header from "../components/astrojs/header/Header.astro";
+import Newsletter from "../components/newsletter/Newsletter.astro";
+import Footer from "../components/astrojs/Footer/Footer.astro";
+
+import button from "../styles/components/button.module.css";
+import Banner from "../assets/images/WelcomeToInstances.png";
+
+/* ────────────────────────────────────────────────────────────────────────────
+   Values still to be confirmed before this page goes live.
+
+   Same rule as the privacy policy: nothing here is invented. Anything
+   unresolved renders as a loud `[bracketed]` marker in the copy rather than a
+   plausible-looking commitment, and is repeated in the dev-only checklist at
+   the top of the page.
+
+   Terms carry more risk than a privacy policy — these are promises that get
+   enforced against us — so a bracketed number in the draft stays bracketed
+   here until someone decides it.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+const terms = {
+    /** §13. Public status page. Null until one exists; the sentence is withheld
+        rather than pointing customers at nothing. */
+    statusPageUrl: null as string | null,
+
+    /** §14. Where customers export Your Content. Section 14 puts backups
+        entirely in their hands, which is far harder to defend while we can't
+        point at a way for them to actually take a copy. */
+    dataExportUrl: null as string | null,
+};
+
+/* Internal routes. `/privacy-policy` is the real path — the draft cited
+   `/privacy`, which does not exist. `/pricing`, `/contact` and `/games` are
+   routed but currently render empty; §9's rates and §2's game list are
+   contractual, so those pages are launch blockers, not cosmetic gaps. */
+const links = {
+    privacyPolicy: "/privacy-policy",
+    /* The live list is the landing page's Supported Games section; `/games`
+       exists as a route but has no content yet. */
+    supportedGames: "/#games",
+    pricing: "/pricing",
+    contact: "/contact",
+};
+
+/** Bump whenever the substance of this page changes. Archive the superseded
+    version at a stable URL first — customers may need to show which version
+    they agreed to. */
+const lastUpdated = new Date("2026-09-06T00:00:00Z");
+const lastUpdatedLabel = lastUpdated.toLocaleDateString("en-GB", {
+    day: "numeric", month: "long", year: "numeric", timeZone: "UTC",
+});
+
+/** Drives the dev-only checklist. Keep in step with the `.pending` markers. */
+const outstanding = [
+    "§2 + §5 — publish the Supported Games list (this page cites the landing-page section; /games is routed but empty)",
+    "§5 — notice period before a game is removed (14 days proposed)",
+    "§9 — /pricing is empty, and §9 makes the rates published there contractual",
+    "§9 — VAT position (place of supply for consumers is their country; no threshold for EU sales)",
+    "§9 — billing currency",
+    "§9 — failed-payment suspension (7 days) and termination (30 days) windows",
+    "§11 — data export window and backup expiry after account closure",
+    "§12 — notice period if we withdraw the service entirely (30 days proposed)",
+    ...(terms.statusPageUrl ? [] : ["§13 — status page URL, or drop the sentence"]),
+    "§13 — whether storage charges accrue during an outage; say so either way",
+    ...(terms.dataExportUrl ? [] : ["§14 — how customers export Your Content; §14 is much weaker without it"]),
+    "§16 — liability cap floor (£100 is a placeholder)",
+    "§20 — complaint acknowledgement (2 working days) and resolution (14 days) targets",
+    "A4 — notice before adding or replacing a sub-processor (30 days proposed)",
+    "§1 / §10 / §20 — /contact is empty and is the cancellation and complaints route",
+    "Process — record per-game licence basis: how each binary is obtained, terms relied on, commercial-hosting restrictions, date checked",
+    "Process — capture Annex A acceptance at signup with a timestamp and version number",
+    "Process — send cooling-off information and a model cancellation form in the signup confirmation email",
+];
+
+/* Single source of truth for the contents nav. Rendered twice (sticky sidebar +
+   mobile disclosure); the scrollspy warns in dev if it drifts from the headings. */
+const sections = [
+    { id: "about",            n: "1",  title: "About these terms" },
+    { id: "definitions",      n: "2",  title: "Some words we use" },
+    { id: "eligibility",      n: "3",  title: "Who can use Instances" },
+    { id: "your-account",     n: "4",  title: "Your account" },
+    { id: "what-we-provide",  n: "5",  title: "What we provide, and what we don't" },
+    { id: "your-content",     n: "6",  title: "Your Instances and Your Content" },
+    { id: "acceptable-use",   n: "7",  title: "Acceptable use" },
+    { id: "our-access",       n: "8",  title: "Our access, and moderation" },
+    { id: "pricing-payment",  n: "9",  title: "Pricing and payment" },
+    { id: "cooling-off",      n: "10", title: "Your 14-day right to change your mind" },
+    { id: "closing-account",  n: "11", title: "Closing your account" },
+    { id: "suspension",       n: "12", title: "Suspension and termination by us" },
+    { id: "availability",     n: "13", title: "Availability" },
+    { id: "backups",          n: "14", title: "Backups" },
+    { id: "changes",          n: "15", title: "Changes to terms, service and prices" },
+    { id: "our-liability",    n: "16", title: "Our responsibility to you" },
+    { id: "your-liability",   n: "17", title: "Your responsibility to us" },
+    { id: "our-ip",           n: "18", title: "Our intellectual property" },
+    { id: "beta",             n: "19", title: "Beta and preview features" },
+    { id: "complaints",       n: "20", title: "Complaints" },
+    { id: "governing-law",    n: "21", title: "Governing law" },
+    { id: "general",          n: "22", title: "General" },
+];
+
+const annexSections = [
+    { id: "annex-roles",            n: "A1", title: "Roles" },
+    { id: "annex-scope",            n: "A2", title: "What we process for you" },
+    { id: "annex-our-obligations",  n: "A3", title: "Our obligations" },
+    { id: "annex-subprocessors",    n: "A4", title: "Sub-processors" },
+    { id: "annex-transfers",        n: "A5", title: "International transfers" },
+    { id: "annex-your-obligations", n: "A6", title: "Your obligations as controller" },
+];
+
+const seo_des = "The agreement between you and Aki Laboratories for using Instances: what we provide, what you pay, what you're responsible for, and how either of us can end it. Pay-as-you-use, no subscription, no minimum commitment.";
+const domain = "instances.aki-labs.com";
+---
+<!doctype html>
+<html lang="en" class="en" prefix="og: http://ogp.me/ns#">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="author" content="Aki Laboratories Limited">
+        <meta name="referrer" content="strict-origin-when-cross-origin">
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+
+        <!-- SEO -->
+        <title>Terms and Conditions - Instances</title>
+        <meta name="description" content={seo_des}>
+        <meta itemprop="description" content={seo_des}>
+        <meta name="robots" content="all" />
+        <link rel="canonical" href={`https://${domain}/terms`}>
+        <link rel="sitemap" href="/sitemap-index.xml" />
+
+        <!-- Twitter/X specific -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="Terms and Conditions - Instances">
+        <meta name="twitter:description" content={seo_des}>
+        <meta name="twitter:image" content={Banner.src}>
+        <meta name="twitter:site" content="@aki_labs">
+
+        <!-- Open Graph -->
+        <meta property="og:title" content="Terms and Conditions - Instances">
+        <meta property="og:description" content={seo_des}>
+        <meta property="og:type" content="article">
+        <meta property="og:url" content={`https://${domain}/terms`}>
+        <meta property="og:image" content={Banner.src}>
+        <meta property="og:site_name" content="Instances">
+        <meta property="og:locale" content="en_US">
+
+        <meta name="theme-color" content="#191C2E">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+    </head>
+    <body>
+        <Header />
+
+        <main class="page">
+
+            {import.meta.env.DEV && (
+                <aside class="devChecklist" aria-label="Pre-publication checklist (development only)">
+                    <p class="bodyTextSmallSemi">Before this page goes live — {outstanding.length} items outstanding</p>
+                    <ul>
+                        {outstanding.map((item) => <li class="bodyTextSmall">{item}</li>)}
+                    </ul>
+                    <p class="bodyTextSmallest">This panel renders in <code>astro dev</code> only. Every bracketed value below also appears inline as a marker.</p>
+                </aside>
+            )}
+
+            <!-- ── Hero ───────────────────────────────────────────────────── -->
+            <header class="hero">
+                <p class="eyebrow bodyTextSmallestSemiCaps">Legal</p>
+                <h1 class="h3">Terms and <span class="gradientOne">Conditions</span></h1>
+                <p class="subTitle heroLead">
+                    The agreement between you and Aki Laboratories for using Instances. You pay
+                    only for what you use, you own what you build, and you can leave whenever you
+                    like. The rest is the detail — including the parts where we're deliberately
+                    telling you what we <em>don't</em> do.
+                </p>
+
+                <div class="heroMeta">
+                    <p class="bodyTextSmall">
+                        Last updated <time datetime={lastUpdated.toISOString().slice(0, 10)}>{lastUpdatedLabel}</time>
+                    </p>
+                    <span class="metaDot" aria-hidden="true"></span>
+                    <p class="bodyTextSmall">Aki Laboratories Limited &middot; Company no. 14904443</p>
+                </div>
+
+                <nav class="jumpTo" aria-label="Most-read sections">
+                    <a class="bodyTextSmallSemi" href="#acceptable-use">Acceptable use</a>
+                    <a class="bodyTextSmallSemi" href="#pricing-payment">What you pay</a>
+                    <a class="bodyTextSmallSemi" href="#backups">Backups</a>
+                    <a class="bodyTextSmallSemi" href="#cooling-off">Cancelling</a>
+                    <a class="bodyTextSmallSemi" href={links.privacyPolicy}>Privacy Policy</a>
+                </nav>
+            </header>
+
+            <div class="layout">
+
+                <!-- ── Contents: sticky sidebar (desktop) ─────────────────── -->
+                <aside class="tocDesktop" data-toc>
+                    <nav aria-labelledby="tocHeading">
+                        <p id="tocHeading" class="tocTitle bodyTextSmallestSemiCaps">Contents</p>
+                        <ol>
+                            {sections.map((s) => (
+                                <li>
+                                    <a href={`#${s.id}`} class="bodyTextSmall">
+                                        <span class="tocNum">{s.n}</span>
+                                        <span class="tocText">{s.title}</span>
+                                    </a>
+                                </li>
+                            ))}
+                        </ol>
+
+                        <a href="#annex" class="tocGroup bodyTextSmallestSemiCaps">Annex A &mdash; Data Processing</a>
+                        <ol>
+                            {annexSections.map((s) => (
+                                <li>
+                                    <a href={`#${s.id}`} class="bodyTextSmall">
+                                        <span class="tocNum">{s.n}</span>
+                                        <span class="tocText">{s.title}</span>
+                                    </a>
+                                </li>
+                            ))}
+                        </ol>
+                    </nav>
+                </aside>
+
+                <!-- ── Contents: disclosure (mobile) ──────────────────────── -->
+                <details class="tocMobile" data-toc>
+                    <summary class="bodyTextSmallSemi">Contents<span class="tocChevron" aria-hidden="true"></span></summary>
+                    <ol>
+                        {sections.map((s) => (
+                            <li>
+                                <a href={`#${s.id}`} class="bodyTextSmall">
+                                    <span class="tocNum">{s.n}</span>
+                                    <span class="tocText">{s.title}</span>
+                                </a>
+                            </li>
+                        ))}
+                    </ol>
+                    <a href="#annex" class="tocGroup bodyTextSmallestSemiCaps">Annex A &mdash; Data Processing</a>
+                    <ol>
+                        {annexSections.map((s) => (
+                            <li>
+                                <a href={`#${s.id}`} class="bodyTextSmall">
+                                    <span class="tocNum">{s.n}</span>
+                                    <span class="tocText">{s.title}</span>
+                                </a>
+                            </li>
+                        ))}
+                    </ol>
+                </details>
+
+                <!-- ── Terms body ─────────────────────────────────────────── -->
+                <article class="prose">
+
+                    <!-- 1 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="about">
+                        <h2 id="about" class="h5"><span class="sectionNum">1</span>About these terms</h2>
+                        <p class="bodyText">
+                            These terms are an agreement between you and <strong>Aki Laboratories Limited</strong>
+                            ("we", "us", "our"), a company registered in England and Wales.
+                        </p>
+
+                        <dl class="factGrid">
+                            <div class="fact">
+                                <dt class="bodyTextSmallestSemiCaps">Company number</dt>
+                                <dd class="bodyTextSmall">14904443</dd>
+                            </div>
+                            <div class="fact">
+                                <dt class="bodyTextSmallestSemiCaps">Registered address</dt>
+                                <dd class="bodyTextSmall">124-128 City Road, London, England, EC1V 2NX</dd>
+                            </div>
+                            <div class="fact">
+                                <dt class="bodyTextSmallestSemiCaps">Contact</dt>
+                                <dd class="bodyTextSmall"><a href="mailto:help@aki-labs.com">help@aki-labs.com</a></dd>
+                            </div>
+                            <div class="fact">
+                                <dt class="bodyTextSmallestSemiCaps">Contact form</dt>
+                                <dd class="bodyTextSmall"><a href={links.contact}>instances.aki-labs.com/contact</a></dd>
+                            </div>
+                        </dl>
+
+                        <p class="bodyText">
+                            They govern your use of <strong>Instances</strong>, our platform for provisioning and
+                            managing game hosting infrastructure, at www.instances.aki-labs.com.
+                        </p>
+                        <p class="bodyText">
+                            By creating an account you agree to these terms. If you don't agree with them, don't
+                            create an account.
+                        </p>
+                        <p class="bodyText">
+                            Our <a href={links.privacyPolicy}>Privacy Policy</a> explains what we do with your
+                            personal data and forms part of this agreement. <strong><a href="#annex">Annex A</a></strong>
+                            sets out how we handle personal data on your behalf, and also forms part of this agreement.
+                        </p>
+
+                        <p class="callout callout--good bodyText">
+                            <strong>Nothing in these terms affects your statutory rights as a consumer.</strong>
+                            Where anything here conflicts with those rights, your statutory rights win.
+                        </p>
+                    </section>
+
+                    <!-- 2 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="definitions">
+                        <h2 id="definitions" class="h5"><span class="sectionNum">2</span>Some words we use</h2>
+
+                        <dl class="defGrid">
+                            <div class="defCard">
+                                <dt class="defTerm subtitleSemi">Instance</dt>
+                                <dd class="bodyTextSmall">A game server or other hosting resource you create through our platform.</dd>
+                            </div>
+                            <div class="defCard">
+                                <dt class="defTerm subtitleSemi">Your Content</dt>
+                                <dd class="bodyTextSmall">Anything you upload, install, configure or generate on an Instance, including game files, world data, mods, configuration and logs.</dd>
+                            </div>
+                            <div class="defCard">
+                                <dt class="defTerm subtitleSemi">Players</dt>
+                                <dd class="bodyTextSmall">People who connect to an Instance you run.</dd>
+                            </div>
+                            <div class="defCard">
+                                <dt class="defTerm subtitleSemi">Supported Games</dt>
+                                <dd class="bodyTextSmall">
+                                    The games we've made available on the platform, listed at
+                                    <a href={links.supportedGames}>instances.aki-labs.com</a>
+                                    <span class="pending">a dedicated Supported Games page &mdash; to be published</span>.
+                                </dd>
+                            </div>
+                        </dl>
+                    </section>
+
+                    <!-- 3 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="eligibility">
+                        <h2 id="eligibility" class="h5"><span class="sectionNum">3</span>Who can use Instances</h2>
+                        <p class="bodyText">
+                            Instances is for <strong>individuals</strong>. Accounts are personal, and you may not
+                            open one on behalf of a company or use the platform to provide hosting services to
+                            others commercially. If that's what you need, contact us at
+                            <a href="mailto:help@aki-labs.com">help@aki-labs.com</a> and we'll talk.
+                        </p>
+
+                        <p class="callout callout--warn bodyText">
+                            You must be <strong>18 or over</strong> to hold an account. If you're under 18, you
+                            can't use Instances, and we'll close any account we find belongs to someone underage.
+                        </p>
+
+                        <p class="bodyText">You must also:</p>
+                        <ul class="markerList bodyText">
+                            <li>have the legal capacity to enter into a contract;</li>
+                            <li>not be located in, or ordinarily resident in, a country subject to UK or applicable international sanctions, and not be a person subject to such sanctions.</li>
+                        </ul>
+                    </section>
+
+                    <!-- 4 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="your-account">
+                        <h2 id="your-account" class="h5"><span class="sectionNum">4</span>Your account</h2>
+                        <p class="bodyText">You're responsible for your account and for anything done through it.</p>
+                        <p class="bodyText">
+                            Keep your login details secure and don't share them. We strongly recommend turning on
+                            multi-factor authentication. Tell us at
+                            <a href="mailto:help@aki-labs.com">help@aki-labs.com</a> as soon as you suspect someone
+                            else has access.
+                        </p>
+                        <p class="bodyText">
+                            We won't be responsible for losses arising from someone else using your account, unless
+                            the unauthorised access was our fault.
+                        </p>
+                        <p class="bodyText">
+                            You need one account per person. Don't create accounts to get around a suspension, a
+                            limit, or a free allowance.
+                        </p>
+                    </section>
+
+                    <!-- 5 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="what-we-provide">
+                        <h2 id="what-we-provide" class="h5"><span class="sectionNum">5</span>What we provide, and what we don't</h2>
+                        <p class="bodyText">
+                            Our platform lets you create, configure, run and manage game servers across the hosting
+                            regions we offer. Each one you create is an Instance.
+                        </p>
+                        <p class="bodyText">
+                            We supply the platform and the container images that make Supported Games run on it.
+                            <strong>We don't own the games, and we don't license them to you.</strong>
+                        </p>
+
+                        <p class="callout callout--note bodyText">
+                            Where a game's server software is included in, or downloaded by, one of our images, it
+                            reaches you under that game publisher's own licence and end-user terms &mdash; not ours.
+                            Your right to run it comes from the publisher. We're not affiliated with, endorsed by,
+                            sponsored by, or acting on behalf of any game publisher or developer, and nothing here
+                            grants you any rights in their software.
+                        </p>
+
+                        <p class="bodyText">
+                            <strong>We support a limited list of games.</strong> You'll find the current list at
+                            <a href={links.supportedGames}>instances.aki-labs.com</a>. We may add games, and we may
+                            remove them &mdash; including where a publisher changes its terms, withdraws permission,
+                            or asks us to stop. If we remove a game you're running, we'll give you at least
+                            <span class="pending">14 days' notice &mdash; to be confirmed</span> and time to get your
+                            data out, unless a publisher or the law requires us to act faster.
+                        </p>
+                        <p class="bodyText">
+                            We may also add, change or remove platform features. If a change materially reduces the
+                            value of what you're using, <a href="#changes">section 15</a> applies.
+                        </p>
+                    </section>
+
+                    <!-- 6 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="your-content">
+                        <h2 id="your-content" class="h5"><span class="sectionNum">6</span>Your Instances and Your Content</h2>
+
+                        <p class="callout callout--good bodyText">
+                            <strong>Your Content belongs to you.</strong> We don't claim any ownership of it.
+                        </p>
+
+                        <p class="bodyText">
+                            You give us permission to host, store, copy, transmit and display Your Content only to
+                            the extent we need to in order to run the service, keep it secure, and provide support
+                            you've asked for. That permission ends when the content is deleted.
+                        </p>
+                        <p class="bodyText"><strong>You're responsible for what runs on your Instances.</strong> That means:</p>
+                        <ul class="markerList bodyText">
+                            <li>complying with the licence and end-user terms of any game you run, including any restrictions on commercial use, paid access, advertising or monetisation &mdash; several major publishers restrict these, and it's on you to check;</li>
+                            <li>having the right to use any mods, plugins, assets or custom content you install;</li>
+                            <li>complying with the law wherever you and your Players are;</li>
+                            <li>what your Players do on your Instance, and moderating it.</li>
+                        </ul>
+                        <p class="bodyText">
+                            If you charge Players for access, or monetise your Instance in any way, that's between
+                            you and the publisher. We don't check it and we're not liable if you get it wrong.
+                        </p>
+                    </section>
+
+                    <!-- 7 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="acceptable-use">
+                        <h2 id="acceptable-use" class="h5"><span class="sectionNum">7</span>Acceptable use</h2>
+                        <p class="bodyText">Don't use Instances to:</p>
+
+                        <ul class="banList">
+                            <li class="bodyText">host, store or distribute anything illegal, or anything that infringes someone else's rights;</li>
+                            <li class="bodyText">host child sexual abuse material &mdash; we report this to the authorities without notice and terminate immediately;</li>
+                            <li class="bodyText">send spam, or run phishing, fraud, or malware distribution;</li>
+                            <li class="bodyText">attack anyone: DDoS, port scanning, brute-forcing, or unauthorised access attempts against any system, including ours;</li>
+                            <li class="bodyText">mine cryptocurrency, or run workloads whose purpose is to consume compute rather than host a game;</li>
+                            <li class="bodyText">harass or threaten anyone, or facilitate harassment, including of Players on your own Instance;</li>
+                            <li class="bodyText">run pirated or cracked game server software, or circumvent licensing or DRM;</li>
+                            <li class="bodyText">resell, sublicense or white-label the platform as your own service;</li>
+                            <li class="bodyText">deliberately evade resource limits, or degrade the service for other customers;</li>
+                            <li class="bodyText">misrepresent your identity or your authority to act.</li>
+                        </ul>
+
+                        <p class="bodyText">
+                            If you're unsure whether something is allowed, ask us at
+                            <a href="mailto:help@aki-labs.com">help@aki-labs.com</a> before you do it.
+                        </p>
+                    </section>
+
+                    <!-- 8 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="our-access">
+                        <h2 id="our-access" class="h5"><span class="sectionNum">8</span>Our access to your Instances, and moderation</h2>
+                        <p class="bodyText">
+                            We can access your Instance's contents, including files, world data, logs and chat
+                            records. We only do this where you've asked us to as part of a support request, where
+                            we're investigating a security incident or a report of abuse or illegal content, where
+                            we need to protect our infrastructure or other customers, or where the law requires it.
+                            Our <a href={links.privacyPolicy}>Privacy Policy</a> explains this in more detail.
+                        </p>
+                        <p class="bodyText">
+                            We don't monitor Instances proactively and we're not obliged to. But when something is
+                            reported to us, or we detect it, we may investigate.
+                        </p>
+                        <p class="bodyText">
+                            If we find a breach of <a href="#acceptable-use">section 7</a>, we may &mdash; depending
+                            on how serious it is &mdash; warn you, suspend the Instance, suspend your account, remove
+                            specific content, or terminate this agreement. We'll normally tell you first and give you
+                            a chance to fix it, unless the breach is serious, unlawful, or fixing it would risk harm
+                            to others.
+                        </p>
+                    </section>
+
+                    <!-- 9 ─────────────────────────────────────────────────── -->
+                    <section aria-labelledby="pricing-payment">
+                        <h2 id="pricing-payment" class="h5"><span class="sectionNum">9</span>Pricing and payment</h2>
+
+                        <div class="labelledBlock labelledBlock--emphasis">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">You pay for what you use</h3>
+                            <p class="bodyText">
+                                There's no subscription and no minimum commitment. Charges accrue based on the
+                                resources your Instances consume, at the rates published at
+                                <a href={links.pricing}>instances.aki-labs.com/pricing</a>. You can see what you've
+                                accrued in your account at any time.
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">When you pay</h3>
+                            <p class="bodyText">
+                                We total your usage at the end of each calendar month and charge your saved payment
+                                method shortly afterwards. You need a valid payment method on file to run an Instance.
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">How you pay</h3>
+                            <p class="bodyText">
+                                Payments are processed by Stripe. You authorise us to charge your saved payment
+                                method for amounts due.
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">When charges stop</h3>
+                            <p class="bodyText">
+                                Compute charges stop when an Instance stops. <strong>Storage charges continue for as
+                                long as we're holding your data</strong>, including for an Instance that's stopped but
+                                not deleted. To stop all charges, delete the Instance. We'll make the difference clear
+                                in the product.
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">Tax</h3>
+                            <p class="bodyText">
+                                <span class="pending">VAT position &mdash; to be confirmed. Cloud hosting is an
+                                electronically supplied service, so for consumers the place of supply is their own
+                                country; EU consumer sales have no registration threshold</span>
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">Currency</h3>
+                            <p class="bodyText">
+                                All charges are in <span class="pending">GBP or USD &mdash; to be confirmed</span>.
+                                Your bank may apply conversion fees we don't control.
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">Failed payments</h3>
+                            <p class="bodyText">
+                                If a payment fails we'll try again and tell you. If it's still unpaid after
+                                <span class="pending">7 days &mdash; to be confirmed</span> we may suspend your
+                                Instances. If it's unpaid after <span class="pending">30 days &mdash; to be
+                                confirmed</span> we may terminate your account and delete your data. Suspended
+                                Instances may continue to incur storage charges &mdash; we'll tell you this when we
+                                suspend.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- 10 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="cooling-off">
+                        <h2 id="cooling-off" class="h5"><span class="sectionNum">10</span>Your 14-day right to change your mind</h2>
+
+                        <p class="callout callout--good bodyText">
+                            As a consumer buying online, you have a legal right to cancel this agreement within
+                            <strong>14 days</strong> of entering into it, without giving a reason.
+                        </p>
+
+                        <p class="bodyText">
+                            Because you only ever pay for what you've used, this right is straightforward here. If
+                            you cancel within 14 days, you'll be charged for the resources you actually consumed up
+                            to that point and nothing else. There's no subscription or upfront payment to refund.
+                        </p>
+                        <p class="bodyText">
+                            If you'd prefer not to incur any charges at all during the 14 days, don't create an
+                            Instance.
+                        </p>
+                        <p class="bodyText">
+                            To cancel, email <a href="mailto:help@aki-labs.com">help@aki-labs.com</a> or use the
+                            form at <a href={links.contact}>instances.aki-labs.com/contact</a>. You don't have to
+                            give a reason.
+                        </p>
+                    </section>
+
+                    <!-- 11 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="closing-account">
+                        <h2 id="closing-account" class="h5"><span class="sectionNum">11</span>Closing your account, and what happens to your data</h2>
+                        <p class="bodyText">
+                            You can close your account at any time from your account settings, or by emailing
+                            <a href="mailto:help@aki-labs.com">help@aki-labs.com</a>.
+                        </p>
+                        <p class="bodyText">
+                            Charges stop as described in <a href="#pricing-payment">section 9</a>. We'll bill you for
+                            usage accrued up to closure in the normal monthly cycle.
+                        </p>
+                        <p class="bodyText"><strong>Your data.</strong> When your account closes:</p>
+                        <ul class="markerList bodyText">
+                            <li>your Instances are stopped and your data is scheduled for deletion;</li>
+                            <li>you have <span class="pending">TBC days</span> to export Your Content before deletion;</li>
+                            <li>after that it's deleted, and backups of our own systems expire within a further <span class="pending">TBC days</span>;</li>
+                            <li>we keep billing records for six years, as UK tax law requires.</li>
+                        </ul>
+
+                        <p class="callout callout--warn bodyText">
+                            Export Your Content before you close your account. Once deleted, we can't recover it.
+                        </p>
+                    </section>
+
+                    <!-- 12 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="suspension">
+                        <h2 id="suspension" class="h5"><span class="sectionNum">12</span>Suspension and termination by us</h2>
+                        <p class="bodyText">We may suspend or terminate your account, or a specific Instance, if:</p>
+                        <ul class="markerList bodyText">
+                            <li>you breach these terms, particularly <a href="#acceptable-use">section 7</a>;</li>
+                            <li>you don't pay;</li>
+                            <li>we're required to by law, a court, or a regulator;</li>
+                            <li>keeping the Instance running would expose us or others to a real risk of harm or legal liability.</li>
+                        </ul>
+                        <p class="bodyText">
+                            <strong>We'll normally warn you first</strong> and give you a reasonable chance to put it
+                            right. We may act without warning where the issue is serious &mdash; illegal content, an
+                            active attack, or a risk to other customers.
+                        </p>
+                        <p class="bodyText">
+                            If we suspend or terminate for a reason that isn't your fault, we won't charge you for
+                            the period you couldn't use the service, and we'll give you a reasonable opportunity to
+                            export your data.
+                        </p>
+                        <p class="bodyText">
+                            We may also stop offering Instances entirely, in which case we'll give you at least
+                            <span class="pending">30 days' notice &mdash; to be confirmed</span> and time to export
+                            your data.
+                        </p>
+                    </section>
+
+                    <!-- 13 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="availability">
+                        <h2 id="availability" class="h5"><span class="sectionNum">13</span>Availability</h2>
+
+                        <p class="callout callout--warn bodyText">
+                            <strong>We don't offer a service level agreement</strong>, and we don't guarantee that
+                            the platform or your Instances will be available without interruption.
+                        </p>
+
+                        <div class="labelledBlock labelledBlock--emphasis">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">What we do commit to</h3>
+                            <p class="bodyText">
+                                We'll provide the service with reasonable care and skill, as the Consumer Rights Act
+                                2015 requires. We'll give advance notice of planned maintenance where we reasonably
+                                can, and aim to schedule it at quieter times.
+                                {terms.statusPageUrl
+                                    ? <Fragment>We publish service status at <a href={terms.statusPageUrl}>our status page</a>.</Fragment>
+                                    : <span class="pending">Service status page &mdash; to be published, or this sentence dropped</span>}
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">What an outage costs you</h3>
+                            <p class="bodyText">
+                                Because you're charged for what you use, compute charges stop when your Instance
+                                stops. An outage doesn't leave you paying for something you're not getting.
+                                <span class="pending">Whether storage charges continue to accrue during an outage
+                                &mdash; to be confirmed and stated plainly either way</span>
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">Things that can interrupt the service</h3>
+                            <p class="bodyText">
+                                Planned and emergency maintenance, faults at our infrastructure providers, network
+                                problems between you and your hosting region, and events outside our reasonable
+                                control.
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">Things outside our control entirely</h3>
+                            <p class="bodyText">
+                                Your own internet connection, the game software you choose to run, mods and plugins
+                                you install, and the behaviour of your Players.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- 14 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="backups" class="keySection">
+                        <h2 id="backups" class="h5"><span class="sectionNum">14</span>Backups</h2>
+
+                        <p class="callout callout--warn bodyText">
+                            <strong>We don't back up Your Content.</strong> There is no backup or restore service on
+                            the platform, and you shouldn't rely on us to recover anything.
+                        </p>
+
+                        <p class="bodyText">
+                            Some games write their own save files or periodic snapshots to the Instance's own
+                            storage, as part of how that game works. <strong>This is not a backup service, and please
+                            don't treat it as one.</strong> It varies from game to game, we don't manage it or
+                            guarantee it, and it doesn't survive the Instance being deleted or its storage being lost.
+                        </p>
+                        <p class="bodyText">
+                            Keep your own copy of anything you can't afford to lose.
+                            {terms.dataExportUrl
+                                ? <Fragment>You can export Your Content at any time &mdash; see <a href={terms.dataExportUrl}>how to export your data</a>.</Fragment>
+                                : <span class="pending">How to export or download Your Content &mdash; to be documented; this section is much harder to rely on until customers have a way to actually do it</span>}
+                        </p>
+                    </section>
+
+                    <!-- 15 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="changes">
+                        <h2 id="changes" class="h5"><span class="sectionNum">15</span>Changes to these terms, the service, and prices</h2>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">These terms</h3>
+                            <p class="bodyText">
+                                We may update these terms where there's a good reason &mdash; a change in the law, a
+                                change to how the service works, new features, or security requirements. We'll give
+                                you at least <strong>30 days' notice</strong> by email and in the product. If you
+                                don't accept the change, you can close your account before it takes effect and you'll
+                                owe nothing beyond the usage you've already incurred.
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">Prices</h3>
+                            <p class="bodyText">
+                                We may change our rates. We'll give you at least <strong>30 days' notice</strong>, and
+                                new rates apply from the start of the next monthly billing period. Usage you've
+                                already incurred is always charged at the rate in force when you incurred it.
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">The service</h3>
+                            <p class="bodyText">
+                                We may change features. If a change materially reduces the value of what you're
+                                using, we'll tell you at least 30 days beforehand.
+                            </p>
+                        </div>
+
+                        <p class="bodyText">We won't make changes retrospectively.</p>
+                    </section>
+
+                    <!-- 16 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="our-liability">
+                        <h2 id="our-liability" class="h5"><span class="sectionNum">16</span>Our responsibility to you</h2>
+
+                        <div class="labelledBlock labelledBlock--emphasis">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">What we don't limit</h3>
+                            <p class="bodyText">
+                                Nothing in these terms excludes or limits our liability for death or personal injury
+                                caused by our negligence, for fraud or fraudulent misrepresentation, or for anything
+                                else that can't be excluded under English law. Your rights under the Consumer Rights
+                                Act 2015 &mdash; including that services are performed with reasonable care and skill
+                                &mdash; always apply.
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">What we're responsible for</h3>
+                            <p class="bodyText">
+                                If we fail to comply with these terms, we're responsible for loss or damage you
+                                suffer that's a foreseeable result of that failure. Loss is foreseeable if it's
+                                obvious it will happen, or if we both knew it might when you entered into this
+                                agreement.
+                            </p>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">What we're not responsible for</h3>
+                            <ul class="markerList bodyText">
+                                <li>Loss of Your Content, where <a href="#backups">section 14</a> puts backups in your hands and you haven't kept your own.</li>
+                                <li>Problems caused by game software, mods or plugins you chose to install.</li>
+                                <li>Anything your Players do.</li>
+                                <li>Consequences of you breaching a game publisher's licence terms.</li>
+                                <li>Losses arising from someone accessing your account because you didn't keep your credentials secure.</li>
+                            </ul>
+                        </div>
+
+                        <div class="labelledBlock">
+                            <h3 class="blockLabel bodyTextSmallestSemiCaps">Our overall limit</h3>
+                            <p class="bodyText">
+                                Except for the things we don't limit above, our total liability to you for all claims
+                                in any 12-month period is limited to the greater of
+                                <span class="pending">£100 &mdash; placeholder, to be decided</span> or the total
+                                amount you paid us in the 12 months before the claim arose.
+                            </p>
+                        </div>
+                    </section>
+
+                    <!-- 17 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="your-liability">
+                        <h2 id="your-liability" class="h5"><span class="sectionNum">17</span>Your responsibility to us</h2>
+                        <p class="bodyText">
+                            If someone brings a claim against us because of Your Content, your use of an Instance, or
+                            your breach of <a href="#acceptable-use">section 7</a>, you agree to cover the reasonable
+                            costs and losses we suffer as a direct result.
+                        </p>
+                        <p class="bodyText">
+                            This only applies where the claim genuinely arises from something you did or failed to
+                            do, and we'll tell you promptly about any such claim, let you be involved in how it's
+                            handled, and not settle it without talking to you first.
+                        </p>
+                    </section>
+
+                    <!-- 18 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="our-ip">
+                        <h2 id="our-ip" class="h5"><span class="sectionNum">18</span>Our intellectual property</h2>
+                        <p class="bodyText">
+                            The platform, its software, design, documentation and branding belong to us. These terms
+                            give you permission to use the service, not ownership of any part of it.
+                        </p>
+                        <p class="bodyText">
+                            Don't copy, reverse-engineer, or create derivative works from the platform, except where
+                            the law says you may.
+                        </p>
+                        <p class="bodyText">
+                            You may tell people you host with us. Don't use our name or logo in a way that suggests
+                            we endorse you or your Instance.
+                        </p>
+                    </section>
+
+                    <!-- 19 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="beta">
+                        <h2 id="beta" class="h5"><span class="sectionNum">19</span>Beta and preview features</h2>
+                        <p class="callout callout--note bodyText">
+                            We may offer features marked beta, preview or experimental. These are provided as-is, may
+                            change or disappear, and are excluded from any commitments in
+                            <a href="#availability">section 13</a>. Don't run anything you care about on them.
+                        </p>
+                    </section>
+
+                    <!-- 20 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="complaints">
+                        <h2 id="complaints" class="h5"><span class="sectionNum">20</span>Complaints</h2>
+                        <p class="bodyText">
+                            Email <a href="mailto:help@aki-labs.com">help@aki-labs.com</a> or use
+                            <a href={links.contact}>instances.aki-labs.com/contact</a>. We'll acknowledge within
+                            <span class="pending">2 working days &mdash; to be confirmed</span> and aim to resolve
+                            things within <span class="pending">14 days &mdash; to be confirmed</span>.
+                        </p>
+                        <p class="bodyText">
+                            If we can't sort it out between us, you can take the matter to court. Nothing here
+                            requires you to give up that right.
+                        </p>
+                    </section>
+
+                    <!-- 21 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="governing-law">
+                        <h2 id="governing-law" class="h5"><span class="sectionNum">21</span>Governing law</h2>
+                        <p class="bodyText">
+                            These terms are governed by the law of England and Wales, and disputes may be brought in
+                            the courts of England and Wales.
+                        </p>
+                        <p class="bodyText">
+                            If you live in Scotland or Northern Ireland, you can also bring proceedings in your own
+                            courts. If you live outside the UK, you keep the benefit of any mandatory consumer
+                            protections in your own country &mdash; this clause doesn't take those away.
+                        </p>
+                    </section>
+
+                    <!-- 22 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="general">
+                        <h2 id="general" class="h5"><span class="sectionNum">22</span>General</h2>
+                        <ul class="markerList bodyText">
+                            <li><strong>Transfer.</strong> You can't transfer your account or your rights under these terms without our agreement. We may transfer ours to a company that takes over our business, and we'll tell you if we do.</li>
+                            <li><strong>Severability.</strong> If a court finds part of these terms unenforceable, the rest continues to apply.</li>
+                            <li><strong>No waiver.</strong> If we don't enforce something straight away, that doesn't mean we've given up the right to.</li>
+                            <li><strong>Notices.</strong> We'll contact you at the email address on your account. Keep it current. You can reach us at <a href="mailto:help@aki-labs.com">help@aki-labs.com</a>.</li>
+                            <li><strong>Whole agreement.</strong> These terms, the <a href={links.privacyPolicy}>Privacy Policy</a> and <a href="#annex">Annex A</a> are the whole agreement between us about Instances.</li>
+                        </ul>
+                    </section>
+
+                    <!-- ── Annex A ────────────────────────────────────────── -->
+                    <section aria-labelledby="annex" class="annexIntro">
+                        <p class="annexKicker bodyTextSmallestSemiCaps">Annex A</p>
+                        <h2 id="annex" class="h5">Data Processing Terms</h2>
+                        <p class="bodyText">
+                            These terms apply where we process personal data on your behalf. They form part of the
+                            agreement between you and Aki Laboratories Limited and satisfy Article 28 of the UK GDPR
+                            and the EU GDPR.
+                        </p>
+                    </section>
+
+                    <!-- A1 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="annex-roles">
+                        <h2 id="annex-roles" class="h5"><span class="sectionNum">A1</span>Roles</h2>
+                        <p class="bodyText">
+                            For personal data about <strong>you</strong> &mdash; your email, username, billing and
+                            account records &mdash; <strong>we are the controller</strong>. Our
+                            <a href={links.privacyPolicy}>Privacy Policy</a> governs that.
+                        </p>
+                        <p class="bodyText">
+                            For personal data processed <strong>on or through your Instances</strong> &mdash; Player
+                            IP addresses, in-game identifiers, chat and event logs, and anything else your game
+                            software records &mdash; <strong>you are the controller and we are your processor</strong>.
+                        </p>
+                    </section>
+
+                    <!-- A2 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="annex-scope">
+                        <h2 id="annex-scope" class="h5"><span class="sectionNum">A2</span>What we process for you</h2>
+
+                        <div class="tableScroll" role="region" aria-label="Scope of processing" tabindex="0">
+                            <table class="dataTable">
+                                <caption class="visuallyHidden">The subject matter, duration, nature, data types and data subjects of the processing we carry out on your behalf</caption>
+                                <tbody>
+                                    <tr>
+                                        <th scope="row">Subject matter</th>
+                                        <td data-label="Subject matter">Hosting and operating the Instances you create.</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Duration</th>
+                                        <td data-label="Duration">For as long as your account and Instances exist, plus the deletion periods in <a href="#closing-account">section 11</a>.</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Nature and purpose</th>
+                                        <td data-label="Nature and purpose">Storage, hosting, transmission, security monitoring, and support.</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Types of personal data</th>
+                                        <td data-label="Types of personal data">IP addresses, in-game usernames and account identifiers, chat and event logs, and whatever else the game software you run records.</td>
+                                    </tr>
+                                    <tr>
+                                        <th scope="row">Categories of data subject</th>
+                                        <td data-label="Categories of data subject">Players and other people who connect to or interact with your Instances.</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- A3 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="annex-our-obligations">
+                        <h2 id="annex-our-obligations" class="h5"><span class="sectionNum">A3</span>Our obligations</h2>
+                        <p class="bodyText">We will:</p>
+                        <ol class="numberedList bodyText">
+                            <li>Process this data only on your documented instructions &mdash; which include your configuration choices in the platform and any support requests you raise &mdash; unless the law requires otherwise, in which case we'll tell you first unless we're prohibited from doing so.</li>
+                            <li>Make sure anyone we authorise to access it is under a duty of confidentiality.</li>
+                            <li>Keep it secure using appropriate technical and organisational measures, including encryption in transit and at rest, access controls, and logging of administrative access.</li>
+                            <li>Help you respond to requests from Players exercising their data protection rights, so far as we reasonably can.</li>
+                            <li>Help you with data protection impact assessments and consultations with regulators, so far as is reasonable given the information available to us.</li>
+                            <li>Tell you without undue delay if we become aware of a personal data breach affecting your Instances, with enough detail for you to meet your own notification obligations.</li>
+                            <li>Delete this data when your account closes, in line with <a href="#closing-account">section 11</a>, unless the law requires us to keep it.</li>
+                            <li>Make available the information you reasonably need to demonstrate we're meeting these obligations.</li>
+                        </ol>
+                    </section>
+
+                    <!-- A4 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="annex-subprocessors">
+                        <h2 id="annex-subprocessors" class="h5"><span class="sectionNum">A4</span>Sub-processors</h2>
+                        <p class="bodyText">
+                            You give us general authorisation to engage sub-processors. Our current sub-processors
+                            are listed in our <a href={links.privacyPolicy}>Privacy Policy</a>. We'll tell you at
+                            least <span class="pending">30 days &mdash; to be confirmed</span> before adding or
+                            replacing one, and you may object by closing your account before the change takes effect.
+                        </p>
+                        <p class="bodyText">We remain responsible to you for what our sub-processors do.</p>
+                    </section>
+
+                    <!-- A5 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="annex-transfers">
+                        <h2 id="annex-transfers" class="h5"><span class="sectionNum">A5</span>International transfers</h2>
+                        <p class="bodyText">
+                            Your Instances run in the hosting region you select. Our platform operates in the United
+                            States. Where personal data moves outside the UK or EEA, we rely on the transfer
+                            mechanisms described in our <a href={links.privacyPolicy}>Privacy Policy</a> &mdash;
+                            adequacy decisions, the EU&ndash;US Data Privacy Framework and its UK Extension, or
+                            Standard Contractual Clauses with the UK International Data Transfer Addendum.
+                        </p>
+                    </section>
+
+                    <!-- A6 ────────────────────────────────────────────────── -->
+                    <section aria-labelledby="annex-your-obligations">
+                        <h2 id="annex-your-obligations" class="h5"><span class="sectionNum">A6</span>Your obligations as controller</h2>
+                        <p class="bodyText">You are responsible for:</p>
+                        <ul class="markerList bodyText">
+                            <li>having a lawful basis for the personal data your Instance processes;</li>
+                            <li>telling your Players what's collected and why;</li>
+                            <li>responding to Players exercising their rights;</li>
+                            <li>configuring your Instance appropriately, including what it logs and how long it keeps it;</li>
+                            <li>not using the platform to process special category data or children's data without the additional safeguards the law requires.</li>
+                        </ul>
+
+                        <p class="contactCta">
+                            <a class={`${button.btn} ${button.outline}`} href="mailto:help@aki-labs.com">
+                                <span class="buttonText">Questions? Email help@aki-labs.com</span>
+                            </a>
+                        </p>
+                    </section>
+
+                    <footer class="proseFooter">
+                        <p class="bodyTextSmall">
+                            Last updated <time datetime={lastUpdated.toISOString().slice(0, 10)}>{lastUpdatedLabel}</time>.
+                            See also our <a href={links.privacyPolicy}>Privacy Policy</a>.
+                        </p>
+                        <a class="backToTop bodyTextSmallSemi" href="#top">Back to top</a>
+                    </footer>
+                </article>
+            </div>
+        </main>
+
+        <Newsletter />
+        <Footer />
+    </body>
+</html>
+
+<!-- Smooth anchor scrolling is a document-level concern, so it can't live in
+     the scoped block below. -->
+<style is:global>
+    @media (prefers-reduced-motion: no-preference) {
+        html { scroll-behavior: smooth; }
+    }
+</style>
+
+<style>
+    /* Page-specific pieces only — the shared legal reading experience (layout,
+       contents nav, tables, callouts, `.pending`, print) lives in
+       styles/legal.css and is shared with /privacy-policy. */
+
+    /* ── §2 definitions ──────────────────────────────────────────────────── */
+
+    .defGrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+        gap: 1rem;
+        margin: 1.5rem 0;
+        padding: 0;
+    }
+
+    .defCard {
+        padding: 1.25rem;
+        border-radius: var(--r-card);
+        background: var(--surface);
+        box-shadow: var(--surface-inset);
+    }
+
+    .defCard .defTerm { margin: 0 0 0.5rem; color: var(--c-orange); }
+    .defCard dd { margin: 0; }
+
+    /* ── §7 prohibited uses ──────────────────────────────────────────────── */
+
+    /* The mirror of the tick list in styles/legal.css: same shape, opposite
+       meaning, so a reader skimming both pages reads the marker before the text. */
+    .banList { list-style: none; margin: 1.5rem 0; padding: 0; display: grid; gap: 0.75rem; }
+
+    .banList li { position: relative; padding-left: 2rem; }
+
+    .banList li::before {
+        content: "";
+        position: absolute;
+        top: 0.3125rem;
+        left: 0;
+        width: 1.125rem;
+        height: 1.125rem;
+        background-color: var(--c-red);
+        -webkit-mask: url("../assets/icons/cross.svg") no-repeat center / contain;
+        mask: url("../assets/icons/cross.svg") no-repeat center / contain;
+    }
+
+    /* ── A3 numbered obligations ─────────────────────────────────────────── */
+
+    .numberedList { margin: 0 0 1rem; padding-left: 1.5rem; display: grid; gap: 0.625rem; }
+    .numberedList li::marker { color: var(--c-orange); font-weight: 600; }
+
+    /* ── Annex A divider ─────────────────────────────────────────────────── */
+
+    .annexIntro {
+        margin-top: 4.5rem;
+        padding-top: 2.5rem;
+        border-top: 1px solid var(--hairline);
+    }
+
+    /* The id lives on the h2 (the scrollspy tracks h2[id]), so jumping to the
+       annex would otherwise tuck the kicker and divider under the header. */
+    .annexIntro h2 { scroll-margin-top: calc(var(--header-h) + 4.5rem); }
+    .annexIntro .annexKicker { margin: 0 0 0.5rem; color: var(--c-purple); }
+    .annexIntro h2 { margin-bottom: 1rem; }
+
+    /* ── Contents: Annex group label ─────────────────────────────────────── */
+
+    .tocGroup {
+        display: block;
+        margin: 1.25rem 0 0.625rem;
+        padding: 0 0.625rem;
+        color: var(--c-purple);
+        text-decoration: none;
+    }
+
+    .tocGroup:hover { color: var(--c-orange); }
+
+    .tocGroup:focus-visible {
+        outline: var(--focus-ring);
+        outline-offset: var(--focus-ring-offset);
+        border-radius: 4px;
+    }
+
+    /* A2 is a row-header table: the label column carries the same weight the
+       column headers do elsewhere. */
+    .dataTable th[scope="row"] {
+        width: 14rem;
+        vertical-align: top;
+        white-space: normal;
+        background: none;
+        border-bottom: 1px solid var(--hairline-soft);
+    }
+
+    @media screen and (max-width: 760px) {
+        /* Stacked rows: the row header becomes the card's own label, and the
+           cell's data-label would then repeat it. */
+        /* Match the stacked cells' zero side padding, or the label sits
+           indented from the value beneath it. */
+        .dataTable th[scope="row"] { display: block; width: auto; border-bottom: none; padding: 0.6875rem 0 0; }
+        .dataTable th[scope="row"] + td::before { content: none; }
+    }
+
+    @media print {
+        .defCard { background: none; box-shadow: none; border: 1px solid #999; }
+        .banList li::before { background-color: #000; }
+        .annexIntro { border-top-color: #000; }
+        .tocGroup { display: none; }
+    }
+</style>
+
+<script>
+    import { initLegalDoc } from "../lib/legalDoc";
+    initLegalDoc("terms");
+</script>
