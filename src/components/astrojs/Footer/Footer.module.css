@@ -97,7 +97,7 @@
     align-items: center;
     gap: 14px;
 
-    font-family: 'Lexend';
+    font-family: var(--font-family-base);
     font-style: normal;
     font-weight: 600;
     font-size: 17.6957px;

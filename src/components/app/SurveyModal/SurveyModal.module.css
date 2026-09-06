@@ -251,7 +251,7 @@
     background: var(--c-green-bright);
     color: var(--c-ink);
 
-    font-family: Lexend;
+    font-family: var(--font-family-base);
     font-weight: 700;
     font-size: 1.5rem;
     line-height: 1;

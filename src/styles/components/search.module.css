@@ -9,7 +9,7 @@
     cursor: text;
 
     /* Placeholder text */
-    font-family: Lexend; font-style: normal; font-weight: 500; font-size: 1rem;
+    font-family: var(--font-family-base); font-style: normal; font-weight: 500; font-size: 1rem;
     color: var(--c-ink);
 }
 

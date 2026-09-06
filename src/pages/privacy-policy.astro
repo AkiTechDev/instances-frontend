@@ -1,6 +1,8 @@
 ---
 // Order matters: tokens (theme/default) before the sheets that consume them,
 // and identical on every entry point so the cascade can't diverge per page.
+import Fonts from "../components/Fonts.astro";
+
 import "../styles/normalise.css"
 import "../styles/global.css"
 import "../styles/theme/default.css"
@@ -102,6 +104,8 @@ const domain = "instances.aki-labs.com";
 <html lang="en" class="en" prefix="og: http://ogp.me/ns#">
     <head>
         <meta charset="UTF-8" />
+
+        <Fonts />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="author" content="Aki Laboratories Limited">
         <meta name="referrer" content="strict-origin-when-cross-origin">

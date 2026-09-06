@@ -22,7 +22,7 @@
     width: 94px;
     height: 26px;
 
-    font-family: 'Lexend';
+    font-family: var(--font-family-base);
     font-style: normal;
     font-weight: 600;
     font-size: 20px;
