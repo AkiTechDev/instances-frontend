@@ -12,8 +12,11 @@
  * Only the `latin` subset is preloaded. `latin-ext` and `vietnamese` are
  * declared in fonts.css behind their unicode-range, so they cost nothing until
  * a page actually renders a character that needs them.
+ *
+ * This component deliberately does not import fonts.css — theme/default.css
+ * does, so the @font-face rules land on every page whether or not someone
+ * remembers this tag. All that is lost by forgetting it is the head start.
  */
-import "../styles/fonts.css";
 import lexendLatin from "../assets/fonts/lexend-latin.woff2?url";
 ---
 

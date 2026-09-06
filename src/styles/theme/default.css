@@ -1,3 +1,8 @@
+/* Defines --font-family-base, which every --font-*-family token below
+   resolves to. Inlined at build time, so this is a dependency
+   declaration rather than a network request. */
+@import "../fonts.css";
+
 :root {
     /* Text Colours */
     --text-colour-dark: #191C2E;
