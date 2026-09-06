@@ -114,7 +114,7 @@
     /* Typography */
 
     /* Basic/H1 */
-    --font-h1-family: Lexend;
+    --font-h1-family: var(--font-family-base);
     --font-h1-weight: 700;
     --font-h1-size: 4rem;
     --font-h1-line-height: 110%;
@@ -123,7 +123,7 @@
     --font-h1-text-transform: initial;
 
     /* Basic/H2 */
-    --font-h2-family: Lexend;
+    --font-h2-family: var(--font-family-base);
     --font-h2-weight: 600;
     --font-h2-size: 3.4375rem;
     --font-h2-line-height: 120%;
@@ -132,7 +132,7 @@
     --font-h2-text-transform: initial;
 
     /* Basic/H3 */
-    --font-h3-family: Lexend;
+    --font-h3-family: var(--font-family-base);
     --font-h3-weight: 600;
     --font-h3-size: 3.125rem;
     --font-h3-line-height: normal;
@@ -141,7 +141,7 @@
     --font-h3-text-transform: initial;
 
     /* Basic/H4 */
-    --font-h4-family: Lexend;
+    --font-h4-family: var(--font-family-base);
     --font-h4-weight: 600;
     --font-h4-size: 2.625rem;
     --font-h4-line-height: normal;
@@ -150,7 +150,7 @@
     --font-h4-text-transform: initial;
 
     /* Basic/H5 */
-    --font-h5-family: Lexend;
+    --font-h5-family: var(--font-family-base);
     --font-h5-weight: 600;
     --font-h5-size: 2rem;
     --font-h5-line-height: 2.125rem;
@@ -159,7 +159,7 @@
     --font-h5-text-transform: initial;
 
     /* Basic/H6 */
-    --font-h6-family: Lexend;
+    --font-h6-family: var(--font-family-base);
     --font-h6-weight: 600;
     --font-h6-size: 1.75rem;
     --font-h6-line-height: 120%;
@@ -168,7 +168,7 @@
     --font-h6-text-transform: initial;
 
     /* Basic/SubtitleSemiBig */
-    --font-subtitleSemiBig-family: Lexend;
+    --font-subtitleSemiBig-family: var(--font-family-base);
     --font-subtitleSemiBig-weight: 600;
     --font-subtitleSemiBig-size: 1.5rem;
     --font-subtitleSemiBig-line-height: normal;
@@ -177,7 +177,7 @@
     --font-subtitleSemiBig-text-transform: initial;
 
     /* Basic/Subtext */
-    --font-subText-family: Lexend;
+    --font-subText-family: var(--font-family-base);
     --font-subText-weight: 400;
     --font-subText-size: 1.5rem;
     --font-subText-line-height: 150%;
@@ -186,7 +186,7 @@
     --font-subText-text-transform: initial;
 
     /* Basic/GameTitle */
-    --font-gameTitle-family: Lexend;
+    --font-gameTitle-family: var(--font-family-base);
     --font-gameTitle-weight: 500;
     --font-gameTitle-size: 1.5rem;
     --font-gameTitle-line-height: 120%;
@@ -195,7 +195,7 @@
     --font-gameTitle-text-transform: uppercase;
 
     /* Basic/SubTitle */
-    --font-subTitle-family: Lexend;
+    --font-subTitle-family: var(--font-family-base);
     --font-subTitle-weight: 400;
     --font-subTitle-size: 1.25rem;
     --font-subTitle-line-height: 130%;
@@ -204,7 +204,7 @@
     --font-subTitle-text-transform: initial;
 
     /* Basic/SubtitleSemi */
-    --font-subtitleSemi-family: Lexend;
+    --font-subtitleSemi-family: var(--font-family-base);
     --font-subtitleSemi-weight: 600;
     --font-subtitleSemi-size: 1.25rem;
     --font-subtitleSemi-line-height: normal;
@@ -213,7 +213,7 @@
     --font-subtitleSemi-text-transform: initial;
 
     /* Basic/StatsText */
-    --font-statsText-family: Lexend;
+    --font-statsText-family: var(--font-family-base);
     --font-statsText-weight: 600;
     --font-statsText-size: 1.125rem;
     --font-statsText-line-height: 1.125rem;
@@ -222,7 +222,7 @@
     --font-statsText-text-transform: initial;
 
     /* Basic/StatsTitle */
-    --font-statsTitle-family: Lexend;
+    --font-statsTitle-family: var(--font-family-base);
     --font-statsTitle-weight: 400;
     --font-statsTitle-size: 1.125rem;
     --font-statsTitle-line-height: 1.25rem;
@@ -231,7 +231,7 @@
     --font-statsTitle-text-transform: initial;
 
     /* Basic/BodyText */
-    --font-bodyText-family: Lexend;
+    --font-bodyText-family: var(--font-family-base);
     --font-bodyText-weight: 400;
     --font-bodyText-size: 1rem;
     --font-bodyText-line-height: 130%;
@@ -240,7 +240,7 @@
     --font-bodyText-text-transform: initial;
 
     /* Basic/BodyTextMedium */
-    --font-bodyTextMedium-family: Lexend;
+    --font-bodyTextMedium-family: var(--font-family-base);
     --font-bodyTextMedium-weight: 500;
     --font-bodyTextMedium-size: 1rem;
     --font-bodyTextMedium-line-height: 145%;
@@ -249,7 +249,7 @@
     --font-bodyTextMedium-text-transform: initial;
 
     /* Basic/CapsTitleText */
-    --font-capsTitleText-family: Lexend;
+    --font-capsTitleText-family: var(--font-family-base);
     --font-capsTitleText-weight: 500;
     --font-capsTitleText-size: 1rem;
     --font-capsTitleText-line-height: normal;
@@ -258,7 +258,7 @@
     --font-capsTitleText-text-transform: uppercase;
 
     /* Basic/BodyTextSmall */
-    --font-bodyTextSmall-family: Lexend;
+    --font-bodyTextSmall-family: var(--font-family-base);
     --font-bodyTextSmall-weight: 400;
     --font-bodyTextSmall-size: 0.875rem;
     --font-bodyTextSmall-line-height: 130%;
@@ -267,7 +267,7 @@
     --font-bodyTextSmall-text-transform: initial;
 
     /* Basic/BodyTextSmallSemi */
-    --font-bodyTextSmallSemi-family: Lexend;
+    --font-bodyTextSmallSemi-family: var(--font-family-base);
     --font-bodyTextSmallSemi-weight: 600;
     --font-bodyTextSmallSemi-size: 0.875rem;
     --font-bodyTextSmallSemi-line-height: 130%;
@@ -276,7 +276,7 @@
     --font-bodyTextSmallSemi-text-transform: initial;
 
     /* Basic/BodyTextSmallest */
-    --font-bodyTextSmallest-family: Lexend;
+    --font-bodyTextSmallest-family: var(--font-family-base);
     --font-bodyTextSmallest-weight: 400;
     --font-bodyTextSmallest-size: 0.75rem;
     --font-bodyTextSmallest-line-height: normal;
@@ -285,7 +285,7 @@
     --font-bodyTextSmallest-text-transform: initial;
 
     /* Basic/BodyTextSmallestSemiCaps */
-    --font-bodyTextSmallestSemiCaps-family: Lexend;
+    --font-bodyTextSmallestSemiCaps-family: var(--font-family-base);
     --font-bodyTextSmallestSemiCaps-weight: 600;
     --font-bodyTextSmallestSemiCaps-size: 0.75rem;
     --font-bodyTextSmallestSemiCaps-line-height: normal;
@@ -294,7 +294,7 @@
     --font-bodyTextSmallestSemiCaps-text-transform: uppercase;
 
     /* Basic/SmallestLabel */
-    --font-smallestLabel-family: Lexend;
+    --font-smallestLabel-family: var(--font-family-base);
     --font-smallestLabel-weight: 500;
     --font-smallestLabel-size: 0.625rem;
     --font-smallestLabel-line-height: normal;
@@ -303,7 +303,7 @@
     --font-smallestLabel-text-transform: uppercase;
 
     /* Button/buttonText */
-    --font-buttonText-family: Lexend;
+    --font-buttonText-family: var(--font-family-base);
     --font-buttonText-weight: 600;
     --font-buttonText-size: 1rem;
     --font-buttonText-line-height: normal;
@@ -312,7 +312,7 @@
     --font-buttonText-text-transform: initial;
 
     /* Button/buttonTextSmall */
-    --font-buttonTextSmall-family: Lexend;
+    --font-buttonTextSmall-family: var(--font-family-base);
     --font-buttonTextSmall-weight: 600;
     --font-buttonTextSmall-size: 0.875rem;
     --font-buttonTextSmall-line-height: normal;

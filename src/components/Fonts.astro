@@ -1,0 +1,20 @@
+---
+/**
+ * Everything a page needs to render in Lexend. Drop it near the top of <head>.
+ *
+ * The preload is the point: without it the browser can't discover the font
+ * until it has downloaded and parsed the stylesheet that declares it, which
+ * puts the fetch a full round trip behind where it could be. `crossorigin` is
+ * required even though the file is same-origin — fonts are always fetched in
+ * CORS mode, and a preload whose mode doesn't match is thrown away and fetched
+ * a second time.
+ *
+ * Only the `latin` subset is preloaded. `latin-ext` and `vietnamese` are
+ * declared in fonts.css behind their unicode-range, so they cost nothing until
+ * a page actually renders a character that needs them.
+ */
+import "../styles/fonts.css";
+import lexendLatin from "../assets/fonts/lexend-latin.woff2?url";
+---
+
+<link rel="preload" href={lexendLatin} as="font" type="font/woff2" crossorigin />

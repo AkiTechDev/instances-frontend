@@ -45,7 +45,7 @@
 }
 
 ::placeholder {
-    font-family: Lexend;
+    font-family: var(--font-family-base);
     font-style: normal;
     font-weight: 400;
     font-size: 1rem;

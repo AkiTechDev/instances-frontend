@@ -10,7 +10,7 @@
    step deeper than the hover shade, so the button visibly "goes down". */
 
 .btn {
-    font-family: Lexend; font-weight: 600; font-size: 16px; line-height: normal;
+    font-family: var(--font-family-base); font-weight: 600; font-size: 16px; line-height: normal;
     border-radius: var(--r-pill); padding: 1rem 1.5rem; border: 1px solid transparent;
     display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; cursor: pointer;
 

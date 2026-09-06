@@ -127,9 +127,9 @@
     border-radius: 4px;
     text-align: left;
     text-decoration: none;
-    /* No `font: inherit` — nothing up the tree sets a family, so the shorthand
-       would reset these off Lexend. The bodyTextMedium class on each item owns
-       the font. */
+    /* No `font: inherit` — the shorthand resets size and weight too, and the
+       bodyTextMedium class on each item owns those. The family comes down from
+       the `html` rule in styles/fonts.css. */
 
     transition: color var(--dur-fast) var(--ease-out),
                 background-color var(--dur-fast) var(--ease-out);

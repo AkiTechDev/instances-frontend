@@ -50,9 +50,9 @@
     margin-left: -0.5rem;   /* keeps the label optically flush with the grid */
     border-radius: var(--r-sm);
     color: inherit;
-    /* No `font: inherit` — nothing up the tree sets a family, so the shorthand
-       would reset this off Lexend. The element's typography class (buttonText)
-       owns the font. */
+    /* No `font: inherit` — the shorthand resets size and weight too, and the
+       element's typography class (buttonText) owns those. The family comes down
+       from the `html` rule in styles/fonts.css. */
 
     transition: color var(--dur-fast) var(--ease-out),
                 transform var(--dur-fast) var(--ease-out);
