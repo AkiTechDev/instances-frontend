@@ -1,4 +1,4 @@
-import type { Game } from '../types';
+import type { Game, GamePage } from '../types';
 import type { InstanceProfile } from '../types';
 
 import banner from '../../../assets/games/ProjectZomboid/banner.png?format=avif;webp&responsive';
@@ -37,12 +37,55 @@ export const ProjectZomboidProfiles: { [id: string]: InstanceProfile } = {
     "Community · 32+ Players": { cpu: 8192, memory: 16384 },
 };
 
+/**
+ * Draft copy for /games/project-zomboid.
+ *
+ * Drafted from the sizing rationale above, so the public explanation and the
+ * tier definitions cannot tell different stories. `draft: true` keeps the page
+ * out of the search index and puts a notice on it until the wording is signed
+ * off; the settings table falls back to the schema's own field names until
+ * someone writes a `config` list.
+ */
+const ProjectZomboidPage: GamePage = {
+    slug: "project-zomboid",
+    draft: true,
+    tagline: "Memory follows where you wander. Cores follow the dead.",
+    summary:
+        "Host a Project Zomboid server. Memory tracks how far players spread across the map, processor tracks zombie simulation, and the tiers are built around both.",
+
+    intro: [
+        "Project Zomboid streams the map in cells around each player. The map is enormous and players scatter, so what is loaded depends on how spread out you are far more than on how many of you there are.",
+        "Meanwhile the server ticks thousands of zombies: pathing, hordes, migration. Those two pressures pull in different directions, which is why memory and cores do not rise together on this list.",
+    ],
+
+    tierNotes: {
+        "Solo · 1-2 Players":
+            "Solo or duo survival.",
+        "Small · 3-8 Players":
+            "A small group. More scattered players means more loaded cells.",
+        "Medium · 8-16 Players":
+            "An active server. The extra cores absorb the rising zombie simulation.",
+        "Large · 16-32 Players":
+            "A large server with players spread wide across the map.",
+        "Community · 32+ Players":
+            "A community server: heavy zombie population and wide world coverage at once.",
+    },
+
+    sizing: [
+        "Memory demand tracks how many separate areas are loaded, not headcount. A handful of scattered survivors can load a great deal of world between them.",
+        "Processor use is dominated by zombie simulation. Populated servers with high zombie counts are processor-bound, so cores ramp with player count and reach eight vCPU for large communities.",
+        "It is JVM-based, so containers carry about 25% headroom over the heap. The default heap is around 3 GB and climbs with players and mods.",
+        "The eight vCPU tier requires at least 16 GB alongside it, which is a Fargate constraint rather than a game one.",
+    ],
+};
+
 const ProjectZomboid: Game = {
     name:     'Project Zomboid',
     category: 'ProjectZomboid',
     profiles: ProjectZomboidProfiles,
     getBanner: async () => banner,
     getSchema: async () => ProjectZomboidConfigurationSchema,
+    page: ProjectZomboidPage,
 };
 
 export default ProjectZomboid;

@@ -1,4 +1,4 @@
-import type { Game } from '../types';
+import type { Game, GamePage } from '../types';
 import type { InstanceProfile } from '../types';
 
 import banner from '../../../assets/games/MinecraftProminence2/banner.png?format=avif;webp&responsive';
@@ -36,12 +36,54 @@ export const MinecraftProminence2Profiles: { [id: string]: InstanceProfile } = {
     "Community · 20+ Players": { cpu: 8192, memory: 16384 },
 };
 
+/**
+ * Draft copy for /games/minecraft-prominence-2.
+ *
+ * Drafted from the sizing rationale above, so the public explanation and the
+ * tier definitions cannot tell different stories. `draft: true` keeps the page
+ * out of the search index and puts a notice on it until the wording is signed
+ * off; the settings table falls back to the schema's own field names until
+ * someone writes a `config` list.
+ */
+const MinecraftProminence2Page: GamePage = {
+    slug: "minecraft-prominence-2",
+    draft: true,
+    tagline: "Four hundred and fifty mods, and Fabric keeping them honest.",
+    summary:
+        "Host a Prominence II server. A large questing pack on Fabric, which runs a step lighter than the equivalent Forge pack — and is sized that way.",
+
+    intro: [
+        "Prominence II (Hasturian Era) is a big RPG and questing pack: roughly 450 mods on Minecraft 1.20.1.",
+        "It runs on Fabric, which is meaningfully lighter on memory and processor overhead than an equivalent Forge pack. That is why its tiers sit a step below where the mod count alone would put them.",
+    ],
+
+    tierNotes: {
+        "Solo · 1-2 Players":
+            "Solo or duo questing. Fabric keeps this comfortable at a size Forge would not.",
+        "Small · 3-6 Players":
+            "A small group. Fabric's efficiency stretches two cores further than Forge would.",
+        "Medium · 6-12 Players":
+            "An active group exploring and working through quests together.",
+        "Large · 12-20 Players":
+            "A large group spread across many loaded areas.",
+        "Community · 20+ Players":
+            "A community server generating terrain across many players at once.",
+    },
+
+    sizing: [
+        "Despite the mod count, Fabric's lower overhead means the memory tiers sit a step below a comparable Forge pack, and two vCPU carries small groups without complaint.",
+        "The load is dominated by exploration and quest content rather than round-the-clock automation, so the heap grows with world size and how far players spread rather than with idle time.",
+        "6 GB of heap is the floor, with roughly 30% container headroom over it. Eight vCPU appears only for large communities generating terrain concurrently.",
+    ],
+};
+
 const MinecraftProminence2: Game = {
     name:     'Minecraft Prominence 2',
     category: 'Minecraft',
     profiles: MinecraftProminence2Profiles,
     getBanner: async () => banner,
     getSchema: async () => MinecraftJavaConfigurationSchema,
+    page: MinecraftProminence2Page,
 };
 
 export default MinecraftProminence2;

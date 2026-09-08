@@ -1,4 +1,4 @@
-import type { Game } from '../types';
+import type { Game, GamePage } from '../types';
 import type { InstanceProfile } from '../types';
 
 import banner from '../../../assets/games/MinecraftRLCraft/banner.png?format=avif;webp&responsive';
@@ -33,12 +33,53 @@ export const MinecraftRLCraftProfiles: { [id: string]: InstanceProfile } = {
     "Large · 10+ Players":   { cpu: 4096, memory: 10240 },
 };
 
+/**
+ * Draft copy for /games/minecraft-rlcraft.
+ *
+ * Drafted from the sizing rationale above, so the public explanation and the
+ * tier definitions cannot tell different stories. `draft: true` keeps the page
+ * out of the search index and puts a notice on it until the wording is signed
+ * off; the settings table falls back to the schema's own field names until
+ * someone writes a `config` list.
+ */
+const MinecraftRLCraftPage: GamePage = {
+    slug: "minecraft-rlcraft",
+    draft: true,
+    tagline: "Hardcore survival on 1.12.2, where extra cores stop helping early.",
+    summary:
+        "Host an RLCraft server. Single-threaded 1.12.2 Forge makes processor speed the ceiling rather than memory, so this pack stops at four vCPU on purpose.",
+
+    intro: [
+        "RLCraft is Shivaxi's hardcore survival pack: about 170 mods on Minecraft 1.12.2 and Forge.",
+        "1.12.2 has no threaded chunk generation, so worldgen and the tick loop are effectively single-threaded. That caps what extra cores can do for you, and these tiers say so rather than selling you more of them.",
+    ],
+
+    tierNotes: {
+        "Solo · 1-2 Players":
+            "A solo hardcore run.",
+        "Small · 3-5 Players":
+            "A small survival group.",
+        "Medium · 6-10 Players":
+            "An active group. The extra cores absorb Lycanites entity spikes and worldgen.",
+        "Large · 10+ Players":
+            "A large group — about as far as 1.12.2 comfortably scales.",
+    },
+
+    sizing: [
+        "There is no threaded chunk generation on 1.12.2 Forge, so single-thread speed is the bottleneck. Adding cores past four does very little for one world, which is why there is no eight vCPU tier here at all.",
+        "The dominant load is entity ticking. Lycanites mobs and aggressive spawns mean huge entity counts, and that drives processor use and tick drops far more than memory pressure does.",
+        "Memory needs are modest for a modded pack. 1.12.2 is lighter than modern packs, so containers stay in the 4–10 GB band with about 30% headroom over the heap.",
+        "RLCraft servers are small by nature, so the player tiers top out lower than the modern packs. That is the game, not the hosting.",
+    ],
+};
+
 const MinecraftRLCraft: Game = {
     name:     'Minecraft RLCraft',
     category: 'Minecraft',
     profiles: MinecraftRLCraftProfiles,
     getBanner: async () => banner,
     getSchema: async () => MinecraftJavaConfigurationSchema,
+    page: MinecraftRLCraftPage,
 };
 
 export default MinecraftRLCraft;

@@ -1,0 +1,403 @@
+---
+// Order matters: tokens (theme/default) before the sheets that consume them,
+// and identical on every entry point so the cascade can't diverge per page.
+import Fonts from "../../components/Fonts.astro";
+
+import "../../styles/normalise.css"
+import "../../styles/global.css"
+import "../../styles/theme/default.css"
+import "../../styles/typography.css"
+
+import { Picture } from "astro:assets";
+
+import button from "../../styles/components/button.module.css";
+import colourStyles from "../../styles/theme/colours.module.css";
+
+import Header from "../../components/astrojs/header/Header.astro";
+import Newsletter from "../../components/newsletter/Newsletter.astro";
+import Footer from "../../components/astrojs/Footer/Footer.astro";
+
+import { gameRegistry } from "../../lib/games";
+import { PRICE_REGION_NAME, cheapestHourly, numberWord, specSpan } from "../../lib/games/gamePage";
+
+const banners = import.meta.glob<{ default: ImageMetadata }>(
+    "../../assets/games/*/banner.png",
+    { eager: true },
+);
+
+const loaded = await Promise.all(
+    Object.entries(gameRegistry).map(async ([id, entry]) => ({
+        id,
+        game: (await entry.load()).default,
+    })),
+);
+
+/* A game without a written page has no route to link to, so it can't be listed.
+   Not silently, though — this is the list of what still needs writing. */
+const unwritten = loaded.filter(({ game }) => !game.page).map(({ id }) => id);
+if (unwritten.length) {
+    console.warn(`[games] no page written yet, so not listed on /games:`, unwritten);
+}
+
+const cards = loaded
+    .filter(({ game }) => game.page)
+    .map(({ id, game }) => {
+        const page = game.page!;
+        const span = specSpan(game);
+        return {
+            id,
+            name: game.name,
+            category: game.category,
+            slug: page.slug,
+            tagline: page.tagline,
+            badge: page.badge,
+            hourly: cheapestHourly(game),
+            tierCount: Object.keys(game.profiles).length,
+            span,
+            banner: banners[`../../assets/games/${id}/banner.png`]?.default,
+        };
+    })
+    /* Minecraft first — it's seven of the ten and what most people arrive
+       looking for — then everything else, cheapest first within each. */
+    .sort((a, b) => {
+        const group = Number(a.category !== "Minecraft") - Number(b.category !== "Minecraft");
+        if (group !== 0) return group;
+        return parseFloat(a.hourly ?? "999") - parseFloat(b.hourly ?? "999");
+    });
+
+/* "Project Zomboid" vs the "ProjectZomboid" category is the same word without
+   the space; a chip repeating the card's own title is just noise. */
+const showCategory = (name: string, category: string) =>
+    name.replace(/\s+/g, "").toLowerCase() !== category.replace(/\s+/g, "").toLowerCase();
+
+const domain = "instances.aki-labs.com";
+const url = `https://${domain}/games`;
+const title = "Game servers we host | Instances";
+const seo_des = "Every game you can run on Instances, each with compute sizes researched for how that game actually behaves — and an hourly price for each size.";
+
+const cheapestOverall = cards
+    .map((card) => card.hourly)
+    .filter((hourly): hourly is string => hourly !== null)
+    .reduce((low, next) => (parseFloat(next) < parseFloat(low) ? next : low), "999");
+---
+<!doctype html>
+<html lang="en" class="en" prefix="og: http://ogp.me/ns#">
+    <head>
+        <meta charset="UTF-8" />
+
+        <Fonts />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="author" content="Aki Laboratories Limited">
+        <meta name="referrer" content="strict-origin-when-cross-origin">
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+
+        <!-- SEO -->
+        <title>{title}</title>
+        <meta name="description" content={seo_des}>
+        <meta itemprop="description" content={seo_des}>
+        <meta name="robots" content="all" />
+        <link rel="canonical" href={url}>
+        <link rel="sitemap" href="/sitemap-index.xml" />
+
+        <!-- Twitter/X specific -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content={title}>
+        <meta name="twitter:description" content={seo_des}>
+        {cards[0]?.banner && <meta name="twitter:image" content={cards[0].banner.src}>}
+        <meta name="twitter:site" content="@aki_labs">
+
+        <!-- Open Graph -->
+        <meta property="og:title" content={title}>
+        <meta property="og:description" content={seo_des}>
+        <meta property="og:type" content="website">
+        <meta property="og:url" content={url}>
+        {cards[0]?.banner && <meta property="og:image" content={cards[0].banner.src}>}
+        <meta property="og:site_name" content="Instances">
+        <meta property="og:locale" content="en_US">
+
+        <!-- Mobile / Browser theming -->
+        <meta name="theme-color" content="#191C2E">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+    </head>
+    <body>
+        <Header />
+
+        <main class="page">
+            <!-- ── Hero ─────────────────────────────────────────────────── -->
+            <section class="hero" aria-labelledby="games-title">
+                <p class="eyebrow bodyTextSmallestSemiCaps">Games</p>
+                <h1 id="games-title" class="h2">
+                    Every game we <span class={colourStyles.gradientOne}>host</span>
+                </h1>
+                <p class="lead subTitle">
+                    {numberWord(cards.length)} of them, and not one sized by a generic small-medium-large.
+                    Each game's tiers come from how that game actually behaves &mdash; what runs
+                    on one thread, what fills memory, where paying for more stops helping.
+                </p>
+                <p class="leadNote bodyTextSmall">
+                    Prices from <strong>${cheapestOverall}</strong> an hour, quoted for
+                    {PRICE_REGION_NAME} and billed only while a server runs.
+                </p>
+            </section>
+
+            <!-- ── The catalogue ────────────────────────────────────────── -->
+            <section class="catalogue" aria-labelledby="catalogue-title">
+                <h2 id="catalogue-title" class="srOnly">All supported games</h2>
+
+                <ul class="cards">
+                    {cards.map((card, index) => (
+                        <li class="card">
+                            <a class="cardLink" href={`/games/${card.slug}`}>
+                                <div class="cardMedia">
+                                    {card.banner && (
+                                        <Picture
+                                            src={card.banner}
+                                            formats={["avif", "webp"]}
+                                            width={620}
+                                            alt=""
+                                            class="cardImage"
+                                            {...(index === 0
+                                                ? { loading: "eager" as const, fetchpriority: "high" as const }
+                                                : { loading: "lazy" as const })}
+                                        />
+                                    )}
+                                    {card.badge && (
+                                        <span class="cardBadge bodyTextSmallestSemiCaps">{card.badge}</span>
+                                    )}
+                                </div>
+
+                                <div class="cardBody">
+                                    <div class="cardHeading">
+                                        <h3 class="cardName">{card.name}</h3>
+                                        {showCategory(card.name, card.category) && (
+                                            <span class="cardCategory bodyTextSmallestSemiCaps">
+                                                {card.category}
+                                            </span>
+                                        )}
+                                    </div>
+
+                                    <p class="cardTagline bodyTextSmall">{card.tagline}</p>
+
+                                    <dl class="cardSpecs">
+                                        <div>
+                                            <dt class="bodyTextSmallestSemiCaps">From</dt>
+                                            <dd class="cardPrice">
+                                                {card.hourly ? `$${card.hourly}` : "—"}
+                                                <span class="per">/hour</span>
+                                            </dd>
+                                        </div>
+                                        <div>
+                                            <dt class="bodyTextSmallestSemiCaps">Sizes</dt>
+                                            <dd class="bodyTextSmall">{card.tierCount}</dd>
+                                        </div>
+                                        <div class="cardRange">
+                                            <dt class="bodyTextSmallestSemiCaps">Range</dt>
+                                            <dd class="bodyTextSmall">
+                                                {card.span.vcpu[0]}&ndash;{card.span.vcpu[1]} vCPU
+                                                &nbsp;&middot;&nbsp;
+                                                {card.span.memoryGb[0]}&ndash;{card.span.memoryGb[1]} GB
+                                            </dd>
+                                        </div>
+                                    </dl>
+                                </div>
+                            </a>
+                        </li>
+                    ))}
+                </ul>
+            </section>
+
+            <!-- ── Closing ──────────────────────────────────────────────── -->
+            <section class="closing" aria-labelledby="closing-title">
+                <h2 id="closing-title" class="h6">Not seeing yours?</h2>
+                <p class="bodyText closingLead">
+                    Every game needs its own tested compute profile before we can host it well,
+                    so requests are genuinely how we decide what to build next. Tell us which one
+                    and how many of you would play.
+                </p>
+                <div class="closingActions">
+                    <a href="/contact?topic=game-request" class:list={[button.btn, button.vibrant]}>
+                        <span class="buttonText">Request a game</span>
+                    </a>
+                    <a href="/dashboard" class:list={[button.btn, button.outline]}>
+                        <span class="buttonText">Go to your dashboard</span>
+                    </a>
+                </div>
+            </section>
+        </main>
+
+        <Newsletter />
+        <Footer />
+    </body>
+</html>
+
+<style>
+    /* Scoped to /games. The card grid deliberately does not reuse the tier grid
+       from [slug].astro — that one sizes to a game's tier count, this one to a
+       fixed catalogue, and merging them would make both worse. */
+
+    .page {
+        width: min(100% - 2rem, 96rem); /* 1536px */
+        margin-inline: auto;
+        padding: 3.5rem var(--padding-sm) 5rem;
+        box-sizing: border-box;
+
+        color: var(--text-colour-light);
+    }
+
+    .srOnly {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    /* ── Hero ─────────────────────────────────────────────────────────── */
+
+    .hero {
+        max-width: 46rem;
+        padding-bottom: 3.5rem;
+        border-bottom: 1px solid var(--hairline);
+        margin-bottom: 3.5rem;
+    }
+
+    .eyebrow { color: var(--c-orange); margin: 0 0 0.75rem; letter-spacing: 0.06em; }
+    .hero h1 { margin: 0 0 1.25rem; text-wrap: balance; }
+    .lead { margin: 0 0 1rem; color: var(--ink-body); line-height: 1.6; }
+    .leadNote { margin: 0; color: var(--ink-muted); }
+    .leadNote strong { color: var(--text-colour-light); font-variant-numeric: tabular-nums; }
+
+    /* ── Cards ────────────────────────────────────────────────────────── */
+
+    .cards {
+        list-style: none;
+        margin: 0 0 5rem;
+        padding: 0;
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 21rem), 1fr));
+        gap: 1.5rem;
+    }
+
+    .card { display: flex; }
+
+    .cardLink {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+
+        border-radius: var(--r-card);
+        background: var(--surface-card);
+        box-shadow: var(--surface-card-inset);
+        overflow: hidden;
+        text-decoration: none;
+        color: inherit;
+
+        transition: transform var(--dur-normal) var(--ease-out),
+                    box-shadow var(--dur-normal) var(--ease-out);
+    }
+
+    .cardLink:hover {
+        transform: translateY(-3px);
+        box-shadow: var(--surface-card-inset), 0 14px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .cardLink:focus-visible {
+        outline: var(--focus-ring);
+        outline-offset: var(--focus-ring-offset);
+    }
+
+    .cardMedia { position: relative; aspect-ratio: 16 / 9; overflow: hidden; }
+
+    .cardImage {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+
+    .cardBadge {
+        position: absolute;
+        top: 0.75rem;
+        right: 0.75rem;
+        padding: 0.3125rem 0.625rem;
+        border-radius: var(--r-chip);
+        background: var(--c-ink);
+        color: var(--c-blue-sky);
+        letter-spacing: 0.06em;
+    }
+
+    .cardBody {
+        display: flex;
+        flex-direction: column;
+        gap: 0.625rem;
+        padding: 1.25rem 1.375rem 1.375rem;
+        flex: 1;
+    }
+
+    .cardHeading { display: flex; align-items: baseline; gap: 0.625rem; flex-wrap: wrap; }
+
+    .cardName {
+        margin: 0;
+        font-family: var(--font-family-base);
+        font-weight: 600;
+        font-size: 1.25rem;
+        line-height: 1.3;
+        color: var(--text-colour-light);
+    }
+
+    .cardCategory {
+        color: var(--c-purple);
+        letter-spacing: 0.06em;
+    }
+
+    /* Pushes the specs to the card's foot so every row of cards lines its
+       numbers up regardless of how long the taglines run. */
+    .cardTagline { margin: 0 0 auto; color: var(--ink-muted); line-height: 1.55; }
+
+    .cardSpecs {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem 1.5rem;
+        margin: 0.5rem 0 0;
+        padding-top: 0.875rem;
+        border-top: 1px solid var(--hairline-soft);
+    }
+
+    .cardSpecs dt { color: var(--ink-muted); letter-spacing: 0.06em; margin-bottom: 0.25rem; }
+    .cardSpecs dd { margin: 0; color: var(--text-colour-light); font-variant-numeric: tabular-nums; }
+
+    .cardPrice { color: var(--c-orange); font-weight: 600; font-size: 1.125rem; }
+    .per { color: var(--ink-muted); font-size: 0.8125rem; font-weight: 400; }
+
+    /* Takes its own line rather than being squeezed beside the other two. */
+    .cardRange { flex-basis: 100%; }
+
+    /* ── Closing ──────────────────────────────────────────────────────── */
+
+    .closing { padding-top: 3rem; border-top: 1px solid var(--hairline); }
+    .closing h2 { margin: 0 0 1rem; font-size: 1.375rem; line-height: 1.3; }
+    .closingLead { margin: 0 0 2rem; color: var(--ink-body); line-height: 1.7; max-width: 44rem; }
+    .closingActions { display: flex; flex-wrap: wrap; gap: 1rem; }
+    /* .btn is padded but content-box, so a full-width anchor would otherwise
+       overflow by its own padding at the narrow breakpoint. */
+    .closingActions a { text-decoration: none; box-sizing: border-box; }
+
+    /* ── Responsive ───────────────────────────────────────────────────── */
+
+    @media (max-width: 1100px) {
+        .page { padding-left: var(--space-md); padding-right: var(--space-md); }
+    }
+
+    @media (max-width: 760px) {
+        .page { padding: 2.5rem 1.25rem 3.5rem; }
+        .closingActions { flex-direction: column; align-items: stretch; }
+        .closingActions a { width: 100%; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .cardLink { transition: none; }
+        .cardLink:hover { transform: none; }
+    }
+</style>

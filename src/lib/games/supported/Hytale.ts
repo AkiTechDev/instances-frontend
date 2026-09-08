@@ -1,4 +1,4 @@
-import type { Game } from '../types';
+import type { Game, GamePage } from '../types';
 import type { InstanceProfile } from '../types';
 
 import banner from '../../../assets/games/Hytale/banner.png?format=avif;webp&responsive';
@@ -33,12 +33,53 @@ export const HytaleProfiles: { [id: string]: InstanceProfile } = {
     "Large · 40-100 Players": { cpu: 4096, memory: 12288 },
 };
 
+/**
+ * Draft copy for /games/hytale.
+ *
+ * Drafted from the sizing rationale above, so the public explanation and the
+ * tier definitions cannot tell different stories. `draft: true` keeps the page
+ * out of the search index and puts a notice on it until the wording is signed
+ * off; the settings table falls back to the schema's own field names until
+ * someone writes a `config` list.
+ */
+const HytalePage: GamePage = {
+    slug: "hytale",
+    draft: true,
+    tagline: "Not out yet. Neither are the real numbers.",
+    badge: "Unreleased",
+    summary:
+        "Hytale server hosting on Instances. The game is unreleased, so these sizes are provisional estimates modelled on comparable voxel sandboxes — and we will keep saying so until they are not.",
+
+    intro: [
+        "Hytale has not been released, so no real server requirements exist for it yet.",
+        "The sizes below are estimates, modelled on comparable modern voxel-sandbox servers and on Hytale's own configuration schema, which allows up to 100 players and a view distance of 15. We will revisit them the moment official server requirements are published.",
+    ],
+
+    tierNotes: {
+        "Solo · 1-4 Players":
+            "Solo, or a small group of friends.",
+        "Small · 5-15 Players":
+            "A small community server.",
+        "Medium · 15-40 Players":
+            "An active server running a higher view distance.",
+        "Large · 40-100 Players":
+            "A large public server approaching the hundred-player cap.",
+    },
+
+    sizing: [
+        "These are provisional. Nothing here has been measured against a real Hytale server, because there is not one to measure yet.",
+        "We have treated it as a modern voxel sandbox: worldgen plus entity and chunk ticking are the expected drivers, so both processor and memory scale with players and view distance.",
+        "Two vCPU as a baseline for small groups, four for larger servers approaching the cap the schema allows.",
+    ],
+};
+
 const Hytale: Game = {
     name:     'Hytale',
     category: 'Hytale',
     profiles: HytaleProfiles,
     getBanner: async () => banner,
     getSchema: async () => HytaleConfigurationSchema,
+    page: HytalePage,
 };
 
 export default Hytale;

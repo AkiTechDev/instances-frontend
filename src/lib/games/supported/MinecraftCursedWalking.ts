@@ -1,4 +1,4 @@
-import type { Game } from '../types';
+import type { Game, GamePage } from '../types';
 import type { InstanceProfile } from '../types';
 
 import banner from '../../../assets/games/MinecraftCursedWalking/banner.png?format=avif;webp&responsive';
@@ -35,12 +35,55 @@ export const MinecraftCursedWalkingProfiles: { [id: string]: InstanceProfile } =
     "Community · 18+ Players": { cpu: 8192, memory: 16384 },
 };
 
+/**
+ * Draft copy for /games/minecraft-cursed-walking.
+ *
+ * Drafted from the sizing rationale above, so the public explanation and the
+ * tier definitions cannot tell different stories. `draft: true` keeps the page
+ * out of the search index and puts a notice on it until the wording is signed
+ * off; the settings table falls back to the schema's own field names until
+ * someone writes a `config` list.
+ */
+const MinecraftCursedWalkingPage: GamePage = {
+    slug: "minecraft-cursed-walking",
+    draft: true,
+    tagline: "The hordes are the workload.",
+    summary:
+        "Host a Cursed Walking server. A zombie-apocalypse pack that is entity-bound rather than memory-bound, so it reaches four vCPU earlier than most.",
+
+    intro: [
+        "The Cursed Walking is a horror survival pack built around constant zombie hordes and special-infected spawns.",
+        "That makes entity count, not player count, the thing that decides how it runs. Entity ticking is largely single-threaded, so raw per-core speed matters more here than a large heap does.",
+    ],
+
+    tierNotes: {
+        "Solo · 1-2 Players":
+            "Solo or duo survival.",
+        "Small · 3-5 Players":
+            "A small group. Cores go to horde entity ticking early on this pack.",
+        "Medium · 6-10 Players":
+            "An active group with several horde zones loaded at once.",
+        "Large · 10-18 Players":
+            "A large group carrying heavy concurrent entity load.",
+        "Community · 18+ Players":
+            "A community server with many horde zones ticking simultaneously.",
+    },
+
+    sizing: [
+        "Entity simulation is the defining load. Constant hordes mean very high entity counts, and that is the biggest cause of tick drops — bigger than anything to do with memory.",
+        "Because entity ticking is largely single-threaded, raw single-thread speed matters most. This pack reaches four vCPU at the small tier rather than scaling memory first.",
+        "More players spread out means more chunks loaded and more hordes ticking at once, so processor demand climbs faster with headcount here than on a tech or quest pack.",
+        "Memory sits in a moderate 6–12 GB band for a modded pack, with about 30% container headroom over the heap.",
+    ],
+};
+
 const MinecraftCursedWalking: Game = {
     name:     'Minecraft Cursed Walking',
     category: 'Minecraft',
     profiles: MinecraftCursedWalkingProfiles,
     getBanner: async () => banner,
     getSchema: async () => MinecraftJavaConfigurationSchema,
+    page: MinecraftCursedWalkingPage,
 };
 
 export default MinecraftCursedWalking;
