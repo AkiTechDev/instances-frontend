@@ -37,6 +37,10 @@ import PromoCTA from "../components/astrojs/PromoCTA/PromoCTA.astro"
 
 import Banner from "../assets/images/WelcomeToInstances.png";
 
+// The homepage shows the pre-signup subset; /faq shows all of them. Both
+// read lib/faqs.ts, so an answer is written once and can't drift.
+import { landingFaqs } from "../lib/faqs";
+
 const seo_des = "Host Minecraft, sandbox games, and more with Instances. No contracts, no setup hassle. Switch games instantly, keep your world, and only pay for what you play.";
 const domain = "instances.aki-labs.com"
 
@@ -145,75 +149,25 @@ const domain = "instances.aki-labs.com"
       </div>
 
       <div class="commonQuestionsContainer">
-        <div class="faqCard">
-          <input id="faqCard1" type="checkbox" />
-          <div class="faqCardBackground"></div>
-          <label for="faqCard1" class="faqCardLabel">
-            <p class="subTitle">Do I need to install anything to use this platform?</p>
-            <div class="faqIcon">
-              <img src={iconArrow} />
+        {landingFaqs.map((faq, i) => (
+          <div class="faqCard">
+            <input id={`faqCard${i + 1}`} type="checkbox" />
+            <div class="faqCardBackground"></div>
+            <label for={`faqCard${i + 1}`} class="faqCardLabel">
+              <p class="subTitle">{faq.q}</p>
+              <div class="faqIcon">
+                <img src={iconArrow} alt="" />
+              </div>
+            </label>
+            <div class="faqCardContent">
+              <div class="faqCardContentInner">
+                {faq.a.map((para) => <p class="bodyText">{para}</p>)}
+              </div>
             </div>
-          </label>
-          <div class="faqCardContent">
-            <p class="bodyText" style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
           </div>
-        </div>
+        ))}
 
-        <div class="faqCard">
-          <input id="faqCard2" type="checkbox" />
-          <div class="faqCardBackground"></div>
-          <label for="faqCard2" class="faqCardLabel">
-            <p class="subTitle">Which Games are supported?</p>
-            <div class="faqIcon">
-              <img src={iconArrow} />
-            </div>
-          </label>
-          <div class="faqCardContent">
-            <p class="bodyText" style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
-          </div>
-        </div>
-
-        <div class="faqCard">
-          <input id="faqCard3" type="checkbox" />
-          <div class="faqCardBackground"></div>
-          <label for="faqCard3" class="faqCardLabel">
-            <p class="subTitle">How does billing works?</p>
-            <div class="faqIcon">
-              <img src={iconArrow} />
-            </div>
-          </label>
-          <div class="faqCardContent">
-            <p class="bodyText" style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
-          </div>
-        </div>
-
-        <div class="faqCard">
-          <input id="faqCard4" type="checkbox" />
-          <div class="faqCardBackground"></div>
-          <label for="faqCard4" class="faqCardLabel">
-            <p class="subTitle">Can I upgrade or downgrade my server later?</p>
-            <div class="faqIcon">
-              <img src={iconArrow} />
-            </div>
-          </label>
-          <div class="faqCardContent">
-            <p class="bodyText" style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
-          </div>
-        </div>
-
-        <div class="faqCard">
-          <input id="faqCard5" type="checkbox" />
-          <div class="faqCardBackground"></div>
-          <label for="faqCard5" class="faqCardLabel">
-            <p class="subTitle">Is there customer support available?</p>
-            <div class="faqIcon">
-              <img src={iconArrow} />
-            </div>
-          </label>
-          <div class="faqCardContent">
-            <p class="bodyText" style="color:#191C2E">Instances is an easy, secure, and fully customizable service that allows casual and part-time gamers to quickly spin up dedicated game servers using a pay-as-you-go model — no technical expertise required.</p>
-          </div>
-        </div>
+        <a href="/faq" class="faqMore bodyTextSmallSemi">See every question and answer</a>
 
       </div>
     </section>
@@ -420,23 +374,52 @@ const domain = "instances.aki-labs.com"
     z-index: 2;
   }
 
+  /* A fixed open height silently cut off any answer longer than about four
+     lines, which is most of them now that the copy is real. Animating a grid
+     row from 0fr to 1fr collapses to the content's own height instead, so an
+     answer someone edits later can't be clipped.
+
+     Where 0fr isn't understood the declaration is dropped and the answer sits
+     open — visible without its animation, which is the right way round. */
   .faqCardContent {
-    max-height: 0;
-    overflow: hidden;
-    transition: all 0.35s;
-    display: block;
+    display: grid;
+    grid-template-rows: 0fr;
+    width: 100%;
     padding-top: 0;
+    transition: grid-template-rows 0.35s, padding-top 0.35s;
 
     z-index: 2;
-
   }
 
+  .faqCardContentInner { overflow: hidden; min-height: 0; }
+
+  .faqCardContent p { color: #191C2E; margin: 0 0 0.75rem; }
+  .faqCardContent p:last-child { margin-bottom: 0; }
+
   .faqCard input:checked ~ .faqCardContent {
-    max-height: 10rem;
+    grid-template-rows: 1fr;
     padding-top: 1.5rem;
 
     z-index: 2;
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .faqCardContent,
+    .faqCardBackground,
+    .faqIcon { transition: none; }
+  }
+
+  /* Sits with the cards rather than the heading: someone who has just read
+     these and not found their question is looking here, not back up there. */
+  .faqMore {
+    align-self: flex-start;
+    margin-top: 0.5rem;
+    color: var(--c-orange);
+    text-decoration: none;
+  }
+
+  .faqMore:hover { color: var(--c-purple); text-decoration: underline; }
+  .faqMore:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-ring-offset); }
 
   .faqCard input:checked ~ .faqCardBackground {
     background: #ffffff;
