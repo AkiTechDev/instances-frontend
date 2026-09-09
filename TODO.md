@@ -5,7 +5,7 @@ Everything here was verified against the code or a production build on the date
 noted — nothing is from memory or assumption. Each item says what's wrong, where,
 and what "done" looks like, so any of them can be picked up cold.
 
-Last reviewed: **2026-09-09**, against a clean `astro build`.
+Last reviewed: **2026-09-10**, against a clean `astro build`.
 
 ---
 
@@ -19,9 +19,9 @@ other page already uses `#191C2E`. One-line fix; it's listed first only because
 it's the cheapest real bug on the site.
 
 ### 2. Blank pages are being submitted to search engines
-`sitemap-0.xml` currently lists `/about/` and `/pricing/` (both 0-byte files), plus
-four routes that only make sense signed in: `/dashboard/`, `/explore/`, `/extra/`,
-`/auth/redirect/`.
+`sitemap-0.xml` currently lists `/about/` (a 0-byte file), plus four routes that
+only make sense signed in: `/dashboard/`, `/explore/`, `/extra/`, `/auth/redirect/`.
+`/pricing/` was on this list until it was written, and belongs in the sitemap now.
 
 Submitting empty and app-only URLs is what gets a site flagged in Search Console.
 The sitemap filter in `astro.config.mjs` already excludes draft game pages — the
@@ -32,14 +32,16 @@ same predicate can exclude these. Two options, and the choice matters:
 - **Better:** invert it — an explicit allow-list of marketing routes, so a new
   app route is excluded by default rather than by someone remembering.
 
-### 3. `/pricing` is a blank page that the Terms treat as contractual
-`src/pages/pricing.astro` is 0 bytes. `terms.astro` §9 says charges accrue "at the
-rates published at instances.aki-labs.com/pricing" — so the contract points at an
-empty page. `/faq` deliberately links to `/games` for prices instead, and says
-nothing it can't stand behind, but that's a workaround.
+### 3. ~~`/pricing` is blank~~ — done, but read items 18–20 before launch
+Written 2026-09-10. Every figure derives from `fgCalc` and the games' own
+`profiles`, so it can't drift from what the create-instance modal charges. **But
+three things below (18, 19, 20) mean the published prices are not yet the prices
+customers will actually be billed** — that has to be resolved before the page can
+be called accurate.
 
-`/about` (`src/pages/about.astro`) is also 0 bytes, with no such contractual
-weight — lower priority.
+`/about` (`src/pages/about.astro`) is still 0 bytes. Nothing links to it, so its
+only current effect is a blank URL in the sitemap. Recommendation was to delete it
+and revisit nearer launch.
 
 ### 4. "Switch games, not just servers" overstates what the product does
 `src/pages/index.astro:135-137` — *"Play Minecraft today, Terraria tomorrow, your
@@ -182,9 +184,57 @@ into a real link.
 
 ---
 
+## Pricing correctness — found while building `/pricing`
+
+These four sit together because each one makes a published price wrong in a
+different way. None is a display bug; all are decisions somebody has to make.
+
+### 18. New instances default to the *expensive* tier
+`src/components/app/CreateInstanceModel/CreateInstanceModal.tsx:114` —
+`initialInput.plan` is `"Premium"`.
+
+`pricing.ts:17` charges Premium at a **1.3x** commission against Default's 1.2x. So
+an untouched create form bills roughly **8% above every price published on
+`/pricing`, `/games` and `/games/<slug>`**, all of which quote Default.
+
+Either default the form to `"Default"`, or publish Premium rates alongside. As it
+stands the site quotes one price and the product charges another — the kind of gap
+that becomes a chargeback rather than a support ticket.
+
+### 19. Nobody has said what "Premium" buys
+`src/lib/instance_tiers.ts` lists `["Default", "Premium"]` and `pricing.ts` prices
+them differently. That is the entire definition — no feature, no priority, no
+support difference is described anywhere in the codebase.
+
+`/pricing` deliberately quotes Default and names the tier it quoted, because
+selling a tier we can't describe isn't something the page should do. Decide what
+Premium is, or remove it.
+
+### 20. The billing currency is still undecided
+`terms.astro` §9 marks it "GBP or USD — to be confirmed", but `/pricing`, `/games`
+and `/games/<slug>` all render `$`. A pricing page is the worst place on the site
+for an unconfirmed currency.
+
+On `/pricing` it is one constant — `CURRENCY` in `src/lib/pricingCalc.ts` — but
+`/games` and `/games/<slug>` have their own hardcoded `$` and should move onto the
+same constant when the decision is made.
+
+Note the underlying rates in `pricing.ts` are AWS Fargate USD list prices, so
+quoting GBP means adopting a conversion policy, not just changing a symbol.
+
+### 21. Storage is charged but not priced
+Terms §9: "Storage charges continue for as long as we're holding your data." There
+is **no storage rate anywhere in the codebase**, so `/pricing` cannot include it.
+
+The page says so explicitly rather than passing a compute-only figure off as the
+whole bill, and `/faq#stopped-server-charges` matches. But an estimate that openly
+excludes a real charge is a stopgap — publish the rate and fold it in.
+
+---
+
 ## Housekeeping
 
-### 17. Four stale Vite cache directories need `sudo rm`
+### 22. Four stale Vite cache directories need `sudo rm`
 ```
 node_modules/.vite/deps.root-owned-stale
 node_modules/.vite/deps.root-owned-stale-1788852098

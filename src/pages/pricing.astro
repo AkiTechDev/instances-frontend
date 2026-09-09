@@ -1,0 +1,754 @@
+---
+// Order matters: tokens (theme/default) before the sheets that consume them,
+// and identical on every entry point so the cascade can't diverge per page.
+import Fonts from "../components/Fonts.astro";
+
+import "../styles/normalise.css"
+import "../styles/global.css"
+import "../styles/theme/default.css"
+import "../styles/typography.css"
+
+import button from "../styles/components/button.module.css";
+import colourStyles from "../styles/theme/colours.module.css";
+
+import Header from "../components/astrojs/header/Header.astro";
+import Newsletter from "../components/newsletter/Newsletter.astro";
+import Footer from "../components/astrojs/Footer/Footer.astro";
+
+import { gameRegistry } from "../lib/games";
+import { regions } from "../lib/regions";
+import {
+    CURRENCY,
+    HOURS_MAX,
+    HOURS_MIN,
+    PRICE_REGION,
+    PRICE_REGION_NAME,
+    PRICE_TIER,
+    WEEKS_PER_MONTH,
+    comparisonHours,
+    formatHours,
+    formatMoney,
+    hourlyFor,
+    memoryGbOf,
+    monthlyFor,
+    playPresets,
+    splitProfileId,
+    vcpuOf,
+    type CalcGame,
+} from "../lib/pricingCalc";
+
+/* Every game and every size, flattened at build time. The estimator needs this
+   in the browser and the game modules can't go there — they import banners and
+   SVGs that only resolve inside Vite's asset pipeline — so the numbers travel
+   as JSON and the maths travels as a module both sides import. */
+const games: CalcGame[] = (
+    await Promise.all(
+        Object.entries(gameRegistry).map(async ([id, entry]) => {
+            const game = (await entry.load()).default;
+            return {
+                id,
+                name: game.name,
+                slug: game.page?.slug,
+                profiles: Object.entries(game.profiles).map(([profileId, profile]) => ({
+                    id: profileId,
+                    cpu: profile.cpu,
+                    memory: profile.memory,
+                })),
+            };
+        }),
+    )
+).sort((a, b) => a.name.localeCompare(b.name));
+
+/* Server-rendered defaults. The page is complete and correct before any script
+   runs; pricingForm.ts only makes the controls live. */
+const DEFAULT_GAME = "MinecraftJava";
+const DEFAULT_HOURS = 8;
+
+const initialGame = games.find((game) => game.id === DEFAULT_GAME) ?? games[0];
+/* Second tier rather than the first: the smallest size is a solo world, and an
+   estimate that opens on the cheapest possible case flatters itself. */
+const initialProfile = initialGame.profiles[Math.min(1, initialGame.profiles.length - 1)];
+const initialHourly = hourlyFor(initialProfile, PRICE_REGION);
+const initialMonthly = initialHourly === null ? null : monthlyFor(initialHourly, DEFAULT_HOURS);
+
+/* From-price per game for the static table, so the page still answers "what
+   does this cost" with no script at all. */
+const fromPrices = games
+    .map((game) => {
+        const priced = game.profiles
+            .map((profile) => hourlyFor(profile, PRICE_REGION))
+            .filter((hourly): hourly is number => hourly !== null);
+        return {
+            game,
+            cheapest: priced.length ? Math.min(...priced) : null,
+            sizes: game.profiles.length,
+        };
+    })
+    .sort((a, b) => (a.cheapest ?? Infinity) - (b.cheapest ?? Infinity));
+
+/* If this ever fires, `fgCalc` has lost the region the whole page quotes and
+   every figure on it would render as an em dash. */
+if (initialHourly === null) {
+    console.warn(`[pricing] no price table for ${PRICE_REGION} — the page will render without figures.`);
+}
+
+const domain = "instances.aki-labs.com";
+const url = `https://${domain}/pricing`;
+const title = "Pricing | Instances";
+const seo_des = `Pay by the hour, with no subscription and no minimum. Work out what your game server would actually cost a month, from ${CURRENCY}${initialHourly ?? ""} an hour.`;
+---
+<!doctype html>
+<html lang="en" class="en" prefix="og: http://ogp.me/ns#">
+    <head>
+        <meta charset="UTF-8" />
+
+        <Fonts />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="author" content="Aki Laboratories Limited">
+        <meta name="referrer" content="strict-origin-when-cross-origin">
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <meta name="generator" content={Astro.generator} />
+
+        <!-- SEO -->
+        <title>{title}</title>
+        <meta name="description" content={seo_des}>
+        <meta itemprop="description" content={seo_des}>
+        <meta name="robots" content="all" />
+        <link rel="canonical" href={url}>
+        <link rel="sitemap" href="/sitemap-index.xml" />
+
+        <!-- Twitter/X specific -->
+        <meta name="twitter:card" content="summary">
+        <meta name="twitter:title" content={title}>
+        <meta name="twitter:description" content={seo_des}>
+        <meta name="twitter:site" content="@aki_labs">
+
+        <!-- Open Graph -->
+        <meta property="og:title" content={title}>
+        <meta property="og:description" content={seo_des}>
+        <meta property="og:type" content="website">
+        <meta property="og:url" content={url}>
+        <meta property="og:site_name" content="Instances">
+        <meta property="og:locale" content="en_US">
+
+        <!-- Mobile / Browser theming -->
+        <meta name="theme-color" content="#191C2E">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+    </head>
+    <body>
+        <Header />
+
+        <main class="page">
+            <!-- ── Masthead ─────────────────────────────────────────────── -->
+            <header class="masthead">
+                <p class="eyebrow bodyTextSmallestSemiCaps">Pricing</p>
+                <h1 class="h2">You pay for the hours you <span class={colourStyles.gradientOne}>actually play</span></h1>
+                <p class="subTitle lead">
+                    There's no plan to choose and no monthly fee to forget about. A server
+                    that ran for six hours this month costs you six hours. Below you can
+                    work out roughly what that means for your group.
+                </p>
+            </header>
+
+            <!-- ── The model, in three lines ────────────────────────────── -->
+            <section class="model" aria-label="How billing works">
+                <div class="modelCard">
+                    <h2 class="h6">Billed by the hour</h2>
+                    <p class="bodyText">
+                        The meter runs while your server is on, and the rate depends on the
+                        size you chose. Nothing is rounded up to a day or a month.
+                    </p>
+                </div>
+                <div class="modelCard">
+                    <h2 class="h6">No subscription, no minimum</h2>
+                    <p class="bodyText">
+                        Nothing to cancel, no tier to be locked into, and no charge at all in
+                        a month where you didn't play.
+                    </p>
+                </div>
+                <div class="modelCard">
+                    <h2 class="h6">One bill, once a month</h2>
+                    <p class="bodyText">
+                        We total your hours at the end of the calendar month and charge your
+                        saved card once. You can see the running total any time.
+                    </p>
+                </div>
+            </section>
+
+            <!-- ── Estimator ────────────────────────────────────────────── -->
+            <section class="calc" aria-labelledby="calc-title">
+                <div class="calcHead">
+                    <h2 id="calc-title" class="h4">What would it cost you?</h2>
+                    <p class="bodyText calcLead">
+                        Three questions, none of them technical. We'll pick the server size
+                        that suits your group and show you the working.
+                    </p>
+                </div>
+
+                <div class="calcBody">
+                    <!-- Controls. Disabled until the script makes them live, so
+                         nothing on the page pretends to work when it can't. -->
+                    <div class="controls">
+                        <div class="field">
+                            <label class="fieldLabel bodyTextSmallestSemiCaps" for="pcGame">What are you playing?</label>
+                            <select id="pcGame" class="control bodyText" data-pc-game disabled>
+                                {games.map((game) => (
+                                    <option value={game.id} selected={game.id === initialGame.id}>{game.name}</option>
+                                ))}
+                            </select>
+                        </div>
+
+                        <div class="field">
+                            <label class="fieldLabel bodyTextSmallestSemiCaps" for="pcSize">How many of you?</label>
+                            <select id="pcSize" class="control bodyText" data-pc-size disabled>
+                                {initialGame.profiles.map((profile) => {
+                                    const { label, players } = splitProfileId(profile.id);
+                                    return (
+                                        <option value={profile.id} selected={profile.id === initialProfile.id}>
+                                            {players ? `${players} — ${label}` : label}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                            <p class="fieldHint bodyTextSmall">We size the server from this — you never have to think in gigabytes.</p>
+                        </div>
+
+                        <div class="field">
+                            <label class="fieldLabel bodyTextSmallestSemiCaps" for="pcRegion">Where are most of you?</label>
+                            <select id="pcRegion" class="control bodyText" data-pc-region disabled>
+                                {Object.entries(regions).map(([id, name]) => (
+                                    <option value={id} selected={id === PRICE_REGION}>{name}</option>
+                                ))}
+                            </select>
+                            <p class="fieldHint bodyTextSmall">Closest to your group, not to you. It affects both lag and price.</p>
+                        </div>
+
+                        <div class="field fieldWide">
+                            <span class="fieldLabel bodyTextSmallestSemiCaps" id="pcHoursLabel">How much would you play?</span>
+                            <div class="presets" role="group" aria-labelledby="pcHoursLabel">
+                                {playPresets.map((preset) => (
+                                    <button
+                                        type="button"
+                                        class="preset"
+                                        data-pc-preset
+                                        data-hours={preset.hours}
+                                        aria-pressed={preset.hours === DEFAULT_HOURS ? "true" : "false"}
+                                        disabled
+                                    >
+                                        <span class="presetName bodyTextSmallSemi">{preset.label}</span>
+                                        <span class="presetDetail bodyTextSmall">{preset.detail}</span>
+                                    </button>
+                                ))}
+                            </div>
+                            <label class="srOnly" for="pcHours">Hours a week</label>
+                            <input
+                                id="pcHours"
+                                class="slider"
+                                type="range"
+                                min={HOURS_MIN}
+                                max={HOURS_MAX}
+                                step="1"
+                                value={DEFAULT_HOURS}
+                                data-pc-hours
+                                disabled
+                            />
+                            <p class="fieldHint bodyTextSmall">
+                                Currently estimating <strong data-pc-play>{formatHours(DEFAULT_HOURS)}</strong>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Result -->
+                    <div class="result">
+                        <p class="resultLabel bodyTextSmallestSemiCaps">Roughly, per month</p>
+                        <p class="resultFigure" data-pc-monthly>
+                            {initialMonthly === null ? "—" : formatMoney(initialMonthly)}
+                        </p>
+
+                        <dl class="resultMeta">
+                            <div>
+                                <dt class="bodyTextSmall">Hourly rate</dt>
+                                <dd class="bodyTextSmallSemi money" data-pc-hourly>
+                                    {initialHourly === null ? "—" : formatMoney(initialHourly)}
+                                </dd>
+                            </div>
+                            <div>
+                                <dt class="bodyTextSmall">Server we'd give you</dt>
+                                <dd class="bodyTextSmallSemi" data-pc-spec>
+                                    {vcpuOf(initialProfile)} vCPU &middot; {memoryGbOf(initialProfile)} GB &middot; {PRICE_REGION_NAME}
+                                </dd>
+                            </div>
+                        </dl>
+
+                        <p class="working bodyTextSmall" data-pc-working>
+                            {initialHourly === null
+                                ? "We don't hold a price for that location yet."
+                                : `${formatMoney(initialHourly)} an hour × ${DEFAULT_HOURS} hours a week × ${WEEKS_PER_MONTH.toFixed(2)} weeks in an average month.`}
+                        </p>
+
+                        <a href={initialGame.slug ? `/games/${initialGame.slug}` : "/games"} class="resultLink bodyTextSmallSemi" data-pc-cta>
+                            See {initialGame.name} in detail
+                        </a>
+                    </div>
+
+                    <!-- Shape of the cost, so one number isn't the whole story -->
+                    <div class="ladder">
+                        <h3 class="h6">The same server, played more or less</h3>
+                        <table class="ladderTable">
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="bodyTextSmallestSemiCaps">If you play</th>
+                                    <th scope="col" class="bodyTextSmallestSemiCaps">Per month</th>
+                                </tr>
+                            </thead>
+                            <tbody data-pc-rows>
+                                {initialHourly !== null && comparisonHours.map((hours) => (
+                                    <tr class={hours === DEFAULT_HOURS ? "isCurrent" : undefined}>
+                                        <th scope="row" class="bodyText">
+                                            {hours === 168 ? "Left running all month" : `${hours} hours a week`}
+                                        </th>
+                                        <td class="bodyText money">{formatMoney(monthlyFor(initialHourly, hours))}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        <p class="ladderNote bodyTextSmall">
+                            That bottom row is the one worth looking at. Leaving a server
+                            running when nobody is on it is the only way to spend real money
+                            here, and it's why stopping it matters.
+                        </p>
+                    </div>
+                </div>
+
+                <p class="estimateNote bodyTextSmall">
+                    An estimate, not a quote. Prices shown are the <strong>{PRICE_TIER}</strong> tier
+                    and update live as you change the answers above.
+                </p>
+            </section>
+
+            <!-- ── What's counted, and what isn't ───────────────────────── -->
+            <section class="scope" aria-labelledby="scope-title">
+                <div class="scopeHead">
+                    <h2 id="scope-title" class="h4">What that figure does and doesn't cover</h2>
+                    <p class="bodyText">
+                        We'd rather you found this out here than on a bill.
+                    </p>
+                </div>
+
+                <div class="scopeCols">
+                    <div class="scopeCol">
+                        <h3 class="scopeLabel bodyTextSmallestSemiCaps">Included, no extra charge</h3>
+                        <ul class="scopeList bodyText">
+                            <li>Setting the server up and keeping it running</li>
+                            <li>The address your friends connect to</li>
+                            <li>Moving to a bigger or smaller size whenever you like</li>
+                            <li>Downloading your world whenever you want a copy</li>
+                            <li>Support, by Discord, email or the contact form</li>
+                        </ul>
+                    </div>
+
+                    <div class="scopeCol scopeCol--warn">
+                        <h3 class="scopeLabel bodyTextSmallestSemiCaps">Not in the figure above</h3>
+                        <ul class="scopeList bodyText">
+                            <li>
+                                <strong>Keeping your world saved.</strong> Stopping a server stops the
+                                hourly charge above, but we're still holding your world, and that
+                                carries a small separate charge for as long as the server exists.
+                                Deleting it is what stops everything.
+                            </li>
+                            <li>
+                                <strong>Tax.</strong> Any VAT or sales tax that applies where you live
+                                is added on top.
+                            </li>
+                        </ul>
+                        <p class="scopePending bodyTextSmall">
+                            The storage rate isn't published yet, so we've left it out of the
+                            estimate rather than guess at it. It is small next to the hourly
+                            cost, but it isn't nothing, and you shouldn't have to discover it.
+                        </p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ── Per-game floor prices ────────────────────────────────── -->
+            <section class="perGame" aria-labelledby="pergame-title">
+                <div class="sectionHead">
+                    <h2 id="pergame-title" class="h4">Every game, cheapest size first</h2>
+                    <p class="bodyText sectionLead">
+                        Quoted in <strong>{PRICE_REGION_NAME}</strong> on the {PRICE_TIER} tier.
+                        Each game's page explains why its sizes are what they are.
+                    </p>
+                </div>
+
+                <div class="tableScroll">
+                    <table class="gameTable">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="bodyTextSmallestSemiCaps">Game</th>
+                                <th scope="col" class="bodyTextSmallestSemiCaps">Sizes</th>
+                                <th scope="col" class="bodyTextSmallestSemiCaps">From, per hour</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {fromPrices.map(({ game, cheapest, sizes }) => (
+                                <tr>
+                                    <th scope="row" class="bodyText">
+                                        {game.slug
+                                            ? <a href={`/games/${game.slug}`}>{game.name}</a>
+                                            : game.name}
+                                    </th>
+                                    <td class="bodyText">{sizes}</td>
+                                    <td class="bodyText money">{cheapest === null ? "—" : formatMoney(cheapest)}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- ── Closing ──────────────────────────────────────────────── -->
+            <section class="closing" aria-labelledby="closing-title">
+                <h2 id="closing-title" class="h5">No card needed to look around</h2>
+                <p class="bodyText closingLead">
+                    You only need a payment method when you start your first server, and
+                    you're charged from the moment it's running &mdash; not before.
+                </p>
+                <div class="closingActions">
+                    <a href="/dashboard" class:list={[button.btn, button.vibrant]}>
+                        <span class="buttonText">Start a server</span>
+                    </a>
+                    <a href="/faq#how-billing-works" class:list={[button.btn, button.outline]}>
+                        <span class="buttonText">Read the billing questions</span>
+                    </a>
+                </div>
+            </section>
+        </main>
+
+        <Newsletter />
+        <Footer />
+
+        <script type="application/json" data-pc-data set:html={JSON.stringify(games)} is:inline />
+        <script>
+            import { initPricingForm } from "../lib/pricingForm";
+            initPricingForm();
+        </script>
+    </body>
+</html>
+
+<style>
+    /* The page has one job: turn "it depends on how much you play" into a number
+       somebody can act on. Everything is arranged around the estimator, and the
+       estimator shows its working so the number can be checked rather than
+       trusted. */
+
+    .page {
+        --header-h: 5.875rem;
+
+        width: min(100% - 2rem, 96rem); /* 1536px */
+        margin-inline: auto;
+        padding: 3.5rem var(--padding-sm) 5rem;
+        box-sizing: border-box;
+
+        color: var(--text-colour-light);
+    }
+
+    .srOnly {
+        position: absolute;
+        width: 1px; height: 1px;
+        margin: -1px; padding: 0;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+    }
+
+    .money { font-variant-numeric: tabular-nums; }
+
+    /* ── Masthead ─────────────────────────────────────────────────────── */
+
+    .masthead { max-width: 46rem; margin-bottom: 3.5rem; }
+    .eyebrow { color: var(--c-orange); margin: 0 0 0.75rem; letter-spacing: 0.06em; }
+    .masthead h1 { margin: 0 0 1.25rem; text-wrap: balance; }
+    .lead { margin: 0; color: var(--ink-body); line-height: 1.6; }
+
+    /* ── Model ────────────────────────────────────────────────────────── */
+
+    .model {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(17rem, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 4.5rem;
+    }
+
+    .modelCard {
+        padding: 1.5rem 1.75rem;
+        border-radius: var(--r-card);
+        background: var(--surface-card);
+        box-shadow: var(--surface-card-inset);
+    }
+
+    .modelCard h2 { margin: 0 0 0.625rem; color: var(--c-orange); }
+    .modelCard p { margin: 0; color: var(--ink-body); line-height: 1.7; }
+
+    /* ── Estimator ────────────────────────────────────────────────────── */
+
+    .calc {
+        padding: 2.5rem;
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-card);
+        background: var(--surface-card);
+        margin-bottom: 4.5rem;
+    }
+
+    .calcHead { max-width: 40rem; margin-bottom: 2.5rem; }
+    .calcHead h2 { margin: 0 0 0.75rem; text-wrap: balance; }
+    .calcLead { margin: 0; color: var(--ink-body); line-height: 1.6; }
+
+    .calcBody {
+        display: grid;
+        grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr);
+        grid-template-areas: "controls result" "controls ladder";
+        gap: 2rem;
+        align-items: start;
+    }
+
+    .controls {
+        grid-area: controls;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1.5rem;
+    }
+
+    .field { display: grid; gap: 0.4375rem; min-width: 0; align-content: start; }
+    .fieldWide { grid-column: 1 / -1; }
+    .fieldLabel { color: var(--c-orange); letter-spacing: 0.06em; }
+    .fieldHint { margin: 0; color: var(--ink-muted); line-height: 1.5; }
+    .fieldHint strong { color: var(--text-colour-light); }
+
+    /* Matches the contact form: every control the same height, so a select
+       can't quietly grow taller than the inputs beside it. */
+    .control {
+        height: 3rem;
+        box-sizing: border-box;
+        padding: 0 1rem;
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-sm);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text-colour-light);
+        width: 100%;
+    }
+
+    .control:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-ring-offset); }
+    .control:disabled { opacity: 0.55; cursor: not-allowed; }
+    .control option { background: #1E2237; color: var(--text-colour-light); }
+
+    .presets { display: grid; grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); gap: 0.625rem; }
+
+    .preset {
+        display: grid;
+        gap: 0.125rem;
+        padding: 0.75rem 1rem;
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-sm);
+        background: rgba(255, 255, 255, 0.03);
+        text-align: left;
+        cursor: pointer;
+        transition: border-color 0.2s, background 0.2s;
+    }
+
+    .preset:hover:not(:disabled) { border-color: var(--c-orange); }
+    .preset:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-ring-offset); }
+    .preset:disabled { opacity: 0.55; cursor: not-allowed; }
+    .preset[aria-pressed="true"] { border-color: var(--c-orange); background: rgba(235, 164, 57, 0.12); }
+    .presetName { color: var(--text-colour-light); }
+    .presetDetail { color: var(--ink-muted); }
+
+    .slider { width: 100%; accent-color: var(--c-orange); margin-top: 0.375rem; }
+    .slider:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-ring-offset); }
+    .slider:disabled { opacity: 0.55; }
+
+    /* ── Result ───────────────────────────────────────────────────────── */
+
+    .result {
+        grid-area: result;
+        padding: 1.75rem;
+        border: 1px solid var(--c-orange);
+        border-radius: var(--r-card);
+        background: rgba(235, 164, 57, 0.07);
+    }
+
+    .resultLabel { color: var(--c-orange); margin: 0 0 0.375rem; letter-spacing: 0.06em; }
+
+    .resultFigure {
+        margin: 0 0 1.25rem;
+        font-size: clamp(2.75rem, 6vw, 3.75rem);
+        line-height: 1;
+        font-weight: 700;
+        font-variant-numeric: tabular-nums;
+        color: var(--text-colour-light);
+    }
+
+    .resultMeta { display: grid; gap: 0.75rem; margin: 0 0 1.25rem; }
+    .resultMeta dt { color: var(--ink-muted); margin-bottom: 0.125rem; }
+    .resultMeta dd { margin: 0; color: var(--text-colour-light); }
+
+    .working { margin: 0 0 1.25rem; color: var(--ink-body); line-height: 1.6; }
+
+    .resultLink { color: var(--c-orange); text-decoration: none; }
+    .resultLink:hover { color: var(--c-purple); text-decoration: underline; }
+    .resultLink:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-ring-offset); }
+
+    /* ── Ladder ───────────────────────────────────────────────────────── */
+
+    .ladder {
+        grid-area: ladder;
+        padding: 1.5rem 1.75rem;
+        border-radius: var(--r-card);
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .ladder h3 { margin: 0 0 1rem; }
+    .ladderTable { width: 100%; border-collapse: collapse; text-align: left; }
+
+    .ladderTable th[scope="col"] {
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid var(--hairline);
+        color: var(--ink-muted);
+        font-weight: 400;
+    }
+
+    .ladderTable th[scope="col"]:last-child,
+    .ladderTable td { text-align: right; }
+
+    .ladderTable tbody th,
+    .ladderTable tbody td {
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--hairline-soft);
+        color: var(--ink-body);
+        font-weight: 400;
+    }
+
+    .ladderTable tbody tr:last-child th,
+    .ladderTable tbody tr:last-child td { border-bottom: 0; }
+
+    .ladderTable tbody tr.isCurrent th,
+    .ladderTable tbody tr.isCurrent td { color: var(--c-orange); }
+
+    .ladderNote { margin: 1rem 0 0; color: var(--ink-muted); line-height: 1.6; }
+
+    .estimateNote { margin: 2rem 0 0; color: var(--ink-muted); line-height: 1.6; }
+    .estimateNote strong { color: var(--text-colour-light); }
+
+    /* ── Scope ────────────────────────────────────────────────────────── */
+
+    .scope { margin-bottom: 4.5rem; }
+    .scopeHead { max-width: 40rem; margin-bottom: 2rem; }
+    .scopeHead h2 { margin: 0 0 0.75rem; text-wrap: balance; }
+    .scopeHead p { margin: 0; color: var(--ink-body); line-height: 1.6; }
+
+    .scopeCols {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+        gap: 1.5rem;
+    }
+
+    .scopeCol {
+        padding: 1.75rem;
+        border-radius: var(--r-card);
+        background: var(--surface-card);
+        box-shadow: var(--surface-card-inset);
+    }
+
+    /* The column people skip is the one that costs them money, so it gets the
+       accent rather than the reassuring one above it. */
+    .scopeCol--warn {
+        border-left: 3px solid var(--c-orange);
+        background: rgba(235, 164, 57, 0.08);
+        box-shadow: none;
+    }
+
+    .scopeLabel { margin: 0 0 1rem; color: var(--c-orange); letter-spacing: 0.06em; }
+    .scopeList { margin: 0; padding-left: 1.125rem; display: grid; gap: 0.75rem; }
+    .scopeList li { color: var(--ink-body); line-height: 1.7; }
+    .scopeList li::marker { color: var(--c-orange); }
+    .scopeList strong { color: var(--text-colour-light); }
+    .scopePending { margin: 1.25rem 0 0; color: var(--ink-muted); line-height: 1.6; }
+
+    /* ── Per-game table ───────────────────────────────────────────────── */
+
+    .perGame { margin-bottom: 4.5rem; }
+    .sectionHead { max-width: 42rem; margin-bottom: 1.75rem; }
+    .sectionHead h2 { margin: 0 0 0.75rem; text-wrap: balance; }
+    .sectionLead { margin: 0; color: var(--ink-body); line-height: 1.6; }
+    .sectionLead strong { color: var(--text-colour-light); }
+
+    .tableScroll {
+        overflow-x: auto;
+        border: 1px solid var(--hairline);
+        border-radius: var(--r-card);
+        max-width: 52rem;
+    }
+
+    .tableScroll:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-ring-offset); }
+
+    .gameTable { width: 100%; border-collapse: collapse; text-align: left; }
+
+    .gameTable th[scope="col"] {
+        padding: 0.875rem 1.125rem;
+        border-bottom: 1px solid var(--hairline);
+        background: rgba(255, 255, 255, 0.03);
+        color: var(--ink-muted);
+        font-weight: 400;
+        white-space: nowrap;
+    }
+
+    .gameTable tbody th,
+    .gameTable tbody td {
+        padding: 0.875rem 1.125rem;
+        border-bottom: 1px solid var(--hairline-soft);
+        color: var(--ink-body);
+        font-weight: 400;
+        vertical-align: top;
+    }
+
+    .gameTable tbody tr:last-child th,
+    .gameTable tbody tr:last-child td { border-bottom: 0; }
+    .gameTable tbody th { color: var(--text-colour-light); }
+    .gameTable a { color: var(--c-orange); text-decoration: none; }
+    .gameTable a:hover { color: var(--c-purple); text-decoration: underline; }
+    .gameTable a:focus-visible { outline: var(--focus-ring); outline-offset: var(--focus-ring-offset); }
+    .gameTable th:last-child, .gameTable td:last-child { text-align: right; white-space: nowrap; }
+
+    /* ── Closing ──────────────────────────────────────────────────────── */
+
+    .closing {
+        padding-top: 3rem;
+        border-top: 1px solid var(--hairline);
+        max-width: 42rem;
+    }
+
+    .closing h2 { margin: 0 0 0.875rem; text-wrap: balance; }
+    .closingLead { margin: 0 0 1.75rem; color: var(--ink-body); line-height: 1.7; }
+    .closingActions { display: flex; flex-wrap: wrap; gap: 1rem 1.25rem; }
+    .closingActions a { text-decoration: none; box-sizing: border-box; }
+
+    /* ── Narrow ───────────────────────────────────────────────────────── */
+
+    @media (max-width: 68rem) {
+        .calcBody {
+            grid-template-columns: minmax(0, 1fr);
+            grid-template-areas: "controls" "result" "ladder";
+        }
+    }
+
+    @media (max-width: 60rem) {
+        .page { padding-inline: 2rem; }
+        .calc { padding: 1.75rem; }
+        .controls { grid-template-columns: minmax(0, 1fr); }
+    }
+
+    @media (max-width: 40rem) {
+        .page { padding-inline: 1.25rem; }
+        .calc { padding: 1.25rem; }
+        .modelCard, .scopeCol, .result, .ladder { padding: 1.25rem; }
+    }
+</style>
