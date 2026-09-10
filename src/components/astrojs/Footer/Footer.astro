@@ -10,10 +10,15 @@ import discordIcon from "../../../assets/icons/socials/discord.svg";
 
 <section class={styles.section}>
     <div class={styles.contentContainer}>
+        <!-- Same labels and destinations as the header nav, plus the legal
+             routes the header deliberately leaves out. The section links are
+             root-relative for the same reason they are there: a bare
+             `#services` only resolves on the landing page. -->
         <div class={styles.nav}>
-            <a class="bodyText" href="#services">Why We</a>
+            <a class="bodyText" href="/#services">Why Us</a>
             <a class="bodyText" href="/games">Games</a>
             <a class="bodyText" href="/pricing">Pricing</a>
+            <a class="bodyText" href="/#process">How it works</a>
             <a class="bodyText" href="/faq">FAQs</a>
             <a class="bodyText" href="/contact">Contact</a>
             <a class="bodyText" href="/privacy-policy">Privacy Policy</a>

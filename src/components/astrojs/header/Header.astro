@@ -3,46 +3,209 @@ import styles from "./Header.module.css";
 import LogoIcon from "../../../assets/icons/logos/icon.svg";
 
 import button from "../../../styles/components/button.module.css";
+
+/**
+ * Primary site navigation.
+ *
+ * Section links are root-relative (`/#process`) rather than bare fragments.
+ * A bare `#process` resolves against the *current* route, so it only ever
+ * worked on the landing page — on /pricing, /faq and the rest it silently did
+ * nothing. The leading slash sends the browser home and then to the section.
+ *
+ * Page links point at the dedicated route, never at the landing page's teaser
+ * of the same content: the index `#faqs` block is a five-question excerpt that
+ * links on to /faq, so /faq is the honest destination for a nav entry.
+ */
+const links = [
+    { href: "/#services", label: "Why Us" },
+    { href: "/games", label: "Games" },
+    { href: "/pricing", label: "Pricing" },
+    { href: "/#process", label: "How it works" },
+    { href: "/faq", label: "FAQs" },
+    { href: "/contact", label: "Contact" },
+];
+
+/** Trailing slashes vary by host config; normalise before comparing. */
+const path = Astro.url.pathname.replace(/\/+$/, "") || "/";
+
+/**
+ * `/games/valheim` should light up "Games", so a route match includes its
+ * children. Section links never match: they all live on `/`, and marking every
+ * one of them current on the home page would be noise rather than orientation.
+ */
+const isCurrent = (href: string) =>
+    !href.startsWith("/#") && (path === href || path.startsWith(`${href}/`));
 ---
 
-<header class={styles.header}>
-    <a href="/" target="_self" class={styles.logo}>
-        <LogoIcon style={"--path2: var(--c-white);"} width="50" height="50" />
-        <span>instances</span>
-    </a>
-
-    <nav>
-        <a class="bodyText" href="#services">Why Us</a>
-        <a class="bodyText" href="/games">Games</a>
-        <a class="bodyText" href="/pricing">Pricing</a>
-        <a class="bodyText" href="#process">Creating an Instance</a>
-        <a class="bodyText" href="/faq">FAQs</a>
-        <a class="bodyText" href="/contact">Contact</a>
-        <!--<a class="bodyText" href="#privacy-policy">Privacy Policy</a> -->
-    </nav>
-    <div class={styles.actions}>
-        <button id="loginBtn" data-login class={`${button.btn} ${button.outlineLight} ${button.sm}`}>
-            <p class="buttonText">Log in</p>
-        </button>
-        <button id="signupBtn" data-login class={`${button.btn} ${button.vibrant} ${button.sm} ${button.icon}`} style={`--icon: url(${LogoIcon.src});`}>
-            <p class="buttonText">Start playing</p>
-        </button>
-        <a href="/dashboard" id="dashboardBtn" class={`${button.btn} ${button.vibrant} ${button.sm}`} style="display: none; text-decoration: none;">
-            <p class="buttonText">Go to Dashboard</p>
+<header class={styles.header} data-site-header>
+    <!-- Always visible. Below the collapse breakpoint this is the whole bar. -->
+    <div class={styles.bar}>
+        <a href="/" target="_self" class={styles.logo}>
+            <LogoIcon style={"--path2: var(--c-white);"} width="32" height="32" />
+            <span>instances</span>
         </a>
+
+        <button
+            type="button"
+            class={styles.burger}
+            data-menu-toggle
+            aria-expanded="false"
+            aria-controls="siteMenu"
+            aria-label="Open menu"
+        >
+            <span class={styles.burgerBox} aria-hidden="true">
+                <span></span><span></span><span></span>
+            </span>
+        </button>
+    </div>
+
+    <!--
+        One copy of the links and actions for both layouts: a flex row beside
+        the logo when there is room, a panel underneath it when there isn't.
+        The panel is absolutely positioned, so opening the menu doesn't change
+        the header's height — pages size their own sticky rails and anchor
+        offsets from that height via `--header-h` (lib/stickyHeader.ts).
+    -->
+    <div class={styles.drawer} id="siteMenu" data-menu>
+        <nav class={styles.nav} aria-label="Primary">
+            {
+                links.map((link) => (
+                    <a
+                        class="bodyText"
+                        href={link.href}
+                        aria-current={isCurrent(link.href) ? "page" : undefined}
+                    >
+                        {link.label}
+                    </a>
+                ))
+            }
+        </nav>
+
+        <div class={styles.actions}>
+            <button id="loginBtn" class={`${button.btn} ${button.outlineLight} ${button.sm}`}>
+                <p class="buttonText">Log in</p>
+            </button>
+            <button id="signupBtn" class={`${button.btn} ${button.vibrant} ${button.sm} ${button.icon}`} style={`--icon: url(${LogoIcon.src});`}>
+                <p class="buttonText">Start playing</p>
+            </button>
+            <a href="/dashboard" id="dashboardBtn" class={`${button.btn} ${button.vibrant} ${button.sm}`} hidden>
+                <p class="buttonText">Go to Dashboard</p>
+            </a>
+        </div>
     </div>
 </header>
 
+<noscript>
+    <!--
+        The menu button needs JS to do anything, so without it lay the panel out
+        in flow and drop the button. The links are the part worth saving; the
+        auth buttons can't work without JS either way.
+    -->
+    <style is:inline set:html={`
+        @media (max-width: 1100px) {
+            .${styles.header} { flex-wrap: wrap; }
+            .${styles.bar} { flex: 1 1 100%; }
+            .${styles.burger} { display: none; }
+            .${styles.drawer} {
+                display: flex;
+                position: static;
+                padding: 0.75rem 0 0;
+                background: none;
+                box-shadow: none;
+                max-height: none;
+            }
+        }
+    `}></style>
+</noscript>
+
 <script>
-    import { hasSession } from "../../../lib/auth";
+    import { hasSession, login } from "../../../lib/auth";
 
-    if (await hasSession()) {
-        document.getElementById("loginBtn")?.remove();
-        document.getElementById("signupBtn")?.remove();
+    const header = document.querySelector<HTMLElement>("[data-site-header]");
 
+    if (header) {
+        /* ---------- Collapsible menu ----------
+           Wired before the session check below, which awaits the network: the
+           menu must not depend on auth resolving, or failing. */
+        const toggle = header.querySelector<HTMLButtonElement>("[data-menu-toggle]");
+        const menu = header.querySelector<HTMLElement>("[data-menu]");
+
+        const isOpen = () => header.dataset.menuOpen === "true";
+
+        const setOpen = (open: boolean) => {
+            header.dataset.menuOpen = String(open);
+            toggle?.setAttribute("aria-expanded", String(open));
+            toggle?.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+        };
+
+        setOpen(false);
+
+        toggle?.addEventListener("click", () => setOpen(!isOpen()));
+
+        // Following a link closes the menu. Needed for the `/#services` entries
+        // in particular: from the landing page they only move the scroll
+        // position, so nothing would otherwise dismiss the panel.
+        menu?.addEventListener("click", (event) => {
+            if ((event.target as HTMLElement).closest("a")) setOpen(false);
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (event.key === "Escape" && isOpen()) {
+                setOpen(false);
+                toggle?.focus();
+            }
+        });
+
+        document.addEventListener("click", (event) => {
+            if (isOpen() && !header.contains(event.target as Node)) setOpen(false);
+        });
+
+        // Widening past the breakpoint hides the button, so an open menu would
+        // be stuck open with no way to dismiss it once the window narrows again.
+        const wide = window.matchMedia("(min-width: 1101px)");
+        wide.addEventListener("change", (event) => {
+            if (event.matches) setOpen(false);
+        });
+
+        /* ---------- Scrolled state ----------
+           The bar is transparent over the top of the page and gains a surface
+           once anything has scrolled under it; blur alone isn't enough contrast
+           against the hero. rAF-throttled so the listener stays cheap. */
+        let ticking = false;
+        const syncScrolled = () => {
+            if (ticking) return;
+            ticking = true;
+            requestAnimationFrame(() => {
+                header.toggleAttribute("data-scrolled", window.scrollY > 8);
+                ticking = false;
+            });
+        };
+
+        window.addEventListener("scroll", syncScrolled, { passive: true });
+        syncScrolled();
+
+        /* ---------- Auth ----------
+           Owned by the header rather than the page: the landing page used to
+           bind these, which left Log in and Start playing inert on every other
+           route that renders this component. */
+        const loginBtn = document.getElementById("loginBtn");
+        const signupBtn = document.getElementById("signupBtn");
         const dashboardBtn = document.getElementById("dashboardBtn");
-        if (dashboardBtn) {
-            dashboardBtn.style.display = "";
+
+        for (const btn of [loginBtn, signupBtn]) {
+            btn?.addEventListener("click", () => login("/dashboard"));
+        }
+
+        // A failure here must leave the signed-out header intact rather than
+        // taking the rest of the script down with it.
+        try {
+            if (await hasSession()) {
+                loginBtn?.remove();
+                signupBtn?.remove();
+                dashboardBtn?.removeAttribute("hidden");
+            }
+        } catch {
+            /* Signed out is the safe assumption. */
         }
     }
 </script>

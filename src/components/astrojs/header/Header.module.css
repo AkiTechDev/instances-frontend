@@ -1,53 +1,274 @@
+/* Site header.
+
+   One markup tree, two layouts:
+
+   · wide (>1100px)  — logo, nav and actions on a single row, 94px tall.
+   · narrow (≤1100px) — logo and a menu button on a 76px bar; nav and actions
+                        move into a panel positioned *under* the bar rather
+                        than inside it.
+
+   Two things about the height are load-bearing. It is fixed per breakpoint —
+   the nav no longer wraps, it collapses — and opening the menu doesn't change
+   it, because the panel is absolutely positioned. Pages derive
+   `scroll-margin-top` and their own sticky offsets from this height through
+   `--header-h` (lib/stickyHeader.ts), so a header that grew mid-scroll moved
+   every anchor target on the page with it.
+
+   Horizontal padding steps down on the same breakpoints the pages use
+   (5rem → 2rem → 1.25rem), so the logo stays flush with the content below it
+   at every width. */
+
 .header {
+    /* Local to this component, but read in several rules below. */
+    --bar-pad-x: var(--padding-sm); /* 5rem, matching the page container */
+    --bar-pad-y: 1.75rem;
+    --bar-h: 5.875rem; /* 94px — keep in step with the padding above */
+
+    /* --c-ink at 82%. The bar is see-through at rest and only paints once the
+       page has scrolled, so this is a scrim rather than a background. */
+    --bar-bg: rgba(25, 28, 46, 0.82);
+
     width: min(100% - 2rem, 96rem); /* 1536px */
     margin-inline: auto;
     position: sticky; top: 0; z-index: 50;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 1.75rem var(--padding-sm); /* 28px 120px */
-    /*background: rgba(25, 28, 46, 0.85); */
-    backdrop-filter: blur(20px);
-    border-radius: 0 0 var(--r-card) var(--r-card);
+    display: flex; align-items: center;
+    padding: var(--bar-pad-y) var(--bar-pad-x);
     box-sizing: border-box;
 
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 0 0 var(--r-card) var(--r-card);
+
     color: var(--c-white);
+    font-family: var(--font-family-base);
+
+    transition: background-color var(--dur-normal) var(--ease-out),
+                box-shadow var(--dur-normal) var(--ease-out);
 }
+
+/* Set once anything has scrolled under the bar. The hairline is an inset
+   shadow rather than a border so it can't add to the height the pages measure. */
+.header[data-scrolled] {
+    background: var(--bar-bg);
+    box-shadow: inset 0 -1px 0 var(--hairline),
+                0 8px 24px rgba(10, 12, 24, 0.28);
+}
+
+/* ---------- Logo ---------- */
 
 .logo {
     text-decoration: none; color: inherit;
-    display: flex; align-items: center; flex-direction: row;
+    display: flex; align-items: center;
     gap: 1rem;
+    flex: none;
 }
 
 .logo span {
-    width: 94px;
-    height: 26px;
-
-    font-family: var(--font-family-base);
-    font-style: normal;
     font-weight: 600;
     font-size: 20px;
     line-height: 130%;
+    white-space: nowrap;
 }
 
-.logo svg { max-width: 32px; max-height: 32px; }
+.logo svg { width: 32px; height: 32px; flex: none; }
 
-/* Sized to its contents with a real gap, rather than capped at 400px and
-   spread with `space-between`: once the links no longer fit inside the cap
-   there is no free space left to distribute and they butt together. */
-.header nav {
+/* ---------- Bar ----------
+   The row that never collapses. On wide screens it holds only the logo; the
+   menu button beside it is revealed at the breakpoint. */
+
+.bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem;
+    flex: none;
+}
+
+/* ---------- Drawer ----------
+   Wide: a flex row filling the space the logo leaves, with the nav centred in
+   whatever the actions don't use. Narrow: the panel under the bar. */
+
+.drawer {
+    flex: 1;
+    display: flex; align-items: center;
+    gap: 2rem;
+    min-width: 0;
+}
+
+.nav {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
+    /* Deliberately no wrapping. Wrapping is what used to take the header from
+       94px to 262px on a phone, and it moved every anchor target with it. */
+    flex-wrap: nowrap;
     column-gap: 1.75rem;
-    row-gap: 0.5rem;
-    margin: 0rem 2rem;
+    margin-inline: auto; /* centres the nav in the free space */
 }
 
-.header nav a {
-  color: var(--text-colour-light);
-  cursor: pointer;
+.nav a {
+    color: var(--text-colour-light);
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color var(--dur-fast) var(--ease-out);
 }
 
-.header nav a:hover { color: var(--text-colour-vibrant); opacity: 1; }
+.nav a:hover { color: var(--text-colour-vibrant); opacity: 1; }
 
-.header .actions { display: flex; gap: 1rem; }
+/* Orientation, not decoration: this is the route you're on. */
+.nav a[aria-current="page"] {
+    color: var(--text-colour-vibrant);
+    position: relative;
+}
+
+.nav a[aria-current="page"]::after {
+    content: "";
+    position: absolute; left: 0; right: 0; bottom: -0.4rem;
+    height: 2px; border-radius: 2px;
+    background: currentColor;
+}
+
+.actions { display: flex; align-items: center; gap: 1rem; flex: none; }
+
+/* `.btn` sets `display: inline-flex`, which is specific enough to beat the
+   `[hidden]` rule in normalise.css. This wins back the attribute for the
+   signed-in swap. */
+.actions [hidden] { display: none; }
+
+/* One ring for everything focusable in here, from the shared token. */
+.logo:focus-visible,
+.nav a:focus-visible,
+.burger:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+    border-radius: var(--r-sm);
+}
+
+/* ---------- Menu button ----------
+   Hidden until the nav collapses. 44px square regardless of the 22×16 icon
+   inside it, so the tap target clears the usual minimum. */
+
+.burger {
+    display: none;
+    width: 44px; height: 44px;
+    align-items: center; justify-content: center;
+    flex: none;
+    padding: 0; margin: 0; border: 0;
+    background: none; color: inherit;
+    cursor: pointer;
+    border-radius: var(--r-sm);
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.burgerBox { display: block; position: relative; width: 22px; height: 16px; }
+
+.burgerBox span {
+    position: absolute; left: 0; right: 0;
+    height: 2px; border-radius: 2px;
+    background: currentColor;
+    transition: transform var(--dur-normal) var(--ease-out),
+                opacity var(--dur-fast) var(--ease-out);
+}
+
+.burgerBox span:nth-child(1) { top: 0; }
+.burgerBox span:nth-child(2) { top: 7px; }
+.burgerBox span:nth-child(3) { top: 14px; }
+
+/* Collapse the three bars into a cross while the panel is open. */
+.header[data-menu-open="true"] .burgerBox span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.header[data-menu-open="true"] .burgerBox span:nth-child(2) { opacity: 0; }
+.header[data-menu-open="true"] .burgerBox span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+/* ---------- Narrow ----------
+   1100px is where the row genuinely stops fitting, and it's the breakpoint the
+   legal pages already collapse on. Closed is expressed as `display: none` here
+   rather than a `hidden` attribute in the markup, so the wide layout is never
+   hidden — including before the script runs, and if it never does. */
+
+@media (max-width: 1100px) {
+    .header {
+        --bar-pad-x: 2rem;
+        --bar-pad-y: 1rem;
+        --bar-h: 4.75rem; /* 76px: 2×16px padding around the 44px button */
+    }
+
+    .bar { flex: 1; }
+    .burger { display: inline-flex; }
+
+    .drawer {
+        display: none;
+        position: absolute;
+        top: 100%; left: 0; right: 0;
+        flex-direction: column; align-items: stretch;
+        gap: 0;
+        padding: 0.5rem 1rem 1rem;
+        box-sizing: border-box;
+
+        /* Opaque, not a scrim. The bar can get away with `--bar-bg` because it
+           has a working backdrop-filter behind it; the panel does not — an
+           ancestor that filters its own backdrop becomes the backdrop root, so
+           a `backdrop-filter` here samples nothing and the page shows straight
+           through the menu. The lighter of the two body-gradient stops reads as
+           a raised surface, and the shadow supplies the edge. */
+        background: var(--c-ink-grad-top);
+        border-radius: 0 0 var(--r-card) var(--r-card);
+        box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.05),
+                    0 16px 32px rgba(10, 12, 24, 0.45);
+
+        /* A short landscape phone can be shorter than the panel. */
+        max-height: calc(100vh - var(--bar-h) - 1rem);
+        max-height: calc(100dvh - var(--bar-h) - 1rem);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
+    .header[data-menu-open="true"] .drawer { display: flex; }
+
+    /* While the menu is open the bar is the top of the panel rather than a
+       floating strip: same surface, and square corners where they meet. */
+    .header[data-menu-open="true"] {
+        background: var(--c-ink-grad-top);
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .nav { flex-direction: column; margin-inline: 0; }
+
+    .nav a {
+        padding: 0.75rem 0.5rem;
+        border-radius: var(--r-sm);
+    }
+
+    /* An underline would collide with the row padding in a stacked list, so
+       the marker moves to the leading edge — the same left-rule treatment the
+       rest of the site uses for emphasis. */
+    .nav a[aria-current="page"] {
+        background: rgba(235, 164, 57, 0.1);
+        box-shadow: inset 2px 0 0 var(--text-colour-vibrant);
+    }
+
+    .nav a[aria-current="page"]::after { content: none; }
+
+    .actions {
+        flex-direction: column; align-items: stretch;
+        gap: 0.625rem;
+        margin-top: 0.75rem;
+        padding-top: 1rem;
+        border-top: 1px solid var(--hairline);
+    }
+}
+
+/* ---------- Phone ----------
+   Matches the 760px step the pages take, so the logo stays flush with the
+   content below it. */
+
+@media (max-width: 760px) {
+    .header { --bar-pad-x: 1.25rem; }
+
+    .logo { gap: 0.75rem; }
+    .logo span { font-size: 18px; }
+
+    .drawer { padding-inline: 0.75rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .header, .nav a, .burgerBox span { transition: none; }
+}
