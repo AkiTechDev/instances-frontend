@@ -1,4 +1,6 @@
 ---
+import { Picture } from "astro:assets";
+
 import styles from "./Hero.module.css";
 import button from "../../../styles/components/button.module.css";
 
@@ -21,5 +23,22 @@ import WelcomeToInstances from "../../../assets/images/WelcomeToInstances.png";
             </a>
         </div>
     </div>
-    <img src={WelcomeToInstances.src} />
+    <!-- Largest contentful paint on the busiest page: eager + high priority so it
+         isn't queued behind the island's JS, and width/height so the box is
+         reserved before the bytes land. The picture element carries the 50%
+         column because it, not the img, is the flex item. -->
+    <Picture
+        src={WelcomeToInstances}
+        formats={["avif", "webp"]}
+        widths={[400, 688, 1032, 1376]}
+        sizes="(min-width: 98rem) 688px, calc(50vw - 6rem)"
+        width={1200}
+        height={800}
+        alt="A blocky, Minecraft-style grass island where a waving player character greets you with 'Welcome to Instances!', joined by a pig, a sheep, a tree and flowers."
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+        pictureAttributes={{ class: styles.media }}
+        class={styles.mediaImage}
+    />
 </section>
