@@ -10,9 +10,24 @@
     gap: 2.5rem;
 }
 
-.container img {
-    width: 50%;
+/* <Picture> renders <picture><source><img>, so the flex item is the <picture>
+   element — the 50% column has to live there or it resolves against the
+   picture's own width instead of the section's. */
+.media {
+    display: block;
+    /* This 50% used to sit on the <img>, which as a replaced element had an
+       automatic minimum size that pinned it there. A <picture> is not replaced,
+       so it needs flex-shrink: 0 or the text column squeezes it to nothing. */
+    flex: 0 0 50%;
     animation: float 5s ease-in-out infinite;
+}
+
+.mediaImage {
+    display: block;
+    width: 100%;
+    /* auto, so the width/height attributes' 3:2 ratio reserves the box while
+       the image is still downloading. */
+    height: auto;
 }
 
 .content {
@@ -47,6 +62,6 @@
     50%      { transform: translateY(-14px); }
   }
 
-  @media (prefers-reduced-motion: reduce) {
-    .errorImageWrap { animation: none; }
-  }
+@media (prefers-reduced-motion: reduce) {
+    .media { animation: none; }
+}

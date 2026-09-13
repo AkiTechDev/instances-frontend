@@ -56,11 +56,49 @@
 .cards {
     flex: 1;
     min-width: 0;
-    overflow: visible;
     container-type: inline-size;
     position: relative;
-    /* clip only the left side; right/top/bottom remain visible for peek + button */
+
+    /* Only ever clipped the left edge: the other three insets are negative,
+       which pushes those edges outward. Kept because the left edge is the one
+       that should be hard, and because below the breakpoint set further down
+       it is the only clipping this component has. */
     clip-path: inset(-100vw -100vw -100vw 0);
+}
+
+/* The cards that aren't on screen are still laid out to the right of .cards —
+   `transform` moves what gets painted, not where anything sits — so something
+   has to stop them counting toward the page's scroll width. `clip-path` can't:
+   it clips ink and nothing else, which is why the landing page scrolled
+   sideways at every width, 2880px of document against a 1440px viewport, with
+   steps 2 and 3 sitting out there fully painted.
+
+   `overflow: clip` does remove them, and unlike `hidden` it doesn't turn this
+   into a scroll container. `overflow-clip-margin` then buys back the bleed this
+   component wants — it is the peek, expressed as a number.
+
+   It is --padding-sm on purpose. Ink inside the clip margin still counts toward
+   an ancestor's scroll width, so a margin wider than the padding this section
+   already reserves puts the scrollbar straight back (8rem does, measured). At
+   exactly --padding-sm the painted edge lands on the container's border box, so
+   the peek can never reach past the section however wide the window gets. It
+   clears the next button's 1.5rem overhang with room to spare, and leaves 56px
+   of the next card showing. Intersected with the clip-path above, the left edge
+   stays hard.
+
+   Gated, because clipping a box only works when the box is the size of what's
+   in it. `container-type: inline-size` means .cards contributes nothing to its
+   own width, so flex-shrink takes it to 424px at 1120px wide and to 0 below
+   430px, while a card can't shrink past its 412px min-content. Above 1120px the
+   two match exactly and the clip costs nothing; below it, clipping would cut
+   the right-hand edge off the card you're meant to be reading — 36px at 1024px.
+   That range needs the section to stack, not to be clipped, so it keeps the
+   behaviour it has today until that lands. */
+@media (min-width: 70rem) {
+    .cards {
+        overflow: clip;
+        overflow-clip-margin: var(--padding-sm);
+    }
 }
 
 .track {

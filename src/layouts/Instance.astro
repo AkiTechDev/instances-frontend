@@ -17,6 +17,14 @@ import AppRouter from "../components/app/Router";
 
 import Banner from "../assets/images/WelcomeToInstances.png";
 
+interface Props {
+    /* Each route here is a different view of the signed-in app, so they
+       shouldn't all report the same title. */
+    title?: string;
+}
+
+const { title = "My Games" } = Astro.props;
+
 const seo_des = "Host Minecraft, sandbox games, and more with Instances. No contracts, no setup hassle. Switch games instantly, keep your world, and only pay for what you play.";
 const domain = "instances.aki-labs.com"
 ---
@@ -34,7 +42,7 @@ const domain = "instances.aki-labs.com"
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
         <meta name="generator" content={Astro.generator} />
 
-        <title>My Games - Instances</title>
+        <title>{title} - Instances</title>
 
         <!-- Claude said no because its behind a login, test manually once published to the domain -->
         <meta name="twitter:card" content="summary_large_image">
@@ -54,8 +62,11 @@ const domain = "instances.aki-labs.com"
         <meta property="og:locale" content="en_US">
         
 
-        <meta name="robots" content="none" />
-        <link rel="canonical" href="https://instances.aki-labs.com">
+        <!-- The signed-in app. Excluded from the sitemap in astro.config.mjs, so
+             these two have to agree: nothing here should be indexed. There is
+             deliberately no canonical — these pages are not duplicates of the
+             marketing homepage, and pointing at it told crawlers they were. -->
+        <meta name="robots" content="noindex, nofollow" />
         <link rel="sitemap" href="/sitemap-index.xml" />
 	</head>
     <body class="grid-container">
