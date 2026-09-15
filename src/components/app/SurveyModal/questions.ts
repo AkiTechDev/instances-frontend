@@ -13,7 +13,9 @@
  * response stays readable even once the wording here has moved on.
  */
 
-export const SURVEY_ID = "beta-2026-09";
+/* Bumped from "beta-2026-09" when the scale moved from 0–5 pills to 1–5 hearts:
+   a 1 now means what a 0 used to, so the two runs must not be pooled. */
+export const SURVEY_ID = "beta-2026-09-hearts";
 
 export interface SurveyQuestion {
     /** Stable key stored with the rating. Never reuse for a different question. */
@@ -22,7 +24,7 @@ export interface SurveyQuestion {
     question: string,
     /** Optional clarifier, shown under the question. */
     hint?: string,
-    /** What the ends of the scale mean here — shown under 0 and 5. */
+    /** What the ends of the scale mean here — shown under the first and last heart. */
     lowLabel: string,
     highLabel: string,
 }
@@ -68,8 +70,19 @@ export const SURVEY_QUESTIONS: SurveyQuestion[] = [
     },
 ];
 
-/** The 0–5 scale, low to high. */
-export const RATING_SCALE = [0, 1, 2, 3, 4, 5] as const;
+/**
+ * The scale, low to high — one entry per heart.
+ *
+ * A list rather than a range because the modal draws exactly one heart per
+ * value and sizes the row from the count, so changing the scale here is the
+ * only edit needed. There is deliberately no zero: hearts fill cumulatively,
+ * so a rating of zero would have to be drawn as no hearts at all, which is
+ * indistinguishable from a question nobody has answered yet.
+ */
+export const RATING_SCALE = [1, 2, 3, 4, 5] as const;
+
+/** Ends of the scale — the only two values that carry a written label. */
+export const MIN_RATING = RATING_SCALE[0];
 
 export const MAX_RATING = RATING_SCALE[RATING_SCALE.length - 1];
 

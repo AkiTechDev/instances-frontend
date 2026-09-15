@@ -4,21 +4,30 @@ import { Portal } from "solid-js/web";
 import styles from "./SurveyModal.module.css";
 import button from "../../../styles/components/button.module.css";
 import iconCross from "../../../assets/icons/cross.svg";
+import iconHeartEmpty from "../../../assets/icons/emptyHeart.svg";
+import iconHeartFilled from "../../../assets/icons/redHeart.svg";
+import iconHeartGlitter from "../../../assets/icons/fullHeart.svg";
 
 import { postSurvey, type SurveyResponse } from "../../../lib/apis";
 import {
     COMMENT_MAX_LENGTH,
     COMMENT_PLACEHOLDER,
     MAX_RATING,
+    MIN_RATING,
     RATING_SCALE,
     SURVEY_ID,
     SURVEY_QUESTIONS,
 } from "./questions";
 
+/** A heart the pointer or keyboard focus is sitting on, before it's committed. */
+type Spot = { question: string, value: number } | null;
+
 const SurveyModal: Component<{ onClose: () => void }> = (props) => {
     const id = createUniqueId();
 
     const [ratings, setRatings] = createSignal<Record<string, number>>({});
+    const [hovered, setHovered] = createSignal<Spot>(null);
+    const [focused, setFocused] = createSignal<Spot>(null);
     const [comment, setComment] = createSignal("");
     const [submitting, setSubmitting] = createSignal(false);
     const [submitted, setSubmitted] = createSignal(false);
@@ -33,6 +42,31 @@ const SurveyModal: Component<{ onClose: () => void }> = (props) => {
 
     const setRating = (questionId: string, value: number) =>
         setRatings((prev) => ({ ...prev, [questionId]: value }));
+
+    /**
+     * How many hearts a question is currently showing filled.
+     *
+     * The pointer wins over keyboard focus, and both win over the committed
+     * rating, so hovering always previews what a click would give you — even
+     * over a row that has already been answered. Falls back to 0: all empty.
+     */
+    const shown = (questionId: string) => {
+        const spot = hovered() ?? focused();
+        if (spot?.question === questionId) return spot.value;
+        return ratings()[questionId] ?? 0;
+    };
+
+    /* Only the top of the scale earns the glitter; below it, plain red. */
+    const heartState = (questionId: string, value: number) => {
+        const filled = shown(questionId);
+        if (value > filled) return "empty";
+        return filled === MAX_RATING ? "glitter" : "filled";
+    };
+
+    /* Previewing after submit would imply the form is still editable. */
+    const hover = (spot: Spot) => {
+        if (!locked()) setHovered(spot);
+    };
 
     // Every dismissal route (backdrop, X, Escape, Cancel) is closed while the
     // POST is in flight, so a half-sent response can't be abandoned mid-way.
@@ -100,6 +134,15 @@ const SurveyModal: Component<{ onClose: () => void }> = (props) => {
             <div
                 ref={containerRef}
                 class={styles.container}
+                /* Declared once here rather than per heart: every rating row
+                   inherits the three artworks, and --rating-count keeps the
+                   row's width in step with however long RATING_SCALE is. */
+                style={
+                    `--heart-empty: url("${iconHeartEmpty.src}");` +
+                    `--heart-filled: url("${iconHeartFilled.src}");` +
+                    `--heart-glitter: url("${iconHeartGlitter.src}");` +
+                    `--rating-count: ${RATING_SCALE.length}`
+                }
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby={`surveyTitle${id}`}
@@ -120,7 +163,7 @@ const SurveyModal: Component<{ onClose: () => void }> = (props) => {
                     <h6 id={`surveyTitle${id}`} class="h6">How are we doing?</h6>
                     <p id={`surveyIntro${id}`} class={`${styles.intro} statsTitle`}>
                         We're in beta, so this is the part where you tell us what's broken.
-                        Rate each one from 0 to 5 — it takes about a minute.
+                        Give each one between one and five hearts — it takes about a minute.
                     </p>
                 </div>
 
@@ -160,26 +203,45 @@ const SurveyModal: Component<{ onClose: () => void }> = (props) => {
                                             </p>
                                         </Show>
 
-                                        <div class={styles.options}>
+                                        {/* Clearing the preview on leaving the row, rather than on
+                                            leaving each heart, stops a slide across the row from
+                                            blinking back to the committed rating in every gap. */}
+                                        <div
+                                            class={styles.options}
+                                            onMouseLeave={() => hover(null)}
+                                        >
                                             <For each={RATING_SCALE}>
                                                 {(value) => (
-                                                    <label class={styles.option}>
+                                                    <label
+                                                        class={styles.option}
+                                                        onMouseEnter={() => hover({ question: q.id, value })}
+                                                    >
                                                         <input
                                                             type="radio"
                                                             name={`${id}-${q.id}`}
                                                             value={value}
                                                             checked={ratings()[q.id] === value}
                                                             onChange={() => setRating(q.id, value)}
+                                                            /* Arrow keys move focus and selection together, so
+                                                               this usually just trails the rating; it earns its
+                                                               keep on the first tab into an unanswered row,
+                                                               where it shows what Space would commit. */
+                                                            onFocus={() => setFocused({ question: q.id, value })}
+                                                            onBlur={() => setFocused(null)}
                                                             disabled={locked()}
                                                             aria-label={
-                                                                value === 0
-                                                                    ? `0 — ${q.lowLabel}`
+                                                                value === MIN_RATING
+                                                                    ? `${MIN_RATING} heart — ${q.lowLabel}`
                                                                     : value === MAX_RATING
-                                                                        ? `${MAX_RATING} — ${q.highLabel}`
-                                                                        : String(value)
+                                                                        ? `${MAX_RATING} hearts — ${q.highLabel}`
+                                                                        : `${value} hearts`
                                                             }
                                                         />
-                                                        <span class="bodyTextSmallSemi">{value}</span>
+                                                        <span
+                                                            class={styles.heart}
+                                                            data-state={heartState(q.id, value)}
+                                                            aria-hidden="true"
+                                                        ></span>
                                                     </label>
                                                 )}
                                             </For>

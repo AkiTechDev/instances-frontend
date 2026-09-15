@@ -312,7 +312,7 @@ export interface SurveyAnswer {
     id: string,
     /** The wording the rater actually saw, stored so old responses stay readable. */
     question: string,
-    /** 0–5 inclusive. */
+    /** Within the survey definition's RATING_SCALE — 1–5 inclusive. */
     rating: number,
 }
 

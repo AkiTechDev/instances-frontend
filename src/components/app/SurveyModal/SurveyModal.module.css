@@ -62,7 +62,7 @@
 
     overflow-y: auto;
     min-height: 0;
-    /* Room for the focus ring on the outermost rating pills. */
+    /* Room for the focus ring on the outermost hearts. */
     padding: 0.25rem;
     margin: -0.25rem;
 }
@@ -70,6 +70,16 @@
 /* ---------- One question ---------- */
 
 .question {
+    /* --rating-count is set on .container from RATING_SCALE, so the row and the
+       labels under it resize themselves if the scale ever gains or loses a
+       heart. 2.75rem is also the 44px minimum comfortable tap target. */
+    --heart-size: 2rem;
+    --heart-gap: 1.5rem;
+    --rating-track: calc(
+        var(--rating-count) * var(--heart-size) +
+        (var(--rating-count) - 1) * var(--heart-gap)
+    );
+
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
@@ -81,21 +91,26 @@
     margin: -0.25rem 0 0.125rem;
 }
 
-/* Capped so the six pills stay a comfortable tap size instead of stretching
-   across the full modal; .scaleLabels shares the cap so the end labels line up
-   under the first and last pill. */
+/* Exactly as wide as the hearts it holds, so .scaleLabels can borrow the same
+   figure and hang its two end labels under the first and last heart. Below that
+   width the hearts shrink together rather than wrapping onto a second line. */
 .options {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 0.5rem;
-    max-width: 20rem;
-    width: 100%;
+    display: flex;
+    flex-direction: row;
+    gap: var(--heart-gap);
+    width: min(var(--rating-track), 100%);
 }
 
+/* The hover lift lives out here rather than on .heart so it composes with the
+   glitter pop instead of the two fighting over one transform. */
 .option {
     position: relative;
     display: flex;
+    flex: 1 1 0;
+    max-width: var(--heart-size);
     cursor: pointer;
+
+    transition: transform var(--dur-fast) var(--ease-out);
 }
 
 /* Kept in the accessibility tree and focusable — only the paint moves to the
@@ -109,44 +124,68 @@
     pointer-events: none;
 }
 
-.option span {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
+/* Which of the three artworks a heart shows is decided in the component: it
+   depends on how its neighbours are rated, which no CSS sibling selector can
+   reach. 9/8 is the artwork's own ratio — any other and the hearts distort. */
+.heart {
     width: 100%;
-    aspect-ratio: 1 / 1;
-    border-radius: 50%;
+    aspect-ratio: 9 / 8;
 
-    border: 1px solid var(--c-grey-200);
-    background: var(--c-white);
-    color: var(--c-ink);
+    background: var(--heart-empty) no-repeat center;
+    background-size: contain;
 
     user-select: none;
-    transition: all 0.15s;
 }
 
-.option:hover span {
-    border-color: var(--c-orange);
+.heart[data-state="filled"] {
+    background-image: var(--heart-filled);
 }
 
-.option input:checked + span {
-    background: var(--c-orange);
-    border-color: var(--c-orange);
-    color: var(--text-colour-dark);
+.heart[data-state="glitter"] {
+    background-image: var(--heart-glitter);
+    animation: heartPop var(--dur-normal) var(--ease-out);
 }
 
-.option input:focus-visible + span {
-    outline: 2px solid var(--c-green-bright);
-    outline-offset: 2px;
+/* Lifts the whole previewed run at once, so a hover reads as "this is the
+   rating you'd get" rather than as one heart bobbing under the cursor. */
+.options:hover .option:has(.heart:not([data-state="empty"])) {
+    transform: translateY(-2px);
+}
+
+.option input:focus-visible + .heart {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+    border-radius: var(--r-sm);
 }
 
 .option:has(input:disabled) {
     cursor: not-allowed;
 }
 
-.option input:disabled + span {
+.option input:disabled + .heart {
     opacity: 0.5;
+}
+
+/* Top of the scale is the one moment worth celebrating, so the pop is scoped
+   to hearts arriving at the glitter state. */
+@keyframes heartPop {
+    0%   { transform: scale(1); }
+    45%  { transform: scale(1.18); }
+    100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .option {
+        transition: none;
+    }
+
+    .heart[data-state="glitter"] {
+        animation: none;
+    }
+
+    .options:hover .option:has(.heart:not([data-state="empty"])) {
+        transform: none;
+    }
 }
 
 .scaleLabels {
@@ -155,7 +194,7 @@
     justify-content: space-between;
     gap: 1rem;
 
-    max-width: 20rem;
+    max-width: min(var(--rating-track), 100%);
     width: 100%;
     opacity: 0.5;
 }
@@ -323,8 +362,7 @@
         padding: 1.5rem 1.25rem;
     }
 
-    .options,
-    .scaleLabels {
-        max-width: none;
-    }
+    /* No max-width override here any more: the hearts already size themselves
+       down with the modal, and unpinning .scaleLabels would push the two end
+       labels out from under the first and last heart. */
 }
