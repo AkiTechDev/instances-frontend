@@ -90,3 +90,51 @@
 
     
 }
+/* ---------- Narrow ----------
+   The card is a row of three: a decorative logo, the copy, and the email
+   field. `.content` is capped at 33% and `.label input` is `flex: 1;
+   min-width: 0`, so as the row runs out of space the copy collapses toward
+   zero and the input follows it. At 390px that left a 160px sliver with the
+   heading broken mid-word and an 18px input — the card's `overflow: hidden`
+   hides the damage from any scroll-width check, which is why this one never
+   showed up as a page overflow.
+
+   Same 1100px / 760px steps as legal.css and the header. */
+
+@media screen and (max-width: 1100px) {
+    .container { padding: 3.5rem 2rem; }
+
+    .card { padding: 2.5rem; gap: 2rem; }
+
+    /* A third of the row is not enough to be worth reading once the row is
+       this narrow; half still leaves the field a usable width. */
+    .card > .content { max-width: 50%; }
+}
+
+@media screen and (max-width: 760px) {
+    .container { padding: 2.5rem 1.25rem; }
+
+    .card {
+        flex-direction: column;
+        /* The row centred its items; stacked, that would shrink each one to
+           its own content width instead of filling the card. */
+        align-items: stretch;
+        gap: 1.5rem;
+        padding: 1.75rem 1.5rem;
+
+        /* --r-pill is 44px. On a short wide card that reads as a rounded
+           banner; on a tall stacked one it reads as a lozenge. --r-card is
+           what the rest of the site uses for panels. */
+        border-radius: var(--r-card);
+    }
+
+    .card > .content { max-width: none; }
+
+    /* The 660px rotated logo is a corner motif on a 1168px card. On a ~330px
+       one there is no corner to sit in: the heading runs the full width, so
+       any size large enough to read as the logo puts its dark navy quadrant
+       behind dark heading text. Scaling and repositioning were both tried --
+       the heading is simply as wide as the card. It is decoration, so it goes
+       rather than costing the heading its contrast. */
+    .card > svg { display: none; }
+}
