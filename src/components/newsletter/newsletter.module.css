@@ -130,6 +130,12 @@
 
     .card > .content { max-width: none; }
 
+    /* The button is 50px square but shrinks as a flex item -- 40px at 320px
+       wide, under the 44px the header's own burger is sized to clear. The
+       input beside it has room to give. Scoped here rather than applied
+       outright so desktop keeps the width it has. */
+    .submitBtn { flex: none; }
+
     /* The 660px rotated logo is a corner motif on a 1168px card. On a ~330px
        one there is no corner to sit in: the heading runs the full width, so
        any size large enough to read as the logo puts its dark navy quadrant
