@@ -92,9 +92,11 @@
    430px, while a card can't shrink past its 412px min-content. Above 1120px the
    two match exactly and the clip costs nothing; below it, clipping would cut
    the right-hand edge off the card you're meant to be reading — 36px at 1024px.
-   That range needs the section to stack, not to be clipped, so it keeps the
-   behaviour it has today until that lands. */
-@media (min-width: 70rem) {
+   That range needs the section to stack, not to be clipped, which is what the
+   max-width: 1119px block at the bottom of this file now does. The two tile
+   exactly: 1120 and up is the clipped carousel, 1119 and down is stacked.
+   Written as 1120px rather than 70rem so the pairing is visible. */
+@media (min-width: 1120px) {
     .cards {
         overflow: clip;
         overflow-clip-margin: var(--padding-sm);
@@ -159,9 +161,14 @@
    swipe, no previous and no position indicator is a poor control on a phone
    anyway. `transform: none` is what actually stops the translate -- it beats
    the base rule on source order, so --idx cannot move anything here even if the
-   script has already set it. */
+   script has already set it.
 
-@media screen and (max-width: 1100px) {
+   1119px, not the 1100px the rest of the site steps at, because this section
+   has a second boundary of its own: the clip that makes the carousel safe only
+   applies from 1120px up. Stacking at 1100 would have left 1101-1119 with an
+   unclipped carousel and ~863px of sideways scroll -- measured, not theorised. */
+
+@media screen and (max-width: 1119px) {
     .container {
         flex-direction: column;
         gap: 3rem;
