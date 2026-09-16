@@ -65,3 +65,39 @@
 @media (prefers-reduced-motion: reduce) {
     .media { animation: none; }
 }
+/* ---------- Narrow ----------
+   The row never collapsed, so at 390px the copy column was 198px wide holding
+   a 4rem headline: the text overflowed both edges at once, which is why this
+   section barely registered on a scroll-width check while being unreadable.
+   The image, pinned at `flex: 0 0 50%`, came out as a 99px thumbnail. */
+
+@media screen and (max-width: 1100px) {
+    .container { padding: 4.5rem 2rem; gap: 2rem; }
+}
+
+@media screen and (max-width: 760px) {
+    .container {
+        flex-direction: column;
+        /* The row centred its items, which stacked would shrink each to its own
+           content width instead of filling the column. */
+        align-items: stretch;
+        padding: 3rem 1.25rem;
+        gap: 2.5rem;
+    }
+
+    /* 50% was a column width. Stacked it would cap the image's height instead,
+       so it has to go back to auto. Copy stays first: it carries the message,
+       and the image is an illustration of it. */
+    .media { flex: 0 0 auto; width: 100%; }
+
+    .content { gap: 1.5rem; }
+
+    /* --font-h1-size is 4rem, which does not fit "servers." on one line in a
+       318px column, let alone 248px at 320px wide. */
+    .container .h1 { font-size: 2.5rem; line-height: 1.15; }
+    .container .subText { font-size: 1.125rem; }
+
+    /* The two buttons need 255px side by side. */
+    .actions { flex-direction: column; align-items: stretch; gap: 1rem; }
+    .actions > * { width: 100%; }
+}

@@ -145,3 +145,75 @@
     .track { transition: none; }
     .next { transition: none; }
 }
+
+/* ---------- Narrow ----------
+   Below the 70rem gate above, the carousel cannot work: `.cards` carries
+   `container-type: inline-size`, so its min-content width is 0 and flex-shrink
+   takes it to nothing, while a card cannot shrink past its 412px min-content.
+   The three cards stayed laid out side by side at their full width regardless,
+   which is what pinned the landing page at a 1971px document from 1100px all
+   the way down to 320px.
+
+   So the carousel is dropped rather than shrunk, and all three steps are shown
+   stacked. There are only three, they are short, and a next-only button with no
+   swipe, no previous and no position indicator is a poor control on a phone
+   anyway. `transform: none` is what actually stops the translate -- it beats
+   the base rule on source order, so --idx cannot move anything here even if the
+   script has already set it. */
+
+@media screen and (max-width: 1100px) {
+    .container {
+        flex-direction: column;
+        gap: 3rem;
+        padding: 4.5rem 2rem;
+    }
+
+    /* `width: min-content` plus `white-space: nowrap` is what made the heading
+       column 416px wide and unshrinkable. */
+    .container > .content {
+        width: auto;
+        white-space: normal;
+    }
+
+    .content > p { width: 100%; }
+
+    .cards {
+        /* Inline-size containment is what let this box shrink to nothing.
+           With no carousel there is nothing left for it to do. */
+        container-type: normal;
+        clip-path: none;
+        width: 100%;
+    }
+
+    .track {
+        flex-direction: column;
+        width: 100%;
+        transform: none;
+    }
+
+    .card {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+    .next { display: none; }
+}
+
+@media screen and (max-width: 760px) {
+    .container { padding: 3.5rem 1.25rem; gap: 2.5rem; }
+
+    /* The icon and the copy side by side leave the copy about 150px at this
+       width. Stacked, the icon becomes a header for the step it belongs to. */
+    .card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.5rem;
+        gap: 1.25rem;
+    }
+
+    .card > picture { width: 140px; height: 140px; }
+
+    /* .h5 is 2rem. "Customise Your Instance" at that size is four lines in a
+       phone-width card. */
+    .card .h5 { font-size: 1.5rem; }
+}

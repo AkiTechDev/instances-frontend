@@ -26,12 +26,22 @@ import WelcomeToInstances from "../../../assets/images/WelcomeToInstances.png";
     <!-- Largest contentful paint on the busiest page: eager + high priority so it
          isn't queued behind the island's JS, and width/height so the box is
          reserved before the bytes land. The picture element carries the 50%
-         column because it, not the img, is the flex item. -->
+         column because it, not the img, is the flex item.
+
+         `sizes` tracks the three layouts in Hero.module.css, so the browser is
+         not still sizing for a 50% column after the section has stacked: above
+         98rem the container is capped and the column is a flat 688px; 1101-1567
+         the edge padding is 5rem a side; 761-1100 it is 2rem; below that the
+         image is the full column at 1.25rem a side. Getting this wrong is silent
+         -- the picture just resolves to a 400w candidate and looks soft. -->
     <Picture
         src={WelcomeToInstances}
         formats={["avif", "webp"]}
         widths={[400, 688, 1032, 1376]}
-        sizes="(min-width: 98rem) 688px, calc(50vw - 6rem)"
+        sizes="(min-width: 98rem) 688px,
+               (min-width: 1101px) calc(50vw - 6rem),
+               (min-width: 761px) calc(50vw - 3rem),
+               calc(100vw - 4.5rem)"
         width={1200}
         height={800}
         alt="A blocky, Minecraft-style grass island where a waving player character greets you with 'Welcome to Instances!', joined by a pig, a sheep, a tree and flowers."
