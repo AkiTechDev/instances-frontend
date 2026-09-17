@@ -1,4 +1,4 @@
-import { Router, Route, redirect } from "@solidjs/router"
+import { Router, Route } from "@solidjs/router"
 import { ErrorBoundary } from "solid-js";
 
 import RootLayout from "./RootLayout/RootLayout";
@@ -50,9 +50,16 @@ const AppRouter = () => {
                             try {
                                 const account = await getAccount();
                                 const state = await getInstanceState({ game: p.params.game, name: p.params.name, user_id: account?.sub ?? "" } as Instance);
-                                if (state.status === "gone") {
-                                    return redirect("/dashboard?no-such-instance");
-                                }
+
+                                // A deleted instance is handled by Management's own
+                                // `onGone`, which navigates to /dashboard?no-such-instance
+                                // before the page paints. There used to be a
+                                // `return redirect(...)` here as well, and it never ran:
+                                // @solidjs/router discards whatever a preload returns
+                                // (createRouteContext passes it to the component as
+                                // `data`, preloadRoute drops it outright). Confirmed by
+                                // removing `onGone` — both entry paths then sat on the
+                                // dead instance's page.
                                 const endpoint = endpointOf(state);
                                 if (endpoint) {
                                     warm(getInstanceConfig(endpoint));
