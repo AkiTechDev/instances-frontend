@@ -450,3 +450,54 @@
         height: 48px;
         border-radius: var(--r-chip);
     }
+
+    /* One card that couldn't load its instance.
+
+       Keeps .skeletonCard's footprint (260px cap, 5/4 banner ratio) so a failed
+       instance holds its place in the grid rather than vanishing — a gap reads
+       as "that server is gone", which is exactly the wrong thing to say when we
+       simply couldn't reach it. The dashed border marks it as a hole in the
+       data, not a surface. */
+    .cardError {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 0.35rem;
+
+        width: 100%;
+        max-width: 260px;
+        /* No aspect-ratio: a fixed height would opt the tile out of the grid's
+           default `stretch`, leaving it short against the cards beside it.
+           The floor is the banner's own 5/4 box at full width. */
+        min-height: 208px;
+        padding: 1rem;
+
+        border: 1px dashed var(--c-grey-200);
+        border-radius: calc(var(--r-sm) + 3px);
+        background: var(--c-cream-list);
+        color: var(--c-ink);
+    }
+
+    /* The same state in list view — mirrors .instanceList's row box so the
+       stripe rhythm and row height survive a failure. */
+    .rowError {
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.25rem 1rem;
+
+        width: 100%;
+        padding: 12px 16px;
+
+        border-bottom: 1px solid var(--c-grey-200);
+        color: var(--c-ink);
+    }
+
+    /* Instance names are user-supplied and can be a single long token. */
+    .cardErrorName {
+        overflow-wrap: anywhere;
+    }
