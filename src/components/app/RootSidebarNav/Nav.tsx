@@ -7,24 +7,31 @@ import exploreIcon from "../../../assets/icons/menu/explore.svg";
 import extraIcon from "../../../assets/icons/menu/extra.svg";
 import { A } from '@solidjs/router';
 
+/* The only persistent navigation in the signed-in app.
+
+   Every icon here is a CSS mask on a custom property, which the accessibility
+   tree cannot see: to a screen reader these were five links with no text at
+   all. The names below are the whole of what they announce, so they say where
+   the link goes rather than what the picture is. `<A>` marks the current one
+   with aria-current on its own. */
 const RootSidebarNav = () => (
-    <section class={styles.container}>
-        <a class={styles.logoIcon} href="/" target="_self">
+    <nav class={styles.container} aria-label="Main">
+        <a class={styles.logoIcon} href="/" target="_self" aria-label="Instances home">
             <LogoIcon width={50} height={50} style={"--path2: white"} />
         </a>
 
-        <A href="/dashboard" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${gamesIcon.src})`}>
+        <A href="/dashboard" class={styles.menuItem} activeClass={styles.menuItemActive} aria-label="My games" style={`--gamesIconUrl: url(${gamesIcon.src})`}>
         </A>
-        <A href="/explore" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${exploreIcon.src})`}>
+        <A href="/explore" class={styles.menuItem} activeClass={styles.menuItemActive} aria-label="Explore games" style={`--gamesIconUrl: url(${exploreIcon.src})`}>
             
         </A>
-        <A href="https://discord.gg/qtnvJEvuDw" target="_blank" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${socialIcon.src})`}>
+        <A href="https://discord.gg/qtnvJEvuDw" target="_blank" class={styles.menuItem} activeClass={styles.menuItemActive} aria-label="Community on Discord (opens in a new tab)" style={`--gamesIconUrl: url(${socialIcon.src})`}>
             
         </A>
-        <A href="/extra" class={styles.menuItem} activeClass={styles.menuItemActive} style={`--gamesIconUrl: url(${extraIcon.src})`}>
+        <A href="/extra" class={styles.menuItem} activeClass={styles.menuItemActive} aria-label="Extras" style={`--gamesIconUrl: url(${extraIcon.src})`}>
             
         </A>
-    </section>
+    </nav>
 );
 
 export default RootSidebarNav;

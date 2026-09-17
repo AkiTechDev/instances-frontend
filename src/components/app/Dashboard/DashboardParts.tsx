@@ -113,7 +113,9 @@ export const DashboardSkeleton: Component<{
  */
 export const NoInstances: Component<{ onCreate: () => void }> = (props) => (
     <div class={styles.noInstancesContainer}>
-        <ResponsiveImage src={mouseImage} width={144} />
+        {/* Spot illustration for the get-started screen — says nothing the
+            heading beside it doesn't. */}
+        <ResponsiveImage src={mouseImage} width={144} alt="" />
         <div class={styles.noContent}>
             <h6 class="h6">No Games Added Yet!</h6>
             <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>

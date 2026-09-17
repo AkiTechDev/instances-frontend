@@ -1,4 +1,6 @@
 import { createSignal, createUniqueId, onCleanup, onMount, Show, type Component } from "solid-js";
+
+import { useFocusTrap } from "../../../lib/hooks/useFocusTrap";
 import { Portal } from "solid-js/web";
 import { revalidate } from "@solidjs/router";
 
@@ -18,6 +20,7 @@ const DeleteInstanceModal: Component<{
     const [deleting, setDeleting] = createSignal(false);
     const [error, setError] = createSignal<string | null>(null);
     let cancelRef: HTMLButtonElement | undefined;
+    let containerRef: HTMLDivElement | undefined;
 
     const gameName = () => gameRegistry[props.instance.game]?.name ?? props.instance.game;
 
@@ -48,11 +51,13 @@ const DeleteInstanceModal: Component<{
         if (e.key === "Escape") dismiss();
     };
 
+    // Land focus on Cancel, never on the destructive button — and keep Tab
+    // inside, so the next press can't reach the page behind this warning.
+    useFocusTrap(() => containerRef, { initialFocus: () => cancelRef });
+
     onMount(() => {
         window.addEventListener("keydown", handleKeydown);
         document.body.style.overflow = "hidden";
-        // Land focus on Cancel, never on the destructive button.
-        cancelRef?.focus();
     });
 
     onCleanup(() => {
@@ -64,9 +69,11 @@ const DeleteInstanceModal: Component<{
         <Portal>
             <div class={styles.backdrop} onClick={dismiss}></div>
             <div
+                ref={containerRef}
                 class={styles.container}
                 role="alertdialog"
                 aria-modal="true"
+                tabindex="-1"
                 aria-labelledby={`deleteTitle${id}`}
                 aria-describedby={`deleteBody${id}`}
                 onClick={(e) => e.stopImmediatePropagation()}

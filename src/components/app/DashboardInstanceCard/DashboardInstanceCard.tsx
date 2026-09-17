@@ -181,7 +181,10 @@ const DashboardInstanceCard: Component<{ instance: Instance; listView: boolean; 
                 <div class={styles.image}>
                     <Suspense fallback={<div class={`${effects.skeletonOnDark} ${styles.bannerSkeleton}`} aria-busy="true" />}>
                         <Show when={banner()} fallback={<div class={`${effects.skeletonOnDark} ${styles.bannerSkeleton}`} />}>
-                            <ResponsiveImage src={banner()!} width={260} />
+                            {/* The game name is rendered as text on the card, and
+                               the stretched link already announces both it and the
+                               instance — so the art itself is decorative. */}
+                            <ResponsiveImage src={banner()!} width={260} alt="" />
                         </Show>
                     </Suspense>
                     <Show when={provisioning.inProgress()}>

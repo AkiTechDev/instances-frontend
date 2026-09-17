@@ -5,3 +5,36 @@ body {
 
     color: #ffffff;
 }
+
+
+/* ---------- Reduced motion ----------
+
+   Ten stylesheets honoured `prefers-reduced-motion` and fifteen did not, so
+   the answer depended on which component you happened to be looking at: the
+   modals, the sidebar, the instance cards, the dashboard header and the
+   tooltip all animated regardless. This is the floor, applied everywhere;
+   components keep their own blocks for the cases that need more than a
+   duration change (button.module.css, for one, also drops the press travel
+   entirely rather than just making it instant).
+
+   0.01ms rather than `none` on purpose. `animation: none` never fires
+   `animationend`, and Tooltip.tsx waits on that event to clear its animation
+   class and unmount — killing animations outright would leave tooltips stuck
+   open for exactly the people who asked for less movement. A duration this
+   short is imperceptible and still completes.
+
+   `scroll-behavior` is in here for the legal pages, which set `smooth` on
+   <html> for their in-page contents links. */
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-delay: 0ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        transition-delay: 0ms !important;
+        scroll-behavior: auto !important;
+    }
+}

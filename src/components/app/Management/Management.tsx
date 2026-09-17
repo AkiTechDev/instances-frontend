@@ -115,7 +115,9 @@ const Management = () => {
                     <div class={styles.panel}>
                         <div class={`${styles.bannerWrapper} ${provisioning.inProgress() ? styles.bannerBusy : ""}`}>
                             <Show when={banner()}>
-                                <ResponsiveImage src={banner()!} />
+                                {/* The game is named in the header above and the
+                                    instance in the overlay below — decorative here. */}
+                                <ResponsiveImage src={banner()!} alt="" />
                             </Show>
                             <Show when={provisioning.inProgress()}>
                                 <div class={effects.sweep} />

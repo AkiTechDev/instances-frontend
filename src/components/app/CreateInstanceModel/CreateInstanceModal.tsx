@@ -21,7 +21,8 @@ import iconTick from "../../../assets/icons/tick.svg";
 import iconCross from "../../../assets/icons/cross.svg";
 import { getInstances, putCreateInstance, type PutCreateInstance } from "../../../lib/apis";
 import { revalidate } from "@solidjs/router";
-import { gameRegistry } from "../../../lib/games/index";
+import { gameRegistry } from "../../../lib/games/index"
+import { useFocusTrap } from "../../../lib/hooks/useFocusTrap";
 import { ResponsiveImage } from "@responsive-image/solid";
 import { createAsync } from "@solidjs/router";
 
@@ -72,6 +73,9 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
     // Registered in onMount rather than during render: a document-level
     // listener attached as a render side effect runs before the component is
     // in the DOM, and re-attaches on every render pass.
+    // Tab stays in the dialog, and focus goes back to whatever opened it.
+    useFocusTrap(() => mainBodyRef);
+
     onMount(() => {
         document.body.addEventListener("click", handleBodyClick);
         window.addEventListener("keydown", handleKeydown);
@@ -193,6 +197,9 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                 role="dialog"
                 aria-modal="true"
                 aria-label="Create a new instance"
+                /* Focus lands here on open, so the dialog's name is announced
+                   before the user is dropped among its controls. */
+                tabindex="-1"
                 onClick={(e) => e.stopImmediatePropagation()}
             >
                 <button
@@ -208,7 +215,8 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                     }}
                 ></button>
                 <Show when={banner()}>
-                    <ResponsiveImage src={banner()!} width={548} height={137} />
+                    {/* "Create a <game> Instance" is the very next line. */}
+                    <ResponsiveImage src={banner()!} width={548} height={137} alt="" />
                 </Show>
                 <div class={styles.header}>
                     <h6 class="h5">Create a {game()?.name ?? ""} Instance</h6>
