@@ -1,3 +1,22 @@
+/* The card renders as a <button> wherever it opens the create flow, and as a
+   plain <div> on the marketing grid where it isn't interactive. Stripping the
+   UA's button styling is what keeps the two indistinguishable. */
+button.container {
+    appearance: none;
+    background: none;
+    border: 0;
+    margin: 0;
+    width: 100%;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+}
+
+button.container:focus-visible {
+    outline: var(--focus-ring);
+    outline-offset: var(--focus-ring-offset);
+}
+
 .container {
     container-type: inline-size;
     container-name: card;
@@ -42,15 +61,18 @@
     text-overflow: ellipsis;
 }
 
-.container:hover .banner {
+.container:hover .banner,
+button.container:focus-visible .banner {
     border: 3px solid var(--hover-colour-frame);
 }
 
-.container:hover > .banner {
+.container:hover > .banner,
+button.container:focus-visible > .banner {
     transform: scale(1.13);
 }
 
-.container:hover p {
+.container:hover p,
+button.container:focus-visible p {
     color: var(--hover-colour);
 }
 

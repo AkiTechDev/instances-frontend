@@ -1,4 +1,6 @@
 import { type Component, createSignal, createUniqueId, onCleanup, onMount, Show } from "solid-js";
+
+import { useFocusTrap } from "../../../lib/hooks/useFocusTrap";
 import { Portal } from "solid-js/web";
 import { createForm, Form, Field, useField, type SubmitHandler } from "@formisch/solid";
 import * as v from 'valibot';
@@ -226,10 +228,14 @@ const InstanceSettingsModal: Component<InstanceConfigFormProps & {
   onClose: () => void
 }> = (props) => {
     const id = createUniqueId();
+    let containerRef: HTMLDivElement | undefined;
 
     const handleKeydown = (e: KeyboardEvent) => {
         if (e.key === "Escape") props.onClose();
     };
+
+    // Tab stays in the dialog, and focus goes back to whatever opened it.
+    useFocusTrap(() => containerRef);
 
     onMount(() => {
         window.addEventListener("keydown", handleKeydown);
@@ -245,9 +251,11 @@ const InstanceSettingsModal: Component<InstanceConfigFormProps & {
         <Portal>
             <div class={styles.backdrop} onClick={() => props.onClose()}></div>
             <div
+                ref={containerRef}
                 class={styles.modal}
                 role="dialog"
                 aria-modal="true"
+                tabindex="-1"
                 aria-labelledby={`instanceSettingsTitle${id}`}
                 onClick={(e) => e.stopImmediatePropagation()}
             >

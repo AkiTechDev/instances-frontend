@@ -76,3 +76,55 @@
     z-index: 0;
     pointer-events: none;
 }
+/* The <Picture> is authored at a fixed 1156x761 with density descriptors, so
+   the <img> carries width="1156" and nothing capped it. The container's content
+   box is `100vw - 12rem`, which only clears 1156px above about 1348px wide --
+   below that the preview quietly bled into the section's own padding, and by
+   390px it was a 1156px image in a 198px box, entirely off screen with just the
+   purple glow behind it visible.
+
+   Not scoped to a media query on purpose: an image that ignores its container
+   is wrong at every width, and this is what every other image on the site
+   already does. It does mean the preview is now 68px narrower at a 1280px
+   viewport, where it used to overhang. */
+.imgWrapper :global(img) {
+    max-width: 100%;
+    height: auto;
+}
+
+@media screen and (max-width: 1100px) {
+    .container { padding: 4.5rem 2rem 0; }
+
+    /* The glow is 110% wide and centred, so it bleeds 5% of the content width
+       past each edge. At 5rem of section padding that bleed lands inside the
+       padding; at 2rem it does not, and from about 770px up to 1100px it pushed
+       the page 2px wider than the viewport. Squaring it to the image keeps the
+       halo -- it is a blurred radial gradient, and filter blur paints outside
+       the box without counting toward scroll width. */
+    .imgWrapper::before { width: 100%; }
+
+    .cta { padding: 2rem 0; }
+
+    .imgWrapper { padding-top: 2.5rem; transform: translateY(-10%); }
+}
+
+@media screen and (max-width: 760px) {
+    .container { padding: 3.5rem 1.25rem 0; }
+
+    .cta > .content { max-width: 100%; }
+
+    /* "Start Playing Now" and "Learn More" need 255px side by side; the
+       column is 318px at 390 and 248px at 320. */
+    .cta > .buttons {
+        flex-direction: column;
+        align-items: stretch;
+        width: 100%;
+        gap: 0.875rem;
+    }
+
+    /* The -20% pull was there to tuck a wide preview under the copy. There is
+       no overlap worth keeping once both are the same width. */
+    .imgWrapper { transform: none; padding-top: 1.5rem; }
+
+    .container .h2 { font-size: 2.25rem; }
+}

@@ -5,6 +5,8 @@ import styles from "./Dashboard.module.css";
 import effects from "../../../styles/components/effects.module.css";
 import button from "../../../styles/components/button.module.css";
 
+import { type Instance } from "../../../lib/apis";
+
 import mouseImage from "../../../assets/images/mouse.png?format=avif;webp&responsive";
 import crossIcon from "../../../assets/icons/cross.svg";
 import refreshIcon from "../../../assets/icons/refresh.svg";
@@ -111,7 +113,9 @@ export const DashboardSkeleton: Component<{
  */
 export const NoInstances: Component<{ onCreate: () => void }> = (props) => (
     <div class={styles.noInstancesContainer}>
-        <ResponsiveImage src={mouseImage} width={144} />
+        {/* Spot illustration for the get-started screen — says nothing the
+            heading beside it doesn't. */}
+        <ResponsiveImage src={mouseImage} width={144} alt="" />
         <div class={styles.noContent}>
             <h6 class="h6">No Games Added Yet!</h6>
             <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
@@ -153,6 +157,51 @@ export const InstanceListError: Component<{ onRetry: () => void | Promise<void> 
                 disabled={retrying()}
                 onClick={() => void retry()}
             ><p class="buttonText">{retrying() ? "Retrying…" : "Try Again"}</p></button>
+        </div>
+    );
+};
+
+
+/**
+ * One instance whose own state call failed.
+ *
+ * Scoped to a single card on purpose. The list-level boundary in Dashboard.tsx
+ * replaces the entire grid with one message, so a single unreachable server
+ * used to hide every healthy one alongside it — measured: one of three
+ * instances returning 500 rendered zero cards and told the account it had no
+ * games. Holding the slot, named, is the honest report: the instance exists,
+ * we just can't reach it this second.
+ *
+ * One markup, two skins — the row and the card differ only in how they lay
+ * out, and a failed instance has the same thing to say in either view.
+ */
+export const InstanceCardError: Component<{
+    instance: Instance;
+    listView: boolean;
+    onRetry: () => void | Promise<void>;
+}> = (props) => {
+    const [retrying, setRetrying] = createSignal(false);
+
+    const retry = async () => {
+        if (retrying()) return;
+        setRetrying(true);
+        try {
+            await props.onRetry();
+        } finally {
+            setRetrying(false);
+        }
+    };
+
+    return (
+        <div class={props.listView ? styles.rowError : styles.cardError} role="alert">
+            <p class={`bodyTextSmallSemi ${styles.cardErrorName}`}>{props.instance.name}</p>
+            <p class="bodyTextSmall">We couldn't reach this server.</p>
+            <button
+                type="button"
+                class={`${button.btn} ${button.link}`}
+                disabled={retrying()}
+                onClick={() => void retry()}
+            >{retrying() ? "Retrying…" : "Retry"}</button>
         </div>
     );
 };

@@ -16,10 +16,10 @@ import refreshIcon from "../../../assets/icons/refresh.svg";
 import LogoIcon from "../../../assets/icons/logos/icon.svg";
 import DashboardInstanceCard from "../DashboardInstanceCard/DashboardInstanceCard";
 import CreateInstanceModal, { type ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
-import { DashboardSkeleton, InstanceListError, NoInstances } from "./DashboardParts";
+import { DashboardSkeleton, InstanceCardError, InstanceListError, NoInstances } from "./DashboardParts";
 
 import { getBestRegion, regions } from "../../../lib/regions";
-import { getInstances } from "../../../lib/apis";
+import { getInstanceState, getInstances } from "../../../lib/apis";
 import { gameRegistry } from "../../../lib/games/index";
 import { useAuth } from "../Auth/AuthProvider";
 
@@ -212,7 +212,29 @@ const Dashboard = () => {
                                 }>
                                     <For each={visibleInstances()}>
                                         {(instance, idx) => (
-                                            <DashboardInstanceCard instance={instance} listView={isListView()} idx={idx()} />
+                                            /* Per card, not per list. Every card polls its own
+                                               instance, and getInstanceState throws by design on
+                                               401/403/5xx — which used to land in the list-level
+                                               boundary above and swap the whole grid for one
+                                               message. One unreachable server out of three
+                                               rendered zero cards and told the account it had no
+                                               games. Caught here, a bad instance degrades in its
+                                               own slot and the healthy ones stay on screen. */
+                                            <ErrorBoundary fallback={(err, reset) => {
+                                                console.error(`failed to render card for ${instance.game}/${instance.name}`, err);
+                                                return (
+                                                    <InstanceCardError
+                                                        instance={instance}
+                                                        listView={isListView()}
+                                                        onRetry={async () => {
+                                                            await revalidate(getInstanceState.keyFor(instance));
+                                                            reset();
+                                                        }}
+                                                    />
+                                                );
+                                            }}>
+                                                <DashboardInstanceCard instance={instance} listView={isListView()} idx={idx()} />
+                                            </ErrorBoundary>
                                         )}
                                     </For>
                                 </Show>

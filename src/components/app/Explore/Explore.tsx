@@ -1,4 +1,4 @@
-import { createSignal, For, Show } from "solid-js";
+import { createSignal, ErrorBoundary, For, Show } from "solid-js";
 import DashboardHeader from "../DashboardHeader/DashboardHeader";
 
 import styles from "./Explore.module.css";
@@ -7,6 +7,7 @@ import { getBestRegion, regions } from "../../../lib/regions";
 import { createAsync } from "@solidjs/router";
 import { gameRegistry } from "../../../lib/games/index";
 import GameCard from "../GameCard/GameCard";
+import RouteError from "../RouteError/RouteError";
 
 const Explore = () => {
     const [openModal, setOpenModal] = createSignal(false)
@@ -36,13 +37,21 @@ const Explore = () => {
                 <div class={styles.exploreHeader}>
                     <h4 class="h4">Games to Try</h4>
                 </div>
-                <div class={styles.gamesContainer}>
-                    <For each={Object.entries(gameRegistry)}>
-                        {([id, ]) => (
-                            <GameCard game_id={id} OpenCreateInstanceModal={OpenCreateInstanceModal} />
-                        )}
-                    </For>
-                </div>
+                {/* Each card loads its game module on demand, so a chunk that
+                    404s after a deploy throws here. Caught at the grid so the
+                    header and the create flow above it stay usable. */}
+                <ErrorBoundary fallback={(err, reset) => {
+                    console.error("failed to render the games grid", err);
+                    return <RouteError onRetry={reset} />;
+                }}>
+                    <div class={styles.gamesContainer}>
+                        <For each={Object.entries(gameRegistry)}>
+                            {([id, ]) => (
+                                <GameCard game_id={id} OpenCreateInstanceModal={OpenCreateInstanceModal} />
+                            )}
+                        </For>
+                    </div>
+                </ErrorBoundary>
             </div>
         </div>
     )

@@ -77,3 +77,27 @@
      animation: shine 2.8s ease-in-out infinite;
 
 }
+/* ---------- Narrow ----------
+   Two present icons flank the copy as flex items with no basis, so they are the
+   first thing the row takes space from: 20px of a 62px icon by 430px, and the
+   copy still overflowing. */
+
+@media screen and (max-width: 1100px) {
+    .container { padding: 4.5rem 2rem; gap: 2rem; }
+
+    .present { flex: none; width: 72px; height: auto; }
+}
+
+@media screen and (max-width: 760px) {
+    .container { padding: 3.5rem 1.25rem; }
+
+    /* A centred block of copy flanked by two icons is a wide-screen
+       composition. At this width the icons are decoration that costs the copy
+       the room it needs. */
+    .present { display: none; }
+
+    .cta { gap: 1.75rem; }
+
+    /* .h1Caps is 3rem, uppercase, and this heading is fifteen words. */
+    .container .h1Caps { font-size: 1.75rem; line-height: 2.25rem; }
+}

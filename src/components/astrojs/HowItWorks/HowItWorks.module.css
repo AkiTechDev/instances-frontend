@@ -92,9 +92,11 @@
    430px, while a card can't shrink past its 412px min-content. Above 1120px the
    two match exactly and the clip costs nothing; below it, clipping would cut
    the right-hand edge off the card you're meant to be reading — 36px at 1024px.
-   That range needs the section to stack, not to be clipped, so it keeps the
-   behaviour it has today until that lands. */
-@media (min-width: 70rem) {
+   That range needs the section to stack, not to be clipped, which is what the
+   max-width: 1119px block at the bottom of this file now does. The two tile
+   exactly: 1120 and up is the clipped carousel, 1119 and down is stacked.
+   Written as 1120px rather than 70rem so the pairing is visible. */
+@media (min-width: 1120px) {
     .cards {
         overflow: clip;
         overflow-clip-margin: var(--padding-sm);
@@ -144,4 +146,81 @@
 @media (prefers-reduced-motion: reduce) {
     .track { transition: none; }
     .next { transition: none; }
+}
+
+/* ---------- Narrow ----------
+   Below the 70rem gate above, the carousel cannot work: `.cards` carries
+   `container-type: inline-size`, so its min-content width is 0 and flex-shrink
+   takes it to nothing, while a card cannot shrink past its 412px min-content.
+   The three cards stayed laid out side by side at their full width regardless,
+   which is what pinned the landing page at a 1971px document from 1100px all
+   the way down to 320px.
+
+   So the carousel is dropped rather than shrunk, and all three steps are shown
+   stacked. There are only three, they are short, and a next-only button with no
+   swipe, no previous and no position indicator is a poor control on a phone
+   anyway. `transform: none` is what actually stops the translate -- it beats
+   the base rule on source order, so --idx cannot move anything here even if the
+   script has already set it.
+
+   1119px, not the 1100px the rest of the site steps at, because this section
+   has a second boundary of its own: the clip that makes the carousel safe only
+   applies from 1120px up. Stacking at 1100 would have left 1101-1119 with an
+   unclipped carousel and ~863px of sideways scroll -- measured, not theorised. */
+
+@media screen and (max-width: 1119px) {
+    .container {
+        flex-direction: column;
+        gap: 3rem;
+        padding: 4.5rem 2rem;
+    }
+
+    /* `width: min-content` plus `white-space: nowrap` is what made the heading
+       column 416px wide and unshrinkable. */
+    .container > .content {
+        width: auto;
+        white-space: normal;
+    }
+
+    .content > p { width: 100%; }
+
+    .cards {
+        /* Inline-size containment is what let this box shrink to nothing.
+           With no carousel there is nothing left for it to do. */
+        container-type: normal;
+        clip-path: none;
+        width: 100%;
+    }
+
+    .track {
+        flex-direction: column;
+        width: 100%;
+        transform: none;
+    }
+
+    .card {
+        flex: 0 0 auto;
+        width: 100%;
+    }
+
+    .next { display: none; }
+}
+
+@media screen and (max-width: 760px) {
+    .container { padding: 3.5rem 1.25rem; gap: 2.5rem; }
+
+    /* The icon and the copy side by side leave the copy about 150px at this
+       width. Stacked, the icon becomes a header for the step it belongs to. */
+    .card {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.5rem;
+        gap: 1.25rem;
+    }
+
+    .card > picture { width: 140px; height: 140px; }
+
+    /* .h5 is 2rem. "Customise Your Instance" at that size is four lines in a
+       phone-width card. */
+    .card .h5 { font-size: 1.5rem; }
 }

@@ -291,6 +291,47 @@ const domain = "instances.aki-labs.com"
     gap: var(--margin-text-sm);
   }
 
+
+  /* ---------- Narrow ----------
+     `grid-template-columns: 2fr 4fr` has no collapse, so the cards kept their
+     four-sevenths of a viewport that no longer had four-sevenths to give. Below
+     768px every one of them sat off screen to the right: the section rendered
+     as a heading above several hundred pixels of nothing. */
+
+  @media screen and (max-width: 1100px) {
+    .servicePropsSection {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 3rem;
+      padding: 4.5rem 2rem;
+      padding-bottom: 3rem;
+    }
+
+    /* Right-aligned reads as a column heading. In one column it just looks
+       like a mistake. */
+    .propsHeadingContainer { align-items: flex-start; max-width: none; }
+
+    .propsContainer { justify-self: stretch; max-width: none; }
+
+    .serviceCardContainer { max-width: none; }
+
+    /* A blurred 2x2 grid of squarcles sitting behind a 2x2 grid of cards. It is
+       absolutely positioned and sized by its own contents, so it neither
+       follows the cards nor shrinks with them -- 546px wide inside a 370px
+       parent, and the section's largest overflow at every width below 768px.
+       Once the cards are no longer a 2x2 it has nothing left to sit behind. */
+    .propsBackgroundContainer { display: none; }
+  }
+
+  @media screen and (max-width: 760px) {
+    .servicePropsSection { padding: 3.5rem 1.25rem; padding-bottom: 2.5rem; }
+
+    .serviceCardContainer { grid-template-columns: minmax(0, 1fr); }
+
+    .serviceCard { padding: 1.75rem 1.5rem; }
+
+    .servicePropsSection .h2 { font-size: 2.25rem; }
+  }
+
 </style>
 
 <style define:vars={{squarcleIconUrl}}>
@@ -475,6 +516,29 @@ const domain = "instances.aki-labs.com"
   .faqCard input:checked ~ .faqCardLabel > .faqIcon {
     transform: rotate(180deg);
     background-color: #EBA439;
+  }
+
+
+  /* ---------- Narrow ----------
+     A row with the heading on one side and the questions on the other, the
+     questions capped at 60%. By 600px that cap was 119px of accordion sitting
+     off the right-hand edge, under a heading that still looked fine. */
+
+  @media screen and (max-width: 1100px) {
+    .faqContainer {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 2.5rem;
+      padding: 4.5rem 2rem;
+    }
+
+    .commonQuestionsContainer { max-width: none; width: 100%; }
+  }
+
+  @media screen and (max-width: 760px) {
+    .faqContainer { padding: 3.5rem 1.25rem; }
+
+    .faqContainer .h2 { font-size: 2.25rem; }
   }
 
 </style>

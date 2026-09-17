@@ -647,7 +647,11 @@ const seo_des = `Pay by the hour, with no subscription and no minimum. Work out 
 
     .scopeCols {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(20rem, 1fr));
+        /* min() so the track can go under 20rem when the column itself is
+           narrower than that. A bare minmax(20rem, 1fr) is a 320px floor, and
+           the content box here is 248px at a 320px viewport -- auto-fit lays
+           one 320px track anyway and the page scrolls sideways. */
+        grid-template-columns: repeat(auto-fit, minmax(min(20rem, 100%), 1fr));
         gap: 1.5rem;
     }
 

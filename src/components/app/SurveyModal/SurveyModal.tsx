@@ -1,4 +1,6 @@
 import { createSignal, createUniqueId, For, onCleanup, onMount, Show, type Component } from "solid-js";
+
+import { useFocusTrap } from "../../../lib/hooks/useFocusTrap";
 import { Portal } from "solid-js/web";
 
 import styles from "./SurveyModal.module.css";
@@ -114,12 +116,14 @@ const SurveyModal: Component<{ onClose: () => void }> = (props) => {
         if (e.key === "Escape") dismiss();
     };
 
+    // Focus the dialog itself rather than the first radio, so the title and
+    // intro are announced before the rater lands in the questions — then keep
+    // Tab inside it.
+    useFocusTrap(() => containerRef);
+
     onMount(() => {
         window.addEventListener("keydown", handleKeydown);
         document.body.style.overflow = "hidden";
-        // Focus the dialog itself rather than the first radio, so the title and
-        // intro are announced before the rater lands in the questions.
-        containerRef?.focus();
     });
 
     onCleanup(() => {

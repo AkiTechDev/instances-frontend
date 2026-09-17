@@ -108,3 +108,52 @@
 .squareLogo a {
     line-height: 0;
 }
+/* ---------- Narrow ----------
+   The three columns are held apart by `margin: auto` on the banner, which
+   works only while there is slack to distribute. Below that the nav and the
+   contact block are already at their content width, so the row has nowhere to
+   go but over the edge — 629px of footer in a 390px viewport, which is what
+   scrolled every page on the site sideways.
+
+   1100px and 760px are the steps legal.css and the header already use. */
+
+@media screen and (max-width: 1100px) {
+    .section { padding-inline: 2rem; }
+
+    /* 6.875rem of side padding here was most of the row's width. */
+    .banner { padding: 1.5rem 2rem 0; gap: 2rem; }
+}
+
+@media screen and (max-width: 760px) {
+    .section { padding-inline: 1.25rem; gap: 1.75rem; }
+
+    .contentContainer {
+        flex-direction: column;
+        align-items: center;
+        gap: 2.5rem;
+    }
+
+    /* Brand first once stacked: it is what identifies the site, and it reads
+       as the start of the footer rather than something wedged between the
+       links and the contact details. */
+    .banner { order: -1; margin: 0; padding: 0; }
+
+    /* Eight links in one column makes a very tall footer. Two keeps it to four
+       rows and still fits "Privacy Policy" at 320px. */
+    .nav {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 1rem 1.5rem;
+        width: 100%;
+    }
+
+    .contact {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1.5rem 2.5rem;
+        width: 100%;
+    }
+
+    .contactBlock { align-items: center; }
+}
