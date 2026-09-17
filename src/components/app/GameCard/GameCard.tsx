@@ -11,7 +11,16 @@ const GameCard: Component<{game_id: string, OpenCreateInstanceModal: ((options: 
 
         const entry = gameRegistry[props.game_id];
 
-        if (!entry) throw new Error(`Uknown game: ${game}`);
+        // The control plane lists games before the frontend ships art and a
+        // config for them, so an unrecognised id is expected traffic, not a
+        // fault. Callers filter these out of their lists; returning undefined
+        // is the backstop, so a stray id costs one card rather than the whole
+        // grid — and, without an error boundary above it, the whole page.
+        if (!entry) {
+            console.warn(`Unknown game id, skipping card: ${props.game_id}`);
+            return undefined;
+        }
+
         const mod = await entry.load();
         return mod.default;
     })

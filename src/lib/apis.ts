@@ -343,12 +343,30 @@ export const postSurvey = async (response: SurveyResponse): Promise<GenericRespo
     return (await resp.json().catch(() => ({ message: "ok" }))) as GenericResponse;
 };
 
-export const getGames = query(async (): Promise<string[]> => {
+/**
+ * Ids of the games the control plane can provision right now.
+ *
+ * Exported unwrapped as well as through `getGames` below because the landing
+ * page's supported-games grid is a Solid island on an Astro page: it renders
+ * outside the app's `<Router>`, and `query()` reaches for router context when
+ * it has an owner. Both callers share this one implementation, so both honour
+ * `PUBLIC_API_BASE` and a staging build can never quote production's list.
+ */
+export const fetchGames = async (): Promise<string[]> => {
     const resp = await fetch(`${API_BASE}/instances/types`, {
         method: "GET",
     });
 
     if (!resp.ok) throw new Error("Failed to get supported Games");
-    
-    return await resp.json()
-}, "supportedGames")
+
+    const data = await resp.json();
+
+    // A shape we don't recognise is a contract change, not an empty catalogue —
+    // say so rather than rendering an empty grid that looks like the truth.
+    if (!Array.isArray(data)) throw new Error("Supported games response was not a list");
+
+    return data.filter((id): id is string => typeof id === "string");
+};
+
+/** Cached, revalidatable wrapper for use inside the router. */
+export const getGames = query(fetchGames, "supportedGames")
