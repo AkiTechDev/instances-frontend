@@ -223,81 +223,6 @@
         66%, 100% { content: "..."; }
     }
 
-    /* Toggle Switch — the control itself lives in the shared
-       styles/components/toggleSwitch.module.css module (which already provides
-       the flex row + positioning). Only the list-row layout slot stays here:
-       it holds space whether or not the instance is currently toggleable, so
-       the row doesn't reflow as state resolves. */
-
-    .toggleSlot {
-        margin: 0 1rem;
-        position: relative;
-        z-index: 3;          /* above the stretched link */
-        min-width: 50px;
-    }
-
-
-    /* List View */
-    .instanceList {
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        padding: 12px 16px;
-        gap: 12px;
-
-        border-radius: var(--r-sm);
-        background-color: var(--colour);
-        width: 100%;
-        color: var(--c-ink);
-
-        position: relative;   /* anchors .cardLink */
-    }
-
-    /* The overlay link is the last child so it can't win `:first-child` off the
-       instance name; being absolutely positioned it stays out of the flex flow. */
-    .instanceList > .cardLink {
-        border-radius: var(--r-sm);
-    }
-
-    .instanceList > :first-child {
-        flex: 1;
-        max-width: 70%;
-    }
-
-    .instanceStatusList {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 0.25rem 0.5rem;
-        max-width: 130px;
-
-        background: var(--c-status-running-bg);
-        border: 1px solid rgba(55, 217, 26, 0.45);
-        border-radius: 16px;
-
-        margin: 0 1rem;
-    }
-
-    /* Direct children only. As a descendant selector this also matched every
-       button inside the options dropdown, squashing the menu items to 22px
-       icons whenever it won the cascade against `.options button`. */
-    .instanceList > button {
-        width: 22px;
-        height: 22px;
-        background: var(--icon) no-repeat center;
-        border: none;
-    }
-
-    .instanceList details {
-        width: 22px;
-        height: 22px;
-
-        border: none;
-        z-index: 10;
-    }
-
-
     /* Suspense skeletons — dimensions only; the shimmer paint comes from the
        shared effects module (.skeleton / .skeletonOnDark), applied alongside. */
 
@@ -311,14 +236,6 @@
         width: 90px;
         height: 22px;
         border-radius: var(--r-chip);
-    }
-
-    .listStatusSkeleton {
-        width: 100%;
-        max-width: 130px;
-        height: 22px;
-        margin: 0 1rem;
-        border-radius: 16px;
     }
 
     .textSkeleton {

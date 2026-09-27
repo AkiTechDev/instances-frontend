@@ -23,6 +23,7 @@ import { getInstances, putCreateInstance, type PutCreateInstance } from "../../.
 import { revalidate } from "@solidjs/router";
 import { gameRegistry } from "../../../lib/games/index"
 import { useFocusTrap } from "../../../lib/hooks/useFocusTrap";
+import { refreshStanding } from "../../../lib/hooks/useAccountStanding";
 import { ResponsiveImage } from "@responsive-image/solid";
 import { createAsync } from "@solidjs/router";
 
@@ -176,6 +177,7 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                 // create closed the modal anyway and the user was left with no
                 // instance and no explanation.
                 await putCreateInstance(gameId()!, formData["instance_name"].replaceAll(' ', ''), new_config);
+                refreshStanding();
                 await revalidate(getInstances.key);
                 props.setIsOpen(false);
             } catch (err) {

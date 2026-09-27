@@ -7,17 +7,41 @@ import { createLimiter } from "./concurrency";
  * can point elsewhere without editing source; per-instance calls use the
  * gateway endpoint the control plane hands back instead.
  */
-const API_BASE = import.meta.env.PUBLIC_API_BASE ?? "https://api.instances.aki-labs.com";
+export const API_BASE = import.meta.env.PUBLIC_API_BASE ?? "https://api.instances.aki-labs.com";
 
 interface GenericResponse {
     message: string
 }
 
 /** Bearer-auth headers, optionally with a JSON content type. */
-const authHeaders = async (json = false): Promise<Record<string, string>> => ({
+export const authHeaders = async (json = false): Promise<Record<string, string>> => ({
     "Authorization": `Bearer ${await getToken()}`,
     ...(json ? { "Content-Type": "application/json" } : {}),
 });
+
+/* A 402 is the start gate refusing a blocked account. It rides on a request
+   the user already caused, so it is both the cheapest and the fastest sign that
+   the account's standing has changed. This module only reports it — the
+   account standing store subscribes — so the import runs one way. */
+const paymentRequiredListeners = new Set<() => void>();
+
+export const onPaymentRequired = (listener: () => void): (() => void) => {
+    paymentRequiredListeners.add(listener);
+    return () => { paymentRequiredListeners.delete(listener); };
+};
+
+/** `fetch` for every authenticated call, so each current and future endpoint
+ *  reports a 402 without wiring of its own. */
+const apiFetch = async (input: string, init?: RequestInit): Promise<Response> => {
+    const resp = await fetch(input, init);
+    if (resp.status === 402) {
+        for (const listener of paymentRequiredListeners) {
+            // A listener's failure must not turn into this request's failure.
+            try { listener(); } catch (err) { console.error("402 listener failed", err); }
+        }
+    }
+    return resp;
+};
 
 export interface Instance {
     user_id: string,
@@ -52,7 +76,7 @@ const parseInstance = (entry: unknown): Instance[] => {
 };
 
 export const getInstances = query(async (): Promise<Instance[]> => {
-    const resp = await fetch(`${API_BASE}/instances/list`, {
+    const resp = await apiFetch(`${API_BASE}/instances/list`, {
         method: "GET",
         cache: "no-store", // disk-cache the list and a delete + recreate looks stale to the user
         headers: await authHeaders(),
@@ -125,7 +149,7 @@ export type InstanceState =
     | (ProvisioningEnvelope & { status: "unknown";      note: string });
 
 export const getInstanceState = query(async (instance: Instance): Promise<InstanceState> => {
-    const resp = await fetch(`${API_BASE}/${instance.game}/${instance.name}`, {
+    const resp = await apiFetch(`${API_BASE}/${instance.game}/${instance.name}`, {
         method: "GET",
         cache: "no-store", // 401 response when instance is delete, if created on same name, browser will return cache rather than ping pong
         headers: await authHeaders(),
@@ -150,7 +174,7 @@ export const getInstanceConfig = query(async (endpoint: string): Promise<Instanc
         throw new Error("Invalid endpoint");
     };
 
-    const resp = await fetch(`${endpoint}/config`, {
+    const resp = await apiFetch(`${endpoint}/config`, {
         method: "GET",
         headers: await authHeaders(),
     });
@@ -195,7 +219,7 @@ export const getInstanceStatus = (endpoint: string): Promise<InstanceRuntimeStat
     statusLimit(async () => {
         let resp: Response;
         try {
-            resp = await fetch(`${endpoint}/status`, {
+            resp = await apiFetch(`${endpoint}/status`, {
                 method: "GET",
                 headers: await authHeaders(),
             });
@@ -219,7 +243,7 @@ export const getInstanceStatus = (endpoint: string): Promise<InstanceRuntimeStat
 export const toggleInstance = async (endpoint: string, isRunning: boolean): Promise<GenericResponse> => {
     const uri = isRunning ? "stop" : "start";
 
-    const resp = await fetch(`${endpoint}/${uri}`, {
+    const resp = await apiFetch(`${endpoint}/${uri}`, {
         method: "GET",
         headers: await authHeaders(),
     });
@@ -236,7 +260,7 @@ export interface PostInstanceConfig {
 }
 
 export const postInstanceConfig = async (endpoint: string, config: PostInstanceConfig): Promise<GenericResponse> => {
-    const resp = await fetch(`${endpoint}/config/instance`, {
+    const resp = await apiFetch(`${endpoint}/config/instance`, {
         method: "POST",
         headers: await authHeaders(true),
         body: JSON.stringify(config)
@@ -250,7 +274,7 @@ export const postInstanceConfig = async (endpoint: string, config: PostInstanceC
 
 
 export const postGameConfig = async (endpoint: string, config: any): Promise<GenericResponse> => {
-    const resp = await fetch(`${endpoint}/config/game`, {
+    const resp = await apiFetch(`${endpoint}/config/game`, {
         method: "POST",
         headers: await authHeaders(true),
         body: JSON.stringify(config)
@@ -263,7 +287,7 @@ export const postGameConfig = async (endpoint: string, config: any): Promise<Gen
 
 
 export const postDownloadGameData = async (endpoint: string): Promise<GenericResponse> => {
-    const resp = await fetch(`${endpoint}/download`, {
+    const resp = await apiFetch(`${endpoint}/download`, {
         method: "POST",
         headers: await authHeaders(),
     });
@@ -274,7 +298,7 @@ export const postDownloadGameData = async (endpoint: string): Promise<GenericRes
 };
 
 export const deleteInstance = async (instance: Instance): Promise<GenericResponse> => {
-    const resp = await fetch(`${API_BASE}/${instance.game}/${instance.name}`, {
+    const resp = await apiFetch(`${API_BASE}/${instance.game}/${instance.name}`, {
         method: "DELETE",
         headers: await authHeaders(),
     });
@@ -296,7 +320,7 @@ export interface PutCreateInstance {
 };
 
 export const putCreateInstance = async (game_id: string, instance_name: string, config: any): Promise<GenericResponse> => {
-    const resp = await fetch(`${API_BASE}/${game_id}/${instance_name}`, {
+    const resp = await apiFetch(`${API_BASE}/${game_id}/${instance_name}`, {
         method: "PUT",
         headers: await authHeaders(true),
         body: JSON.stringify(config)
@@ -330,7 +354,7 @@ export interface SurveyResponse {
 }
 
 export const postSurvey = async (response: SurveyResponse): Promise<GenericResponse> => {
-    const resp = await fetch(`${API_BASE}/feedback`, {
+    const resp = await apiFetch(`${API_BASE}/feedback`, {
         method: "POST",
         headers: await authHeaders(true),
         body: JSON.stringify(response)

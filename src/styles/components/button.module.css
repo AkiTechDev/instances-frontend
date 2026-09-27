@@ -61,6 +61,13 @@
 .btn.outlineDark:hover:not(:disabled) { background: var(--text-colour-dark); border-color: var(--text-colour-dark); color: var(--text-colour-light); }
 .btn.outlineDark:active:not(:disabled) { background: var(--c-ink-grad-top); border-color: var(--c-ink-grad-top); color: var(--text-colour-light); }
 
+/* Filled ink, for a light surface where orange would fight the picture. The
+   sheen stands in for --bg-body's gradient: a gradient can't transition, but a
+   background-color showing through a translucent one can. */
+.btn.dark { background-color: var(--c-ink); background-image: linear-gradient(180deg, rgb(255 255 255 / 0.05), transparent); border-color: var(--c-ink); color: var(--text-colour-light); }
+.btn.dark:hover:not(:disabled) { background-color: var(--c-purple-deep); border-color: var(--c-purple-deep); }
+.btn.dark:active:not(:disabled) { background-color: var(--c-purple-deep); border-color: var(--c-purple-deep); filter: brightness(0.85); }
+
 .btn.secondary { background: var(--colour-text-secondary); border-color: var(--colour-text-secondary); color: var(--colour-text-primary); }
 .btn.secondary:hover:not(:disabled) { background: var(--c-purple); border-color: var(--c-purple); }
 .btn.secondary:active:not(:disabled) { background: var(--c-purple-deep); border-color: var(--c-purple-deep); color: var(--c-white); }
@@ -74,6 +81,13 @@
 /* A link-styled button has no surface to sink, so it shifts colour instead of
    travelling. */
 .btn.link:active:not(:disabled) { color: var(--c-purple-deep); transform: none; }
+
+/* The quiet counterpart for artwork, where orange text would be lost: muted
+   ink that firms up on hover. Padded like a real button so the tap target
+   stays comfortable; only the text shows. */
+.btn.linkDark { background: transparent; border: 0; color: color-mix(in srgb, var(--c-ink) 70%, transparent); padding: 0.5rem 1rem; }
+.btn.linkDark:hover:not(:disabled) { color: var(--c-ink); }
+.btn.linkDark:active:not(:disabled) { color: var(--c-ink); transform: none; }
 
 .btn:disabled, .btn:disabled:hover {
     background: var(--c-grey-400); border-color: var(--c-grey-400); color: var(--c-ink);

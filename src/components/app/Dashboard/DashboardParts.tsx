@@ -28,15 +28,6 @@ const InstanceCardSkeleton: Component = () => (
     </div>
 );
 
-/** The same, for the list view's rows. */
-const InstanceRowSkeleton: Component = () => (
-    <div class={styles.skeletonRow}>
-        <div class={`${effects.skeleton} ${styles.skeletonRowName}`} />
-        <div class={`${effects.skeleton} ${styles.skeletonRowStatus}`} />
-        <div class={`${effects.skeleton} ${styles.skeletonRowMeta}`} />
-    </div>
-);
-
 /**
  * Loading state for an account we expect to be empty — mirrors NoInstances
  * (art, two lines, button) inside the same centred container, so the
@@ -68,7 +59,6 @@ const EmptyStateSkeleton: Component = () => (
 export const DashboardSkeleton: Component<{
     /** Which layout the resolved list is expected to produce. */
     shape?: "list" | "empty";
-    listView?: boolean;
     cards?: number;
 }> = (props) => (
     <Show when={props.shape !== "empty"} fallback={<EmptyStateSkeleton />}>
@@ -94,13 +84,9 @@ export const DashboardSkeleton: Component<{
                 <div class={`${effects.skeleton} ${styles.skeletonFilter}`} />
                 <div class={`${effects.skeleton} ${styles.skeletonFilter}`} />
             </div>
-            <div class={props.listView ? styles.gamesListContainer : styles.gamesGridContainer}>
+            <div class={styles.gamesGridContainer}>
                 <Index each={Array.from({ length: props.cards ?? 4 })}>
-                    {() => (
-                        <Show when={props.listView} fallback={<InstanceCardSkeleton />}>
-                            <InstanceRowSkeleton />
-                        </Show>
-                    )}
+                    {() => <InstanceCardSkeleton />}
                 </Index>
             </div>
         </div>
@@ -121,6 +107,17 @@ export const NoInstances: Component<{ onCreate: () => void }> = (props) => (
             <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
         </div>
         <button type="button" class={`${button.btn} ${button.vibrant} ${button.icon} ${button.rotate45}`} style={`--icon: url(${crossIcon.src})`} onClick={() => props.onCreate()}><p class="buttonText">Create New Game</p></button>
+    </div>
+);
+
+/**
+ * Stands in for the list view until it's built. Same heading-and-subline
+ * treatment as the Extra page's placeholder.
+ */
+export const ListViewComingSoon: Component = () => (
+    <div class={styles.comingSoon}>
+        <h3 class="h3">List View Coming Soon</h3>
+        <p class="statsTitle">Switch back to grid view to see your instances.</p>
     </div>
 );
 
@@ -171,13 +168,9 @@ export const InstanceListError: Component<{ onRetry: () => void | Promise<void> 
  * instances returning 500 rendered zero cards and told the account it had no
  * games. Holding the slot, named, is the honest report: the instance exists,
  * we just can't reach it this second.
- *
- * One markup, two skins — the row and the card differ only in how they lay
- * out, and a failed instance has the same thing to say in either view.
  */
 export const InstanceCardError: Component<{
     instance: Instance;
-    listView: boolean;
     onRetry: () => void | Promise<void>;
 }> = (props) => {
     const [retrying, setRetrying] = createSignal(false);
@@ -193,7 +186,7 @@ export const InstanceCardError: Component<{
     };
 
     return (
-        <div class={props.listView ? styles.rowError : styles.cardError} role="alert">
+        <div class={styles.cardError} role="alert">
             <p class={`bodyTextSmallSemi ${styles.cardErrorName}`}>{props.instance.name}</p>
             <p class="bodyTextSmall">We couldn't reach this server.</p>
             <button

@@ -4,6 +4,7 @@ import { ErrorBoundary } from "solid-js";
 import RootLayout from "./RootLayout/RootLayout";
 import Dashboard from "./Dashboard/Dashboard";
 import { AuthProvider } from "./Auth/AuthProvider";
+import { AccountStandingProvider } from "./AccountStanding/AccountStandingProvider";
 import Explore from "./Explore/Explore";
 import Extra from "./Extra/Extra";
 import Management from "./Management/Management";
@@ -40,41 +41,43 @@ const AppRouter = () => {
                 return <RouteError fullWidth onRetry={() => window.location.reload()} />;
             }}>
                 <AuthProvider>
-                    <Router root={RootLayout} >
-                        <Route path="/dashboard" component={Dashboard} preload={() => {
-                            warm(getInstances().then((instances: Instance[]) => {
-                                instances.forEach((instance: Instance) => warm(getInstanceState(instance)));
-                            }));
-                        }} />
-                        <Route path="/:game/:name" component={Management} preload={async (p) => {
-                            try {
-                                const account = await getAccount();
-                                const state = await getInstanceState({ game: p.params.game, name: p.params.name, user_id: account?.sub ?? "" } as Instance);
+                    <AccountStandingProvider>
+                        <Router root={RootLayout} >
+                            <Route path="/dashboard" component={Dashboard} preload={() => {
+                                warm(getInstances().then((instances: Instance[]) => {
+                                    instances.forEach((instance: Instance) => warm(getInstanceState(instance)));
+                                }));
+                            }} />
+                            <Route path="/:game/:name" component={Management} preload={async (p) => {
+                                try {
+                                    const account = await getAccount();
+                                    const state = await getInstanceState({ game: p.params.game, name: p.params.name, user_id: account?.sub ?? "" } as Instance);
 
-                                // A deleted instance is handled by Management's own
-                                // `onGone`, which navigates to /dashboard?no-such-instance
-                                // before the page paints. There used to be a
-                                // `return redirect(...)` here as well, and it never ran:
-                                // @solidjs/router discards whatever a preload returns
-                                // (createRouteContext passes it to the component as
-                                // `data`, preloadRoute drops it outright). Confirmed by
-                                // removing `onGone` — both entry paths then sat on the
-                                // dead instance's page.
-                                const endpoint = endpointOf(state);
-                                if (endpoint) {
-                                    warm(getInstanceConfig(endpoint));
-                                    warm(getInstanceStatus(endpoint));
+                                    // A deleted instance is handled by Management's own
+                                    // `onGone`, which navigates to /dashboard?no-such-instance
+                                    // before the page paints. There used to be a
+                                    // `return redirect(...)` here as well, and it never ran:
+                                    // @solidjs/router discards whatever a preload returns
+                                    // (createRouteContext passes it to the component as
+                                    // `data`, preloadRoute drops it outright). Confirmed by
+                                    // removing `onGone` — both entry paths then sat on the
+                                    // dead instance's page.
+                                    const endpoint = endpointOf(state);
+                                    if (endpoint) {
+                                        warm(getInstanceConfig(endpoint));
+                                        warm(getInstanceStatus(endpoint));
+                                    }
+                                } catch {
+                                    // Same bargain as `warm`, for the awaited half: the
+                                    // page re-reads these queries and shows its own
+                                    // failure state. Letting it through would reject the
+                                    // preload promise, which the router also floats.
                                 }
-                            } catch {
-                                // Same bargain as `warm`, for the awaited half: the
-                                // page re-reads these queries and shows its own
-                                // failure state. Letting it through would reject the
-                                // preload promise, which the router also floats.
-                            }
-                        }}  />
-                        <Route path="/explore" component={Explore} />
-                        <Route path="/extra" component={Extra} />
-                    </Router>
+                            }}  />
+                            <Route path="/explore" component={Explore} />
+                            <Route path="/extra" component={Extra} />
+                        </Router>
+                    </AccountStandingProvider>
                 </AuthProvider>
             </ErrorBoundary>
     )
