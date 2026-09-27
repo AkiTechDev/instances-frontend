@@ -6,6 +6,7 @@ import {
     type InstanceRuntimeStatus,
 } from "../apis";
 import { pollUntilSettled } from "../polling";
+import { refreshStanding, useReportRunning } from "./useAccountStanding";
 
 type RuntimeState = InstanceRuntimeStatus["state"];
 type RunningStatus = Extract<InstanceRuntimeStatus, { state: "running" }>;
@@ -128,6 +129,8 @@ export function useInstanceRuntime(endpoint: Accessor<string | undefined>): Inst
             // Hold the first-stage text, then poll for the destination state
             // (not the lagging current one) so the panel doesn't flash back.
             await pollStatus({ target: wasRunning ? "stopped" : "running", initialDelayMs: 4000 });
+            // A stop ends a play session, which is what moves trial usage.
+            if (wasRunning) refreshStanding();
         } catch (err) {
             console.error("toggle failed", err);
         } finally {
@@ -135,6 +138,9 @@ export function useInstanceRuntime(endpoint: Accessor<string | undefined>): Inst
             setBusy(false);
         }
     };
+
+    // Drives the account's local trial countdown while this server runs.
+    useReportRunning(isRunning);
 
     // Landing on the page mid start/stop: resume polling immediately — no
     // delay, no target, just run until it settles.

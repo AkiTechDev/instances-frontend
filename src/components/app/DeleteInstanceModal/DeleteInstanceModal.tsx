@@ -1,6 +1,7 @@
 import { createSignal, createUniqueId, onCleanup, onMount, Show, type Component } from "solid-js";
 
 import { useFocusTrap } from "../../../lib/hooks/useFocusTrap";
+import { refreshStanding } from "../../../lib/hooks/useAccountStanding";
 import { Portal } from "solid-js/web";
 import { revalidate } from "@solidjs/router";
 
@@ -36,6 +37,7 @@ const DeleteInstanceModal: Component<{
         setError(null);
         try {
             await deleteInstance(props.instance);
+            refreshStanding();
             // Drop the cached instance list so the dashboard doesn't render a
             // card for something that no longer exists.
             await revalidate(getInstances.key);

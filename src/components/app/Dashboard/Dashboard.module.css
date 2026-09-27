@@ -126,39 +126,23 @@
         gap: 20px;
     }
 
-    .gamesListContainer {
-        display: grid;
-        grid-template-columns: 1fr;
-        width: 100%;
-    }
-
-    .gamesListViewHeader {
-        box-sizing: border-box;
+    /* List view placeholder — mirrors the Extra page's "Under Construction"
+       block (h3 over a muted statsTitle), so unfinished areas read the same
+       wherever they turn up. */
+    .comingSoon {
         display: flex;
-        flex-direction: row;
+        flex-direction: column;
         align-items: center;
-        padding: 12px 16px;
-        gap: 12px;
-
-        border-radius: 8px;
-        background-color: var(--colour-text-primary);
-        color: var(--colour-text-tertiary);
+        justify-content: center;
         width: 100%;
-    }
+        padding: var(--margin-el-md) 0;
 
-    .gamesListViewHeader > :nth-child(1) {
-        flex: 1;
-        max-width: 68.022%;
-    }
-
-    .gamesListViewHeader > :nth-child(2) {
-        width: 80px;
+        color: var(--colour-text-primary);
         text-align: center;
-        margin: 0 1rem;
     }
 
-    .gamesListViewHeader > :nth-child(3) {
-        margin-right: auto;
+    .comingSoon > p {
+        opacity: 0.6;
     }
 
     /* Filter Container  */
@@ -386,37 +370,6 @@
         border-radius: 6px;
     }
 
-    /* List view — mirrors .instanceList's row. */
-    .skeletonRow {
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        padding: 12px 16px;
-        gap: 12px;
-        width: 100%;
-    }
-
-    .skeletonRowName {
-        flex: 1;
-        max-width: 70%;
-        height: 1rem;
-        border-radius: 6px;
-    }
-
-    .skeletonRowStatus {
-        width: 130px;
-        height: 22px;
-        margin: 0 1rem;
-        border-radius: 16px;
-    }
-
-    .skeletonRowMeta {
-        width: 120px;
-        height: 0.875rem;
-        border-radius: 6px;
-    }
-
     /* Empty-account loading state — traces NoInstances so the get-started
        screen lands exactly where the skeleton was. */
     .skeletonEmptyArt {
@@ -477,23 +430,6 @@
         border: 1px dashed var(--c-grey-200);
         border-radius: calc(var(--r-sm) + 3px);
         background: var(--c-cream-list);
-        color: var(--c-ink);
-    }
-
-    /* The same state in list view — mirrors .instanceList's row box so the
-       stripe rhythm and row height survive a failure. */
-    .rowError {
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 0.25rem 1rem;
-
-        width: 100%;
-        padding: 12px 16px;
-
-        border-bottom: 1px solid var(--c-grey-200);
         color: var(--c-ink);
     }
 

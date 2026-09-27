@@ -106,7 +106,7 @@ const ToggleSwitch: Component<{
     </div>
 );
 
-const DashboardInstanceCard: Component<{ instance: Instance; listView: boolean; idx: number }> = (props) => {
+const DashboardInstanceCard: Component<{ instance: Instance }> = (props) => {
     const id = createUniqueId();
     const detailHref = `/${props.instance.game}/${props.instance.name}`;
     const gameName = createMemo(() => gameRegistry[props.instance.game]?.name ?? props.instance.game);
@@ -140,40 +140,6 @@ const DashboardInstanceCard: Component<{ instance: Instance; listView: boolean; 
 
     const toggleLabel = () =>
         `${runtime.intent() ? "Stop" : "Start"} ${props.instance.name}`;
-
-    if (props.listView) {
-        return (
-            <div
-                class={styles.instanceList}
-                style={`--colour: ${props.idx % 2 === 0 ? 'var(--colour-text-tertiary)' : 'var(--c-cream-list)'}`}
-            >
-                <p class="bodyTextSmallSemi">{props.instance.name}</p>
-                <Suspense fallback={<div class={`${effects.skeleton} ${styles.listStatusSkeleton}`} aria-busy="true" />}>
-                    <div class={styles.instanceStatusList}>
-                        <p class="bodyTextSmallestSemiCaps">{labelText()}</p>
-                    </div>
-                </Suspense>
-                <Suspense fallback={<p class={`bodyTextSmall ${effects.skeleton} ${styles.textSkeleton}`} aria-busy="true">&nbsp;</p>}>
-                    <p class="bodyTextSmall">{subtitleText()}</p>
-                </Suspense>
-                <div class={styles.toggleSlot}>
-                    <Suspense>
-                        <Show when={canToggle(state())}>
-                            <ToggleSwitch
-                                id={`toggle-list-${id}`}
-                                checked={runtime.intent()}
-                                disabled={runtime.busy()}
-                                label={toggleLabel()}
-                                onToggle={toggle}
-                            />
-                        </Show>
-                    </Suspense>
-                </div>
-                <InstanceOptions endpoint={provisioning.endpoint() ?? ""} instance={props.instance} class={styles.raised} />
-                <A href={detailHref} class={styles.cardLink} aria-label={cardLinkLabel()} />
-            </div>
-        );
-    }
 
     return (
         <div class={styles.card}>

@@ -32,7 +32,7 @@
     /* Light surfaces */
     --c-white:          #FFFFFF;
     --c-cream-grey:     #F3F4F4;   /* default filter button background */
-    --c-cream-list:     #F9F9F9;   /* zebra-stripe row in list view */
+    --c-cream-list:     #F9F9F9;   /* failed instance card on the dashboard */
     --c-grey-100:       #F5F5F5;   /* management page canvas */
     --c-grey-200:       #E2E3EB;   /* default border colour */
     --c-grey-300:       #DADADA;   /* sidebar hover */

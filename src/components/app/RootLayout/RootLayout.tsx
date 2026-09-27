@@ -1,6 +1,7 @@
 // Root layout — children is injected by the router
 import { ErrorBoundary } from "solid-js";
 
+import AccountPrompts from "../AccountStanding/AccountPrompts";
 import RootSidebarNav from "../RootSidebarNav/Nav";
 import RouteError from "../RouteError/RouteError";
 
@@ -12,6 +13,9 @@ import RouteError from "../RouteError/RouteError";
 const RootLayout = (props: { children?: any }) => (
     <>
         <RootSidebarNav />
+        {/* Chrome, not route content — above the boundary so a route that
+            throws still shows a blocked account's banner. */}
+        <AccountPrompts />
         <ErrorBoundary fallback={(err, reset) => {
             console.error("route failed to render", err);
             return <RouteError onRetry={reset} />;

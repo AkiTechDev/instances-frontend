@@ -16,10 +16,11 @@ import refreshIcon from "../../../assets/icons/refresh.svg";
 import LogoIcon from "../../../assets/icons/logos/icon.svg";
 import DashboardInstanceCard from "../DashboardInstanceCard/DashboardInstanceCard";
 import CreateInstanceModal, { type ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
-import { DashboardSkeleton, InstanceCardError, InstanceListError, NoInstances } from "./DashboardParts";
+import { DashboardSkeleton, InstanceCardError, InstanceListError, ListViewComingSoon, NoInstances } from "./DashboardParts";
 
 import { getBestRegion, regions } from "../../../lib/regions";
 import { getInstanceState, getInstances } from "../../../lib/apis";
+import { refreshStanding } from "../../../lib/hooks/useAccountStanding";
 import { gameRegistry } from "../../../lib/games/index";
 import { useAuth } from "../Auth/AuthProvider";
 
@@ -90,6 +91,8 @@ const Dashboard = () => {
     const handleRefresh = async () => {
         if (isRefreshing()) return;
         setIsRefreshing(true);
+        // The user asked, so the account's standing is re-read too.
+        refreshStanding({ force: true });
         try {
             // Awaited, so the button stops spinning when the data actually
             // lands rather than after a fixed guess at how long it takes.
@@ -152,7 +155,7 @@ const Dashboard = () => {
                 {/* `instances()` stays undefined until the list resolves, so the
                     skeleton covers loading and the zero-state below can only be
                     reached by a resolved — genuinely empty — list. */}
-                <Show when={instances()} fallback={<DashboardSkeleton shape={expectedShape} listView={isListView()} />}>
+                <Show when={instances()} fallback={<DashboardSkeleton shape={expectedShape} />}>
                     <Show when={hasInstances()} fallback={<NoInstances onCreate={() => OpenCreateInstanceModal({game_id: null, allow_game_change: true})} />}>
                         <DashboardSidebarNav filter={gameFilter} setFilter={setGameFilter} openCreateIntanceModal={OpenCreateInstanceModal}/>
                         <div class={styles.gamesContainer}>
@@ -194,51 +197,45 @@ const Dashboard = () => {
                                     </label>
                                 </div>
                             </div>
-                            <div class={ isListView() ?  styles.gamesListContainer : styles.gamesGridContainer}>
-                                <Show when={isListView()}>
-                                    <div class={styles.gamesListViewHeader}>
-                                        <p class="bodyTextSmall">Instance</p>
-                                        <p class="bodyTextSmall">Status</p>
-                                        <p class="bodyTextSmall">Activity</p>
-                                        <p></p>
-                                        <p></p>
-                                    </div>
-                                </Show>
-
-                                <Show when={visibleInstances().length > 0} fallback={
-                                    <p class={`statsTitle ${styles.noMatches}`}>
-                                        No instances match "{instanceSearchText()}".
-                                    </p>
-                                }>
-                                    <For each={visibleInstances()}>
-                                        {(instance, idx) => (
-                                            /* Per card, not per list. Every card polls its own
-                                               instance, and getInstanceState throws by design on
-                                               401/403/5xx — which used to land in the list-level
-                                               boundary above and swap the whole grid for one
-                                               message. One unreachable server out of three
-                                               rendered zero cards and told the account it had no
-                                               games. Caught here, a bad instance degrades in its
-                                               own slot and the healthy ones stay on screen. */
-                                            <ErrorBoundary fallback={(err, reset) => {
-                                                console.error(`failed to render card for ${instance.game}/${instance.name}`, err);
-                                                return (
-                                                    <InstanceCardError
-                                                        instance={instance}
-                                                        listView={isListView()}
-                                                        onRetry={async () => {
-                                                            await revalidate(getInstanceState.keyFor(instance));
-                                                            reset();
-                                                        }}
-                                                    />
-                                                );
-                                            }}>
-                                                <DashboardInstanceCard instance={instance} listView={isListView()} idx={idx()} />
-                                            </ErrorBoundary>
-                                        )}
-                                    </For>
-                                </Show>
-                            </div>
+                            {/* The list view isn't built yet — the toggle stays so the
+                                layout is discoverable, but it lands on a plain notice
+                                rather than a half-finished table. */}
+                            <Show when={!isListView()} fallback={<ListViewComingSoon />}>
+                                <div class={styles.gamesGridContainer}>
+                                    <Show when={visibleInstances().length > 0} fallback={
+                                        <p class={`statsTitle ${styles.noMatches}`}>
+                                            No instances match "{instanceSearchText()}".
+                                        </p>
+                                    }>
+                                        <For each={visibleInstances()}>
+                                            {(instance) => (
+                                                /* Per card, not per list. Every card polls its own
+                                                   instance, and getInstanceState throws by design on
+                                                   401/403/5xx — which used to land in the list-level
+                                                   boundary above and swap the whole grid for one
+                                                   message. One unreachable server out of three
+                                                   rendered zero cards and told the account it had no
+                                                   games. Caught here, a bad instance degrades in its
+                                                   own slot and the healthy ones stay on screen. */
+                                                <ErrorBoundary fallback={(err, reset) => {
+                                                    console.error(`failed to render card for ${instance.game}/${instance.name}`, err);
+                                                    return (
+                                                        <InstanceCardError
+                                                            instance={instance}
+                                                            onRetry={async () => {
+                                                                await revalidate(getInstanceState.keyFor(instance));
+                                                                reset();
+                                                            }}
+                                                        />
+                                                    );
+                                                }}>
+                                                    <DashboardInstanceCard instance={instance} />
+                                                </ErrorBoundary>
+                                            )}
+                                        </For>
+                                    </Show>
+                                </div>
+                            </Show>
                         </div>
                     </Show>
                 </Show>

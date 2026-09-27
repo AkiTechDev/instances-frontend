@@ -9,6 +9,8 @@ interface ImportMetaEnv {
     readonly PUBLIC_ZITADEL_PROJECT_ID: string;
     /** Control-plane base URL. Defaults to production when unset. */
     readonly PUBLIC_API_BASE?: string;
+    /** Answer account standing from a fixture instead of the API — see lib/accountMock.ts. */
+    readonly PUBLIC_STANDING_MOCK?: string;
 }
 
 interface ImportMeta {
