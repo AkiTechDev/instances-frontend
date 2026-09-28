@@ -96,7 +96,6 @@ const SurveyModal: Component<{ onClose: () => void }> = (props) => {
             ...(trimmedComment ? { comment: trimmedComment } : {}),
             context: {
                 path: window.location.pathname,
-                user_agent: navigator.userAgent,
             },
         };
 
