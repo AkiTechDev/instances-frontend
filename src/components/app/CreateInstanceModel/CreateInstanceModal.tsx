@@ -243,8 +243,10 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                     <p class={`${styles.error} bodyTextSmall`} role="alert">{error()}</p>
                 </Show>
 
+                {/* Regions are usually ranked before the modal opens, so the
+                    wait is more often the game's own module loading. */}
                 <Show when={gameId() && !ready()}>
-                    <p class={`${styles.loading} bodyTextSmall`} role="status">Finding the closest region…</p>
+                    <p class={`${styles.loading} bodyTextSmall`} role="status">{props.regions ? "Loading…" : "Finding the closest region…"}</p>
                 </Show>
 
                 <Show when={form()}>

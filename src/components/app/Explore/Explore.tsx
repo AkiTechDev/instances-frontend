@@ -1,9 +1,9 @@
-import { createSignal, ErrorBoundary, For, Show } from "solid-js";
+import { createSignal, ErrorBoundary, For, onMount, Show } from "solid-js";
 import DashboardHeader from "../DashboardHeader/DashboardHeader";
 
 import styles from "./Explore.module.css";
 import CreateInstanceModal, { type ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
-import { getBestRegion, regions } from "../../../lib/regions";
+import { getRegionsByLatency, preloadRegionRanking } from "../../../lib/regions";
 import { createAsync } from "@solidjs/router";
 import { gameRegistry } from "../../../lib/games/index";
 import GameCard from "../GameCard/GameCard";
@@ -13,14 +13,11 @@ const Explore = () => {
     const [openModal, setOpenModal] = createSignal(false)
     const [modalOptions, setModalOptions] = createSignal<ModalOptions>({game_id: null, allow_game_change: true})
 
-    // Deferred until the modal opens — ranking regions pings all 14 of them,
-    // and browsing the game list doesn't need that. Cached for an hour, so
-    // re-opening the modal costs nothing.
-    const regionsByLatency = createAsync(async () => {
-        if (!openModal()) return undefined;
-        const ordered = await getBestRegion();
-        return Object.fromEntries(ordered.map(({ region }) => [region, regions[region]]));
-    })
+    // Ranked in the background once the page is idle, so picking a game opens
+    // onto a finished region list. Gated on the modal so the pings wait for
+    // idle rather than starting during first render.
+    onMount(preloadRegionRanking);
+    const regionsByLatency = createAsync(async () => openModal() ? getRegionsByLatency() : undefined);
 
     const OpenCreateInstanceModal = (options: ModalOptions) => {
         setModalOptions(options);

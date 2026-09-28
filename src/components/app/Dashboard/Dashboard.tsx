@@ -1,4 +1,4 @@
-import { createSignal, For, catchError, createEffect, createMemo, ErrorBoundary, Show } from "solid-js";
+import { createSignal, For, catchError, createEffect, createMemo, ErrorBoundary, onMount, Show } from "solid-js";
 import { createAsync, revalidate } from "@solidjs/router";
 import DashboardHeader from "../DashboardHeader/DashboardHeader";
 import DashboardSidebarNav from "../DashboardSidebarNav/DashboardSidebarNav";
@@ -18,7 +18,7 @@ import DashboardInstanceCard from "../DashboardInstanceCard/DashboardInstanceCar
 import CreateInstanceModal, { type ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
 import { DashboardSkeleton, InstanceCardError, InstanceListError, ListViewComingSoon, NoInstances } from "./DashboardParts";
 
-import { getBestRegion, regions } from "../../../lib/regions";
+import { getRegionsByLatency, preloadRegionRanking } from "../../../lib/regions";
 import { getInstanceState, getInstances } from "../../../lib/apis";
 import { refreshStanding } from "../../../lib/hooks/useAccountStanding";
 import { gameRegistry } from "../../../lib/games/index";
@@ -72,15 +72,12 @@ const Dashboard = () => {
         document.body.style.overflow = openModal() ? 'hidden' : '';
     });
 
-    // Ranking regions means pinging all 14 of them. Gated on the modal actually
-    // being open so a dashboard visit that never creates an instance — the
-    // common case — doesn't pay for a dropdown nobody opened. `getBestRegion`
-    // caches for an hour, so re-opening the modal is free.
-    const regionsByLatency = createAsync(async () => {
-        if (!openModal()) return undefined;
-        const ordered = await getBestRegion();
-        return Object.fromEntries(ordered.map(({ region }) => [region, regions[region]]));
-    })
+    // Regions are ranked in the background once the page is idle, so the
+    // modal normally opens onto a finished list; opening it sooner joins the
+    // ranking already under way. Read only while the modal is open — ungated,
+    // this would start the pings during first render instead of at idle.
+    onMount(preloadRegionRanking);
+    const regionsByLatency = createAsync(async () => openModal() ? getRegionsByLatency() : undefined);
 
     const OpenCreateInstanceModal = (options: ModalOptions) => {
         setModalOptions(options);
