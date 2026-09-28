@@ -3,6 +3,7 @@ import { createEffect, createMemo, createResource, createSignal, on, type Access
 import {
     getInstanceStatus,
     toggleInstance,
+    userMessageOf,
     type InstanceRuntimeStatus,
 } from "../apis";
 import { pollUntilSettled } from "../polling";
@@ -13,26 +14,32 @@ type RunningStatus = Extract<InstanceRuntimeStatus, { state: "running" }>;
 
 export interface InstanceRuntime {
     /**
-     * One coarse status for the whole UI: while a toggle is in flight the
-     * optimistic intent wins (instant feedback), otherwise the latest polled
-     * runtime state, falling back to "stopped" before the first poll lands.
+     * One coarse status for the whole UI: once the gateway has accepted a
+     * start/stop, its destination wins ("starting"/"stopping") until the
+     * server gets there; otherwise the latest polled runtime state, falling
+     * back to "stopped" before the first poll lands.
      */
     status: Accessor<RuntimeState>;
     isRunning: Accessor<boolean>;
     /**
-     * What a two-state control (a switch, an ON/OFF badge) should show: the
-     * user's intent while a toggle is in flight, so the switch doesn't snap
-     * back to OFF for the minute the server spends starting. Falls back to the
-     * real state once the action settles.
+     * What a two-state control (a switch, an ON/OFF badge) should show: where
+     * an accepted toggle is heading, so the switch doesn't snap back to OFF for
+     * the minute the server spends starting. Falls back to the real state once
+     * the action settles.
      */
     intent: Accessor<boolean>;
-    /** True while a start/stop is in flight. */
+    /** True from the click until the action settles or is refused. */
     busy: Accessor<boolean>;
     canToggle: Accessor<boolean>;
     /** Connectivity payload — only present while genuinely running. */
     running: Accessor<RunningStatus | undefined>;
     startingPhase: Accessor<string | undefined>;
     errorMessage: Accessor<string | undefined>;
+    /**
+     * Why the last start/stop was refused — the API's own message when it sent
+     * one. Cleared when the next toggle begins.
+     */
+    toggleError: Accessor<string | undefined>;
     /** Start if stopped, stop if running. No-op while busy or unreachable. */
     toggle: () => Promise<void>;
     refetch: () => void;
@@ -45,7 +52,7 @@ const TERMINAL: RuntimeState[] = ["forbidden", "error"];
  * Runtime status of one instance's game server, plus the start/stop control.
  *
  * Owns three things that used to be reimplemented per call site: the status
- * resource, the optimistic toggle, and the poll loop that waits for the server
+ * resource, the start/stop toggle, and the poll loop that waits for the server
  * to actually get there. Both the management panel and the dashboard card use
  * this, so a toggle behaves identically in either place.
  *
@@ -58,6 +65,7 @@ export function useInstanceRuntime(endpoint: Accessor<string | undefined>): Inst
     const [optimistic, setOptimistic] = createSignal<"starting" | "stopping" | null>(null);
     const [busy, setBusy] = createSignal(false);
     const [polling, setPolling] = createSignal(false);
+    const [toggleError, setToggleError] = createSignal<string | undefined>(undefined);
 
     const status = createMemo<RuntimeState>(() => optimistic() ?? runtime()?.state ?? "stopped");
     const isRunning = createMemo(() => status() === "running");
@@ -123,9 +131,24 @@ export function useInstanceRuntime(endpoint: Accessor<string | undefined>): Inst
 
         const wasRunning = isRunning();
         setBusy(true);
-        setOptimistic(wasRunning ? "stopping" : "starting");
+        setToggleError(undefined);
         try {
             await toggleInstance(ep, wasRunning);
+        } catch (err) {
+            // Refused (a 402 from a used-up trial, say) or unreachable: say
+            // why, and don't poll for a server that was never asked to move.
+            console.error("toggle refused", err);
+            setToggleError(userMessageOf(err, wasRunning
+                ? "We couldn't stop your server — try again shortly."
+                : "We couldn't start your server — try again shortly."));
+            setBusy(false);
+            return;
+        }
+
+        // Accepted — only now does the UI say the server is on its way. This
+        // used to be set before the request, so a refusal still read "Starting…".
+        setOptimistic(wasRunning ? "stopping" : "starting");
+        try {
             // Hold the first-stage text, then poll for the destination state
             // (not the lagging current one) so the panel doesn't flash back.
             await pollStatus({ target: wasRunning ? "stopped" : "running", initialDelayMs: 4000 });
@@ -150,7 +173,7 @@ export function useInstanceRuntime(endpoint: Accessor<string | undefined>): Inst
 
     return {
         status, isRunning, intent, busy, canToggle,
-        running, startingPhase, errorMessage,
+        running, startingPhase, errorMessage, toggleError,
         toggle, refetch: () => void refetch(),
     };
 }

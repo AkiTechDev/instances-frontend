@@ -19,7 +19,7 @@ import selectStyles from "../FormModules/FormSelect.module.css";
 import submitBtnStyle from "../../../styles/components/formSubmitButton.module.css";
 import iconTick from "../../../assets/icons/tick.svg";
 import iconCross from "../../../assets/icons/cross.svg";
-import { getInstances, putCreateInstance, type PutCreateInstance } from "../../../lib/apis";
+import { getInstances, putCreateInstance, userMessageOf, type PutCreateInstance } from "../../../lib/apis";
 import { revalidate } from "@solidjs/router";
 import { gameRegistry } from "../../../lib/games/index"
 import { useFocusTrap } from "../../../lib/hooks/useFocusTrap";
@@ -182,7 +182,9 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                 props.setIsOpen(false);
             } catch (err) {
                 console.error("create instance failed", err);
-                setError("We couldn't create that instance. Nothing has been charged — check the name isn't already taken and try again.");
+                // The API's own reason when it gives one (a used-up trial, a
+                // taken name); ours only when it doesn't, or never answered.
+                setError(userMessageOf(err, "We couldn't create that instance. Nothing has been charged — check the name isn't already taken and try again."));
                 setCreating(false);
             }
         }

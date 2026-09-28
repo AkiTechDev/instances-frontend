@@ -205,6 +205,16 @@
 
 }
 
+/* Same box as the create modal's error, so a refusal reads the same anywhere. */
+.toggleError {
+    align-self: stretch;
+    color: var(--c-red-deep);
+    background: var(--c-red-soft);
+    border-radius: var(--r-sm);
+    padding: 0.75rem 1rem;
+    margin: 0;
+}
+
 .connectivityInfo {
     display: flex;
     flex-direction: column;

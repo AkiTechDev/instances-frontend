@@ -43,6 +43,32 @@ const apiFetch = async (input: string, init?: RequestInit): Promise<Response> =>
     return resp;
 };
 
+/**
+ * A request the API refused. Its error bodies are `{ code, message, details }`
+ * (see `StatusError`), and that `message` is written for the person using the
+ * app — so it is kept apart from `Error.message`, which is for the console.
+ */
+export class ApiError extends Error {
+    readonly status: number;
+    readonly code: string | undefined;
+    readonly userMessage: string | undefined;
+
+    constructor(status: number, description: string, body: StatusError | null) {
+        super(`${description} (${status})`);
+        this.name = "ApiError";
+        this.status = status;
+        this.code = typeof body?.code === "string" ? body.code : undefined;
+        this.userMessage = typeof body?.message === "string" && body.message.trim() ? body.message.trim() : undefined;
+    }
+}
+
+const apiError = async (resp: Response, description: string): Promise<ApiError> =>
+    new ApiError(resp.status, description, await resp.json().catch(() => null));
+
+/** The API's own explanation of a failure when it sent one, else `fallback`. */
+export const userMessageOf = (err: unknown, fallback: string): string =>
+    err instanceof ApiError && err.userMessage ? err.userMessage : fallback;
+
 export interface Instance {
     user_id: string,
     name: string,
@@ -247,7 +273,14 @@ export const toggleInstance = async (endpoint: string, isRunning: boolean): Prom
         method: "GET",
         headers: await authHeaders(),
     });
-    return await resp.json() as GenericResponse;
+
+    // Only a 2xx means the gateway took the action on. This used to go
+    // unchecked, so a refused start — a 402 from a used-up trial — still
+    // showed "Starting…" and polled for a server that was never started.
+    if (!resp.ok) throw await apiError(resp, `Failed to ${uri} instance`);
+
+    // A bare 2xx with no body is still an acceptance.
+    return (await resp.json().catch(() => ({ message: "ok" }))) as GenericResponse;
 };
 
 
@@ -326,7 +359,7 @@ export const putCreateInstance = async (game_id: string, instance_name: string, 
         body: JSON.stringify(config)
     });
 
-    if (!resp.ok) throw new Error("Failed to create Instance");
+    if (!resp.ok) throw await apiError(resp, "Failed to create Instance");
 
     return await resp.json();
 };

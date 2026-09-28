@@ -149,6 +149,12 @@ const Management = () => {
                                     <InstanceOptions endpoint={provisioning.endpoint()!} instance={instance()} />
                                 </div>
                                 <div class={styles.connectivity}>
+                                    {/* Above the status rather than in place of it: a refused
+                                        stop leaves the server running, and its addresses
+                                        should stay on screen. */}
+                                    <Show when={runtime.toggleError()}>
+                                        <p class={`${styles.toggleError} bodyTextSmall`} role="alert">{runtime.toggleError()}</p>
+                                    </Show>
                                     <Switch fallback={<StatusBanner title="Your world is offline" subtitle="Hit Start to drop back in" />}>
                                         <Match when={runtime.status() === "running"}>
                                             <CopyRow label="Domain" value={runtime.running()?.domain} onCopy={copyText} />
