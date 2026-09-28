@@ -346,10 +346,11 @@ export interface SurveyResponse {
     submitted_at: string,
     answers: SurveyAnswer[],
     comment?: string,
+    /* No user agent: it isn't collected with feedback, and the /feedback
+       Lambda discards one if an older build still sends it. */
     context: {
         /** Route the rater was on when they opened the survey. */
         path: string,
-        user_agent: string,
     },
 }
 
