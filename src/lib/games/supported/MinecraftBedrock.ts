@@ -2,7 +2,8 @@ import type { Game, GamePage } from '../types';
 import type { InstanceProfile } from '../types';
 
 import banner from '../../../assets/games/MinecraftBedrock/banner.png?format=avif;webp&responsive';
-import { MinecraftJavaConfigurationSchema } from './MinecraftJava/schema';
+
+import * as v from "valibot";
 
 /**
  * Compute profiles for Minecraft Bedrock Dedicated Server (BDS).
@@ -74,8 +75,56 @@ const MinecraftBedrock: Game = {
     category: 'Minecraft',
     profiles: MinecraftBedrockProfiles,
     getBanner: async () => banner,
-    getSchema: async () => MinecraftJavaConfigurationSchema,
+    getSchema: async () => MinecraftBedrockConfigurationSchema,
     page: MinecraftBedrockPage,
 };
 
 export default MinecraftBedrock;
+
+/*
+ * Mirrors the Bedrock server's own schema, which rejects any key it doesn't
+ * list. It is not Java's: the game mode is GAMEMODE where Java has MODE,
+ * ALLOW_CHEATS is required, versions are minor lines only, and the EULA can
+ * only be accepted. Borrowing Java's schema sent MODE and dropped ALLOW_CHEATS,
+ * so every save was refused — and the form looked for MODE in a config that
+ * only has GAMEMODE, so it showed the first game mode instead of the saved one.
+ */
+const versions = [
+    "LATEST",
+    "1.21",
+    "1.20",
+    "1.19",
+    "1.18",
+    "1.17",
+    "1.16"
+];
+
+const difficulty = [
+    "peaceful",
+    "easy",
+    "normal",
+    "hard"
+];
+
+const gamemodes = [
+    "creative",
+    "survival",
+    "adventure"
+];
+
+const eula = [
+    "TRUE"
+];
+
+export const MinecraftBedrockConfigurationSchema = v.object({
+    SERVER_NAME: v.pipe(v.string(), v.minLength(4), v.maxLength(32)),
+    SERVER_PORT: v.pipe(v.number(), v.integer(), v.minValue(1024), v.maxValue(65535)),
+    VERSION: v.picklist(versions),
+    MOTD: v.pipe(v.string(), v.minLength(1), v.maxLength(128)),
+    DIFFICULTY: v.picklist(difficulty),
+    HARDCORE: v.boolean(),
+    GAMEMODE: v.picklist(gamemodes),
+    PVP: v.boolean(),
+    ALLOW_CHEATS: v.boolean(),
+    EULA: v.picklist(eula)
+});

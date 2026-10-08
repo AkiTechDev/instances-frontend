@@ -5,7 +5,9 @@ import toggleSwitch from "../../../styles/components/toggleSwitch.module.css";
 const FormCheckbox: Component<{ field: any, field_id: string, field_label: string, field_placeholder: boolean }> = (props) => {
     return (
         <div class={toggleSwitch.container}>
-            <input {...props.field.props} id={props.field_id} type="checkbox" checked={props.field.value} />
+            {/* formisch's field has `input`, not `value` — reading `value` left
+                every toggle OFF on load, whatever the saved config said. */}
+            <input {...props.field.props} id={props.field_id} type="checkbox" checked={props.field.input} />
             <label for={props.field_id}>
                 <p class="smallestLabel">ON</p>
                 <p class="smallestLabel">OFF</p>

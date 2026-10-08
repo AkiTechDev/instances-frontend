@@ -7,7 +7,10 @@ const FormNumberInput: Component<{ field: any, field_id: string, field_label: st
     return (
         <div class={`${styles.instanceConfigSettingsContainer} ${props.size ? sizeClass(props.size) : styles.fieldXS}`}>
             <label class="bodyTextSmall">{props.field_label} </label>
-            <input {...props.field.props} type="number" value={props.field.input} class={`${styles.select} bodyText`}></input>
+            {/* formisch stores an input's `.value`, which is a string even here,
+                so any edit failed the schema's number check and nothing saved.
+                valueAsNumber leaves a cleared box as NaN, an error, not 0. */}
+            <input {...props.field.props} type="number" value={props.field.input} onInput={(e) => props.field.onInput(e.currentTarget.valueAsNumber)} class={`${styles.select} bodyText`}></input>
             {props.field.errors && <div>{props.field.errors[0]}</div>}
         </div>
     )
