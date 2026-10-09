@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createSignal, For, Show, type Component, type Setter, onCleanup, onMount } from "solid-js"
+import { createEffect, createMemo, createSignal, createUniqueId, For, Show, type Component, type Setter, onCleanup, onMount } from "solid-js"
 import { Portal } from "solid-js/web"
 
 import * as v from 'valibot';
@@ -39,6 +39,7 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
     const [showAdvanced, setShowAdvanced] = createSignal(false);
     const [creating, setCreating] = createSignal(false);
     const [error, setError] = createSignal<string | null>(null);
+    const setupNoteId = createUniqueId();
     let mainBodyRef: HTMLDivElement | undefined;
 
     // Creation can't be called back once the PUT is away, so every dismissal
@@ -325,6 +326,17 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                                 </div>
                             </Show>
 
+                            {/* Only games that set `setupMinutes` — most are up
+                                in the few minutes nobody needs warning about. */}
+                            <Show when={game()?.setupMinutes}>
+                                {(minutes) => (
+                                    <p id={setupNoteId} class={`${styles.setupNote} bodyTextSmall`}>
+                                        Setup takes <strong>about {minutes()} {minutes() === 1 ? "minute" : "minutes"}</strong> while
+                                        we install the game and build its server. Your dashboard will show you the moment it's ready.
+                                    </p>
+                                )}
+                            </Show>
+
                             <div class={styles.formFooter}>
                                 <AdvancedSettingsToggle expanded={showAdvanced()} onToggle={() => setShowAdvanced(!showAdvanced())} />
 
@@ -333,6 +345,7 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                                     style={`--icon: url("${iconTick.src}")`}
                                     type="submit"
                                     disabled={creating()}
+                                    aria-describedby={game()?.setupMinutes ? setupNoteId : undefined}
                                 >
                                     {creating() ? "Creating Instance…" : "Create Instance"}
                                 </button>

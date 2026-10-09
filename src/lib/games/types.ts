@@ -74,6 +74,14 @@ export interface Game {
     name: string;
     category: string;
     profiles: { [id: string]: InstanceProfile };
+    /**
+     * Roughly how long a new instance takes to become playable, in minutes:
+     * building its infrastructure plus installing the game. The create modal
+     * shows it above the create button. Leave it out for games that are up in
+     * the "few minutes" the FAQ promises — it's for the ones where the wait
+     * would otherwise surprise someone.
+     */
+    setupMinutes?: number;
     // Lazy loaders — nothing is imported until called
     getBanner: () => Promise<ImageData>;
     getSchema: () => Promise<v.ObjectSchema<any, undefined>>;

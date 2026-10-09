@@ -83,6 +83,7 @@ const ProjectZomboid: Game = {
     name:     'Project Zomboid',
     category: 'ProjectZomboid',
     profiles: ProjectZomboidProfiles,
+    setupMinutes: 10,
     getBanner: async () => banner,
     getSchema: async () => ProjectZomboidConfigurationSchema,
     page: ProjectZomboidPage,
