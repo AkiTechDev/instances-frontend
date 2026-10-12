@@ -36,6 +36,13 @@
   display: none;
 }
 
+/* Text and number fields share the select's box but not its capitalising.
+   That is for the lower-cased option labels; on a typed value it shows
+   something other than what gets saved — a webhook read "Https://Discord.Com/…". */
+input.select {
+    text-transform: none;
+}
+
 /* Control band — normalises the height of every control (input, select,
    toggle) so they line up across a grid row regardless of type. */
 .control {

@@ -118,13 +118,9 @@ const eula = [
 
 export const MinecraftBedrockConfigurationSchema = v.object({
     SERVER_NAME: v.pipe(v.string(), v.minLength(4), v.maxLength(32)),
-    SERVER_PORT: v.pipe(v.number(), v.integer(), v.minValue(1024), v.maxValue(65535)),
-    VERSION: v.picklist(versions),
-    MOTD: v.pipe(v.string(), v.minLength(1), v.maxLength(128)),
+    SERVER_PORT: v.pipe(v.number(), v.integer(), v.minValue(1024), v.maxValue(65515)),
     DIFFICULTY: v.picklist(difficulty),
-    HARDCORE: v.boolean(),
     GAMEMODE: v.picklist(gamemodes),
-    PVP: v.boolean(),
     ALLOW_CHEATS: v.boolean(),
-    EULA: v.picklist(eula)
+    EULA: v.picklist(eula),
 });

@@ -92,11 +92,22 @@ const ProjectZomboid: Game = {
 export default ProjectZomboid;
 
 export const ProjectZomboidConfigurationSchema = v.object({
-    ADMIN_USERNAME: v.pipe(v.string(), v.minLength(4), v.maxLength(16)),
-    ADMIN_PASSWORD: v.pipe(v.string(), v.minLength(8), v.maxLength(32)),
-    PASSWORD: v.pipe(v.string(), v.minLength(8), v.maxLength(32)),
-    SERVER_NAME: v.pipe(v.string(), v.minLength(4), v.maxLength(32)),
-    DEFAULT_PORT: v.pipe(v.number(), v.minValue(1024), v.maxValue(65535)),
-    UDP_PORT: v.pipe(v.number(), v.minValue(1024), v.maxValue(65535)),
-    UPDATE_ON_START: v.boolean()
+    ADMIN_USERNAME: v.pipe(v.string(), v.minLength(4), v.maxLength(16),
+        v.regex(/^[A-Za-z0-9_-]+$/, "Use letters, numbers, _ and - only"),
+        v.check((name) => name === "admin" || !name.toLowerCase().startsWith("admin"),
+            'Can\'t start with "admin" unless it is exactly "admin"')),
+    ADMIN_PASSWORD: v.pipe(v.string(), v.minLength(8), v.maxLength(32),
+        v.regex(/^[\x21-\x7E]+$/, "Letters, numbers and symbols only, no spaces")),
+    PUBLIC_NAME: v.pipe(v.string(), v.minLength(4), v.maxLength(32),
+        v.regex(/^[\x20-\x3C\x3E-\x7E]*[\x21-\x3C\x3E-\x7E]$/, "No =, and no space at the end")),
+    PASSWORD: v.pipe(v.string(), v.minLength(8), v.maxLength(32),
+        v.regex(/^[\x21-\x3C\x3E-\x7E]+$/, "Letters, numbers and symbols only, no spaces or =")),
+    MAX_PLAYERS: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)),
+    PVP: v.boolean(),
+    OPEN: v.boolean(),
+    PUBLIC: v.boolean(),
+    GLOBAL_CHAT: v.boolean(),
+    STEAM_VAC: v.boolean(),
+    SERVER_BRANCH: v.picklist(["public", "unstable"]),
+    DEFAULT_PORT: v.pipe(v.number(), v.integer(), v.minValue(1024), v.maxValue(65534)),
 });

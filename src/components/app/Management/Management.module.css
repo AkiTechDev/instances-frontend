@@ -101,7 +101,12 @@
         auto-fit,
         minmax(600px, 1fr)
     );
-    grid-template-rows: 320px auto;
+    /* The first row is the banner's height, which starts the game settings
+       level with the quick actions. A floor, not a fixed size: once the
+       instance settings outgrow it — a save error, or fields stacked one per
+       row on a narrow card — a fixed row let them spill over the game
+       settings below (by 79–130px, measured at 1440–1920 wide). */
+    grid-template-rows: minmax(320px, auto) auto;
 
 
     gap: 24px;
@@ -316,6 +321,16 @@
 .instanceConfigHeader > p {
     opacity: 0.6;
     z-index: 0;
+}
+
+/* A settings card whose config couldn't be loaded. Full width like the form it
+   stands in for, with the retry right-aligned where Save sits. */
+.configError {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1rem;
+    width: 100%;
 }
 
 

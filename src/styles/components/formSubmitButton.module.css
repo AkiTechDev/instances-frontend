@@ -1,9 +1,10 @@
 /* Form submit button.
 
    The green + tick is a SUCCESS state, driven by the `.submitted` class the
-   form sets from `form.isSubmitted`. It used to hang off `:focus`, which meant
-   tabbing to the button claimed the form had saved, and a failed POST left it
-   green until the button lost focus. Focus is not success. */
+   form sets once its save has gone through. It used to hang off `:focus`, which
+   meant tabbing to the button claimed the form had saved, and a failed POST left
+   it green until the button lost focus. Focus is not success — and neither is
+   formisch's `isSubmitted`, which turns on the moment a save is attempted. */
 
 .button {
     display: flex;

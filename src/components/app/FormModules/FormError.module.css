@@ -1,0 +1,22 @@
+/* Same box as the create modal's error and the start/stop refusal, so a failed
+   request reads the same anywhere. Spans the whole row of a form grid, and
+   stretches in a column that right-aligns its children, as the settings cards
+   do — a short message would otherwise hug the right edge. */
+.error {
+    grid-column: 1 / -1;
+    align-self: stretch;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    color: var(--c-red-deep);
+    background: var(--c-red-soft);
+    border-radius: var(--r-sm);
+    padding: 0.75rem 1rem;
+    margin: 0;
+
+    /* API messages can carry a URL (the webhook ones do), which would
+       otherwise push a narrow card wider than the screen. */
+    overflow-wrap: anywhere;
+}

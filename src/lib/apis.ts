@@ -52,6 +52,12 @@ export class ApiError extends Error {
     readonly status: number;
     readonly code: string | undefined;
     readonly userMessage: string | undefined;
+    /**
+     * The specific reason, when the API gave one beyond `userMessage`. A 500's
+     * message is always the generic "An unexpected error occurred…"; what
+     * actually failed ("We couldn't save your Discord webhook…") is sent here.
+     */
+    readonly detail: string | undefined;
 
     constructor(status: number, description: string, body: StatusError | null) {
         super(`${description} (${status})`);
@@ -59,6 +65,8 @@ export class ApiError extends Error {
         this.status = status;
         this.code = typeof body?.code === "string" ? body.code : undefined;
         this.userMessage = typeof body?.message === "string" && body.message.trim() ? body.message.trim() : undefined;
+        const detail = typeof body?.details === "string" ? body.details.trim() : "";
+        this.detail = detail && detail !== this.userMessage ? detail : undefined;
     }
 }
 
@@ -68,6 +76,45 @@ const apiError = async (resp: Response, description: string): Promise<ApiError> 
 /** The API's own explanation of a failure when it sent one, else `fallback`. */
 export const userMessageOf = (err: unknown, fallback: string): string =>
     err instanceof ApiError && err.userMessage ? err.userMessage : fallback;
+
+/** A failed request, put the way the person using the app should read it. */
+export interface Failure {
+    message: string,
+    detail?: string,
+}
+
+/**
+ * The API's own explanation when its error envelope carries one, along with
+ * the specific reason it sends in `details`. Otherwise ours, by the kind of
+ * failure: only our API's bodies carry a `code`, and one without came from the
+ * gateway in front of it — a token it refused, a function that crashed — whose
+ * bare "Unauthorized" or "Internal Server Error" is a status line, not an
+ * explanation anyone can act on.
+ */
+export const describeFailure = (err: unknown): Failure => {
+    if (!(err instanceof ApiError)) {
+        // fetch rejects with a TypeError when no answer came back at all:
+        // offline, DNS, or a response the browser wasn't allowed to read.
+        return {
+            message: err instanceof TypeError
+                ? "We couldn't reach the server. Check your connection and try again."
+                : "Something went wrong. Try again in a moment.",
+        };
+    }
+
+    if (err.code && err.userMessage) return { message: err.userMessage, detail: err.detail };
+
+    // getToken() renews or redirects before it hands over an expired token, so
+    // a 401 here is a token the gateway refused outright — refreshing the page
+    // would only send the same one again.
+    if (err.status === 401) {
+        return { message: "Your sign-in wasn't accepted. Sign out and back in, then try again." };
+    }
+    if (err.status >= 500) {
+        return { message: `Something went wrong on our side (error ${err.status}). Try again in a few minutes — if it keeps happening, contact support.` };
+    }
+    return { message: `The request was refused (error ${err.status}). Try again in a moment — if it keeps happening, contact support.` };
+};
 
 export interface Instance {
     user_id: string,
@@ -205,7 +252,7 @@ export const getInstanceConfig = query(async (endpoint: string): Promise<Instanc
         headers: await authHeaders(),
     });
 
-    if (!resp.ok) throw new Error("Failed to fetch Instance configuration");
+    if (!resp.ok) throw await apiError(resp, "Failed to fetch Instance configuration");
 
     const data = await resp.json();
 
@@ -299,10 +346,13 @@ export const postInstanceConfig = async (endpoint: string, config: PostInstanceC
         body: JSON.stringify(config)
     });
 
-    if (!resp.ok) throw new Error(`Failed to save Instance configuration (${resp.status})`);
+    // An ApiError, not a bare Error: the form shows the API's reason, and a
+    // bare Error used to carry nothing the user could be told.
+    if (!resp.ok) throw await apiError(resp, "Failed to save Instance configuration");
 
-    return await resp.json();
-
+    // The save is done once a 2xx is back — an unreadable body must not turn
+    // it into a failure the user retries.
+    return (await resp.json().catch(() => ({ message: "ok" }))) as GenericResponse;
 };
 
 
@@ -313,9 +363,10 @@ export const postGameConfig = async (endpoint: string, config: any): Promise<Gen
         body: JSON.stringify(config)
     });
 
-    if (!resp.ok) throw new Error("Failed to upload Game configuration");
+    // See postInstanceConfig for both of these.
+    if (!resp.ok) throw await apiError(resp, "Failed to upload Game configuration");
 
-    return await resp.json();
+    return (await resp.json().catch(() => ({ message: "ok" }))) as GenericResponse;
 };
 
 

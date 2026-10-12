@@ -1,6 +1,7 @@
 import { createForm, Field, Form, type SubmitHandler } from "@formisch/solid";
-import { type Component, For } from "solid-js"
+import { type Component, createSignal, For, Show } from "solid-js"
 import FormSelect from "../FormModules/FormSelect";
+import FormError from "../FormModules/FormError";
 
 import gameStyles from "./ManagementGameConfiguration.module.css";
 import selectStyles from "../FormModules/FormSelect.module.css";
@@ -10,7 +11,7 @@ import iconTick from "../../../assets/icons/tick.svg";
 import FormTextInput from "../FormModules/FormTextInput";
 import FormNumberInput from "../FormModules/FormNumberInput";
 import FormCheckbox from "../FormModules/FormCheckbox";
-import { postGameConfig } from "../../../lib/apis";
+import { describeFailure, postGameConfig, type Failure } from "../../../lib/apis";
 
 import * as v from "valibot";
 
@@ -31,9 +32,27 @@ const ManagementGameConfiguration: Component<{ schema: v.ObjectSchema<any, undef
 
     //type ConfigKey = keyof typeof props.schema.entries;
 
+    // Why the last save failed, until the next attempt. Kept here rather than
+    // left to formisch, which catches a throw from the handler into the form's
+    // own errors — rendered nowhere, so a refused save used to vanish silently.
+    const [saveFailure, setSaveFailure] = createSignal<Failure>();
+    // Apart from formisch's `isSubmitted`, which turns on at the start of every
+    // attempt: going by that, a refused save read "Settings Saved".
+    const [saved, setSaved] = createSignal(false);
+
     const submitForm: SubmitHandler<typeof props.schema> = async (values) => {
         if (gameForm.isValid) {
-            await postGameConfig(props.endpoint, values)
+            setSaveFailure(undefined);
+            setSaved(false);
+            try {
+                await postGameConfig(props.endpoint, values)
+            } catch (err) {
+                console.error("game settings save failed", err);
+                // The edits stay in the form, so trying again is one click.
+                setSaveFailure(describeFailure(err));
+                return;
+            }
+            setSaved(true);
             props.onSubmitted?.()
         }
     }
@@ -103,19 +122,25 @@ const ManagementGameConfiguration: Component<{ schema: v.ObjectSchema<any, undef
                     )
                 }}
             </For>
-            {/* The green + tick is driven by `isSubmitted`, not by `:focus` —
-                tabbing to this button used to claim the settings had saved. */}
+            {/* Just above the button, not at the top: this card runs long, and
+                the top is off screen by the time anyone presses Save. */}
+            <Show when={saveFailure()}>
+                {(failure) => <FormError title="We couldn't save your changes" failure={failure()} />}
+            </Show>
+            {/* The green + tick waits for a save that went through — not
+                `:focus`, which claimed tabbing to this button had saved, and
+                not `isSubmitted`, which claimed a refused save had. */}
             <button
                 class={`${submitBtnStyle.button} buttonTextSmall`}
                 classList={{
                     [submitBtnStyle.busy]: gameForm.isSubmitting,
-                    [submitBtnStyle.submitted]: gameForm.isSubmitted && !gameForm.isDirty && !gameForm.isSubmitting,
+                    [submitBtnStyle.submitted]: saved() && !gameForm.isDirty && !gameForm.isSubmitting,
                 }}
                 style={`--icon: url("${iconTick.src}")`}
                 type="submit"
                 disabled={!gameForm.isDirty || gameForm.isSubmitting}
             >
-                {gameForm.isSubmitting ? "Saving Settings" : gameForm.isSubmitted ? "Settings Saved" : "Save Settings"}
+                {gameForm.isSubmitting ? "Saving Settings" : saved() ? "Settings Saved" : "Save Settings"}
             </button>
         </Form>
     )

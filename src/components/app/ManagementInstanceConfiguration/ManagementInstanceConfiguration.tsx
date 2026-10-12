@@ -6,6 +6,7 @@ import { createForm, Form, Field, useField, type SubmitHandler } from "@formisch
 import * as v from 'valibot';
 import FormSelect from "../FormModules/FormSelect";
 import FormTextInput from "../FormModules/FormTextInput";
+import FormError from "../FormModules/FormError";
 import AdvancedSettingsToggle from "../FormModules/AdvancedSettingsToggle";
 
 import { fgCalc } from "../../../lib/pricing";
@@ -19,7 +20,7 @@ import submitBtnStyle from "../../../styles/components/formSubmitButton.module.c
 import iconTick from "../../../assets/icons/tick.svg";
 import iconCross from "../../../assets/icons/cross.svg";
 import { regions } from "../../../lib/regions";
-import { postInstanceConfig, type Instance, type InstanceConfig, type PostInstanceConfig } from "../../../lib/apis";
+import { describeFailure, postInstanceConfig, type Failure, type Instance, type InstanceConfig, type PostInstanceConfig } from "../../../lib/apis";
 import type { InstanceProfile } from "../../../lib/games/types";
 
 
@@ -105,6 +106,14 @@ const InstanceConfigForm: Component<InstanceConfigFormProps & {
         return fgCalc(props.config["region"], profile.memory, profile.cpu, formTier.input || props.config["plan"]) ?? undefined;
     };
 
+    // Why the last save failed, until the next attempt. Kept here rather than
+    // left to formisch, which catches a throw from the handler into the form's
+    // own errors — rendered nowhere, so a refused save used to vanish silently.
+    const [saveFailure, setSaveFailure] = createSignal<Failure>();
+    // Apart from formisch's `isSubmitted`, which turns on at the start of every
+    // attempt: going by that, a refused save read "Settings Saved".
+    const [saved, setSaved] = createSignal(false);
+
     const submitForm: SubmitHandler<typeof InstanceConfigurationSchema> = async (values) => {
           if (instanceForm.isValid) {
               const profile = props.profiles[values["profile"]];
@@ -120,9 +129,19 @@ const InstanceConfigForm: Component<InstanceConfigFormProps & {
                 // Always sent — a blank value is how the user clears a webhook.
                 webhook_url: (values["webhook_url"] ?? "").trim()
               };
-              await postInstanceConfig(props.endpoint, new_config)
+              setSaveFailure(undefined);
+              setSaved(false);
+              try {
+                  await postInstanceConfig(props.endpoint, new_config)
+              } catch (err) {
+                  console.error("instance settings save failed", err);
+                  // The edits stay in the form, so trying again is one click.
+                  setSaveFailure(describeFailure(err));
+                  return;
+              }
               // Only once it's saved: a failed POST leaves the picker showing
               // what the instance still actually is.
+              setSaved(true);
               setCurrentProfile(values["profile"])
               props.onSubmitted?.()
           }
@@ -195,6 +214,11 @@ const InstanceConfigForm: Component<InstanceConfigFormProps & {
           </div>
         </Show>
 
+        {/* Beside the button that was just pressed — inline and in the modal. */}
+        <Show when={saveFailure()}>
+          {(failure) => <FormError title="We couldn't save your changes" failure={failure()} />}
+        </Show>
+
         <div class={styles.formFooter}>
           <Show when={props.onShowAll}>
             <AdvancedSettingsToggle
@@ -203,19 +227,20 @@ const InstanceConfigForm: Component<InstanceConfigFormProps & {
             />
           </Show>
 
-          {/* The green + tick is driven by `isSubmitted`, not by `:focus` —
-              tabbing to this button used to claim the settings had saved. */}
+          {/* The green + tick waits for a save that went through — not
+              `:focus`, which claimed tabbing to this button had saved, and not
+              `isSubmitted`, which claimed a refused save had. */}
           <button
             class={`${submitBtnStyle.button} ${styles.footerSubmit} buttonTextSmall`}
             classList={{
               [submitBtnStyle.busy]: instanceForm.isSubmitting,
-              [submitBtnStyle.submitted]: instanceForm.isSubmitted && !instanceForm.isDirty && !instanceForm.isSubmitting,
+              [submitBtnStyle.submitted]: saved() && !instanceForm.isDirty && !instanceForm.isSubmitting,
             }}
             style={`--icon: url("${iconTick.src}")`}
             type="submit"
             disabled={!instanceForm.isDirty || instanceForm.isSubmitting}
           >
-            {instanceForm.isSubmitting ? "Saving Settings" : instanceForm.isSubmitted ? "Settings Saved" : "Save Settings"}
+            {instanceForm.isSubmitting ? "Saving Settings" : saved() ? "Settings Saved" : "Save Settings"}
           </button>
         </div>
       </Form>

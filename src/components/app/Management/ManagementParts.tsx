@@ -3,8 +3,12 @@ import { Index, Show, type Component } from "solid-js";
 import styles from "./Management.module.css";
 import effects from "../../../styles/components/effects.module.css";
 
+import submitBtnStyle from "../../../styles/components/formSubmitButton.module.css";
+
 import Tooltip from "../Tooltip/Tooltip";
+import FormError from "../FormModules/FormError";
 import clipboardIcon from "../../../assets/icons/clipboard.svg";
+import type { Failure } from "../../../lib/apis";
 
 /* Presentational pieces of the management page. Split out so Management.tsx
    holds the page's wiring and nothing else. */
@@ -25,6 +29,28 @@ export const ConfigFormSkeleton: Component<{ rows: number }> = (props) => (
             )}
         </Index>
         <div class={`${effects.skeleton} ${styles.skeletonButton}`} />
+    </div>
+);
+
+/**
+ * In place of a settings form whose config couldn't be loaded: what failed
+ * where the fields would be, and the retry where Save would be. Both settings
+ * cards read the one request, so the page owns the retry and they share it.
+ */
+export const ConfigLoadError: Component<{
+    failure: Failure;
+    retrying: boolean;
+    onRetry: () => void;
+}> = (props) => (
+    <div class={styles.configError}>
+        <FormError title="We couldn't load these settings" failure={props.failure} />
+        <button
+            type="button"
+            class={`${submitBtnStyle.button} buttonTextSmall`}
+            classList={{ [submitBtnStyle.busy]: props.retrying }}
+            disabled={props.retrying}
+            onClick={() => props.onRetry()}
+        >{props.retrying ? "Retrying…" : "Try Again"}</button>
     </div>
 );
 

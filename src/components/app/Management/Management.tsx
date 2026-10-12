@@ -1,5 +1,5 @@
-import { createAsync, useNavigate, useParams } from "@solidjs/router";
-import { createMemo, Match, Show, Suspense, Switch } from "solid-js";
+import { createAsync, revalidate, useNavigate, useParams } from "@solidjs/router";
+import { createMemo, createSignal, Match, Show, Suspense, Switch } from "solid-js";
 
 import styles from "./Management.module.css";
 import effects from "../../../styles/components/effects.module.css";
@@ -12,12 +12,20 @@ import playIcon from "../../../assets/icons/play.svg";
 
 import {
     ConfigFormSkeleton,
+    ConfigLoadError,
     CopyRow,
     PanelBodySkeleton,
     StatusBanner,
 } from "./ManagementParts";
 
-import { getInstanceConfig, type Instance, type InstanceState } from "../../../lib/apis";
+import {
+    describeFailure,
+    getInstanceConfig,
+    type Failure,
+    type Instance,
+    type InstanceConfig,
+    type InstanceState,
+} from "../../../lib/apis";
 import { useAuth } from "../Auth/AuthProvider";
 import { useInstanceRuntime } from "../../../lib/hooks/useInstanceRuntime";
 import { useProvisioningProgress } from "../../../lib/hooks/useProvisioningProgress";
@@ -35,6 +43,11 @@ const provisioningMessage = (s: InstanceState): string => {
     if (s.status === "unknown") return s.note;
     return s.raw_status;
 };
+
+/** What both settings cards are built from: the config, or why it didn't load. */
+type ConfigLoad =
+    | { config: InstanceConfig, failure?: undefined }
+    | { config?: undefined, failure: Failure };
 
 const Management = () => {
     const params = useParams();
@@ -70,10 +83,36 @@ const Management = () => {
     // Game-server runtime (running / stopped / starting) + the start/stop control.
     const runtime = useInstanceRuntime(provisioning.endpoint);
 
-    const config = createAsync(async () => {
+    // A failed load is a value here, not a throw. Thrown, it reached the
+    // route's error boundary and took the whole page down with it — start/stop
+    // and the server's addresses included — to say the page had failed to
+    // draw, when one request had failed. The settings cards say so instead.
+    const configLoad = createAsync(async (): Promise<ConfigLoad | undefined> => {
         const ep = provisioning.endpoint();
-        return ep ? getInstanceConfig(ep) : undefined;
+        if (!ep) return undefined;
+        try {
+            return { config: await getInstanceConfig(ep) };
+        } catch (err) {
+            console.error("instance config failed to load", err);
+            return { failure: describeFailure(err) };
+        }
     });
+    const config = () => configLoad()?.config;
+    const configFailure = () => configLoad()?.failure;
+
+    // The query caches a failed fetch like any other, so retrying means
+    // revalidating it. Shared by both cards, which read the same request.
+    const [retryingConfig, setRetryingConfig] = createSignal(false);
+    const retryConfig = async () => {
+        const ep = provisioning.endpoint();
+        if (!ep || retryingConfig()) return;
+        setRetryingConfig(true);
+        try {
+            await revalidate(getInstanceConfig.keyFor(ep));
+        } finally {
+            setRetryingConfig(false);
+        }
+    };
 
     const banner = createAsync(async () => game()?.getBanner());
     const schema = createAsync(async () => game()?.getSchema());
@@ -198,9 +237,14 @@ const Management = () => {
                                 <p class="bodyText">You can edit the Instance to your preference at any time.</p>
                             </div>
                             <Suspense fallback={<ConfigFormSkeleton rows={4} />}>
-                                <Show when={config() && !provisioning.isUpdating()} fallback={<ConfigFormSkeleton rows={4} />}>
-                                    <ManagementInstanceConfigForm config={config()!} instance={instance()} endpoint={provisioning.endpoint()!} profiles={game()!.profiles} onSubmitted={provisioning.onConfigSubmitted} />
-                                </Show>
+                                <Switch fallback={<ConfigFormSkeleton rows={4} />}>
+                                    <Match when={!provisioning.isUpdating() && configFailure()}>
+                                        {(failure) => <ConfigLoadError failure={failure()} retrying={retryingConfig()} onRetry={() => void retryConfig()} />}
+                                    </Match>
+                                    <Match when={config() && !provisioning.isUpdating()}>
+                                        <ManagementInstanceConfigForm config={config()!} instance={instance()} endpoint={provisioning.endpoint()!} profiles={game()!.profiles} onSubmitted={provisioning.onConfigSubmitted} />
+                                    </Match>
+                                </Switch>
                             </Suspense>
                         </div>
                         <div class={styles.instanceConfigContainer}>
@@ -209,9 +253,14 @@ const Management = () => {
                                 <p class="bodyText">Adjust how the game feels.</p>
                             </div>
                             <Suspense fallback={<ConfigFormSkeleton rows={5} />}>
-                                <Show when={config() && schema() && !provisioning.isUpdating()} fallback={<ConfigFormSkeleton rows={5} />}>
-                                    <ManagementGameConfiguration schema={schema()!} config={config()!.game} endpoint={provisioning.endpoint()!} onSubmitted={provisioning.onConfigSubmitted} />
-                                </Show>
+                                <Switch fallback={<ConfigFormSkeleton rows={5} />}>
+                                    <Match when={!provisioning.isUpdating() && configFailure()}>
+                                        {(failure) => <ConfigLoadError failure={failure()} retrying={retryingConfig()} onRetry={() => void retryConfig()} />}
+                                    </Match>
+                                    <Match when={config() && schema() && !provisioning.isUpdating()}>
+                                        <ManagementGameConfiguration schema={schema()!} config={config()!.game} endpoint={provisioning.endpoint()!} onSubmitted={provisioning.onConfigSubmitted} />
+                                    </Match>
+                                </Switch>
                             </Suspense>
                         </div>
                     </Show>
