@@ -23,6 +23,7 @@ export function generateRandomName() {
   return { prefix: pick(PREFIXES), middle: pick(MIDDLES), suffix: pick(SUFFIXES) };
 }
 
+// Run together, as an instance name takes letters, digits, - and _ only.
 export function fullSeverName(parts: {[id: string]: string}) {
-  return `${parts.prefix} ${parts.middle} ${parts.suffix}`;
+  return `${parts.prefix}${parts.middle}${parts.suffix}`;
 }

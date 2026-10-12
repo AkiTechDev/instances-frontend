@@ -105,7 +105,16 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
         if (!ready()) return undefined;
 
         const schema = v.object({
-            instance_name: v.pipe(v.string(), v.minLength(4), v.maxLength(32)),
+            // The characters the control plane accepts, so a bad name is
+            // caught here rather than by the API. And at least four, as the
+            // name is also where the server's display name starts, which every
+            // game's settings require to be four or more.
+            instance_name: v.pipe(
+                v.string(),
+                v.minLength(4, "At least 4 characters"),
+                v.maxLength(32, "At most 32 characters"),
+                v.regex(/^[A-Za-z0-9_-]+$/, "Letters, numbers, - and _ only, no spaces"),
+            ),
             plan: v.picklist(instance_tiers),
             auto_start: v.boolean(),
             profile: v.picklist(Object.keys(profiles()!)),
@@ -177,7 +186,7 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                 // Awaited: this used to be fire-and-forget, so a rejected
                 // create closed the modal anyway and the user was left with no
                 // instance and no explanation.
-                await putCreateInstance(gameId()!, formData["instance_name"].replaceAll(' ', ''), new_config);
+                await putCreateInstance(gameId()!, formData["instance_name"], new_config);
                 refreshStanding();
                 await revalidate(getInstances.key);
                 props.setIsOpen(false);

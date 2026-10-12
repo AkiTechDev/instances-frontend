@@ -10,7 +10,7 @@ import * as v from "valibot";
  *
  * NOTE: These are PROVISIONAL estimates. Hytale is not released, so no real server specs exist
  * yet — the numbers below are modeled on comparable modern voxel-sandbox servers and this game's
- * schema (MAX_PLAYERS up to 100, VIEW_DISTANCE up to 15). Revisit once official server
+ * schema (MAX_PLAYERS up to 100, MAX_VIEW_RADIUS up to 15). Revisit once official server
  * requirements are published.
  *
  * Sizing rationale (estimated):
@@ -84,22 +84,15 @@ const Hytale: Game = {
 
 export default Hytale;
 
-const auth_modes = [
-    "authenticated",
-    "offline"
-]
-
-const patchline = [
-    "release",
-    "pre-release"
-]
+// What players see. Control characters would be dropped on the way into the
+// server's config.json, and a brace stops the change being written at all.
+const displayText = /^[^\x00-\x1F\x7F{}]+$/;
 
 export const HytaleConfigurationSchema = v.object({
-    SERVER_NAME: v.pipe(v.string(), v.minLength(4), v.maxLength(32)),
-    DEFAULT_PORT: v.pipe(v.number(), v.minValue(1024), v.maxValue(65535)),
-    MAX_PLAYERS: v.pipe(v.number(), v.minValue(1), v.maxValue(100)),
-    VIEW_DISTANCE: v.pipe(v.number(), v.minValue(1), v.maxValue(15)),
-    AUTH_MODE: v.picklist(auth_modes),
-    PATCHLINE: v.picklist(patchline),
-    DOWNLOAD_ON_START: v.boolean()
+    SERVER_NAME: v.pipe(v.string(), v.minLength(4), v.maxLength(32), v.regex(displayText, "No { } or control characters")),
+    MOTD: v.pipe(v.string(), v.minLength(1), v.maxLength(128), v.regex(displayText, "No { } or control characters")),
+    DEFAULT_PORT: v.pipe(v.number(), v.integer(), v.minValue(1024), v.maxValue(65535)),
+    MAX_PLAYERS: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(100)),
+    MAX_VIEW_RADIUS: v.pipe(v.number(), v.integer(), v.minValue(1), v.maxValue(15)),
+    GAMEMODE: v.picklist(["Adventure", "Creative"]),
 });

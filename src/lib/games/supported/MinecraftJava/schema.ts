@@ -20,14 +20,15 @@ const modes = [
     "survival",
     "adventure"
 ];
+// The server won't start without the EULA accepted, so there is nothing else
+// to offer.
 const eula = [
-    "TRUE",
-    "FALSE"
+    "TRUE"
 ];
 
 export const MinecraftJavaConfigurationSchema = v.object({
     SERVER_NAME: v.pipe(v.string(), v.minLength(4), v.maxLength(32)),
-    SERVER_PORT: v.pipe(v.number(), v.minValue(1024), v.maxValue(65535)),
+    SERVER_PORT: v.pipe(v.number(), v.integer(), v.minValue(1024), v.maxValue(65535)),
     VERSION: v.picklist(versions),
     MOTD: v.pipe(v.string(), v.minLength(1), v.maxLength(128)),
     DIFFICULTY: v.picklist(difficulty),
@@ -36,15 +37,3 @@ export const MinecraftJavaConfigurationSchema = v.object({
     PVP: v.boolean(),
     EULA: v.picklist(eula)
 });
-
-export interface MinecraftJavaConfiguration {
-    server_name: string,
-    server_port: number,
-    version: string,
-    MOTD: string,
-    difficulty: string,
-    hardcore: boolean,
-    mode: string,
-    pvp: boolean,
-    eula: boolean
-}

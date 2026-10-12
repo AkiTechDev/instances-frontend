@@ -84,21 +84,12 @@ export default MinecraftBedrock;
 /*
  * Mirrors the Bedrock server's own schema, which rejects any key it doesn't
  * list. It is not Java's: the game mode is GAMEMODE where Java has MODE,
- * ALLOW_CHEATS is required, versions are minor lines only, and the EULA can
- * only be accepted. Borrowing Java's schema sent MODE and dropped ALLOW_CHEATS,
- * so every save was refused — and the form looked for MODE in a config that
- * only has GAMEMODE, so it showed the first game mode instead of the saved one.
+ * ALLOW_CHEATS is required, and there is no VERSION, as the server always runs
+ * the latest release. Borrowing Java's schema sent MODE and dropped
+ * ALLOW_CHEATS, so every save was refused — and the form looked for MODE in a
+ * config that only has GAMEMODE, so it showed the first game mode instead of
+ * the saved one.
  */
-const versions = [
-    "LATEST",
-    "1.21",
-    "1.20",
-    "1.19",
-    "1.18",
-    "1.17",
-    "1.16"
-];
-
 const difficulty = [
     "peaceful",
     "easy",

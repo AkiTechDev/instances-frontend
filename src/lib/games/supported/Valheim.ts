@@ -106,11 +106,13 @@ export default Valheim;
 
 export const ValheimConfigurationSchema = v.object({
     SERVER_NAME: v.pipe(v.string(), v.minLength(4), v.maxLength(32)),
-    SERVER_PORT: v.pipe(v.number(), v.minValue(1024), v.maxValue(65535)),
+    SERVER_PORT: v.pipe(v.number(), v.integer(), v.minValue(1024), v.maxValue(65535)),
     WORLD_NAME: v.pipe(v.string(), v.minLength(4), v.maxLength(32)),
-    SERVER_PASS: v.pipe(v.string(), v.minLength(4), v.maxLength(32)),
+    // Valheim won't start with a shorter password.
+    SERVER_PASS: v.pipe(v.string(), v.minLength(5), v.maxLength(32)),
     SERVER_PUBLIC: v.boolean(),
-    ADMINLIST_IDS: v.pipe(v.string(), v.minLength(4), v.maxLength(124)),
-    BANNEDLIST_IDS: v.pipe(v.string(), v.minLength(4), v.maxLength(124)),
-    PERMITTEDLIST_IDS: v.pipe(v.string(), v.minLength(4), v.maxLength(124))
+    // Empty is the default and means nobody, so the lists have no minimum.
+    ADMINLIST_IDS: v.pipe(v.string(), v.maxLength(124)),
+    BANNEDLIST_IDS: v.pipe(v.string(), v.maxLength(124)),
+    PERMITTEDLIST_IDS: v.pipe(v.string(), v.maxLength(124))
 });
