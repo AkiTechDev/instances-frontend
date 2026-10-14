@@ -376,9 +376,11 @@ export const postDownloadGameData = async (endpoint: string): Promise<GenericRes
         headers: await authHeaders(),
     });
 
-    if (!resp.ok) throw new Error("Failed to request game data download");
+    // See postInstanceConfig for both of these. The refusal is the one that
+    // matters here: a 403 says why ("You must be on the premium plan…").
+    if (!resp.ok) throw await apiError(resp, "Failed to request game data download");
 
-    return await resp.json();
+    return (await resp.json().catch(() => ({ message: "ok" }))) as GenericResponse;
 };
 
 export const deleteInstance = async (instance: Instance): Promise<GenericResponse> => {

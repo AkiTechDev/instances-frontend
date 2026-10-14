@@ -185,7 +185,7 @@ const Management = () => {
                                         title="Coming soon"
                                         type="button"
                                     ><p class="buttonText">Invite Friends</p></button>
-                                    <InstanceOptions endpoint={provisioning.endpoint()!} instance={instance()} />
+                                    <InstanceOptions endpoint={provisioning.endpoint()!} instance={instance()} onUpdateStarted={provisioning.onConfigSubmitted} />
                                 </div>
                                 <div class={styles.connectivity}>
                                     {/* Above the status rather than in place of it: a refused

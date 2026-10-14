@@ -125,9 +125,14 @@ const DashboardInstanceCard: Component<{ instance: Instance }> = (props) => {
 
     const state = provisioning.state;
 
-    const labelText = createMemo(() => cardLabel(state(), runtime.intent()));
-    const subtitleText = createMemo(() => cardSubtitle(state()));
-    const variant = createMemo(() => statusVariantOf(state(), runtime.intent()));
+    // True as soon as an update from the options menu is accepted, before the
+    // stack itself reports "updating". The badge, subtitle and switch follow
+    // it, not only the raw state, or the card would say RUNNING under the sweep.
+    const updating = provisioning.isUpdating;
+
+    const labelText = createMemo(() => updating() ? "UPDATING" : cardLabel(state(), runtime.intent()));
+    const subtitleText = createMemo(() => updating() ? "Updating" : cardSubtitle(state()));
+    const variant = createMemo(() => updating() ? "updating" : statusVariantOf(state(), runtime.intent()));
 
     const toggle = (e: Event) => {
         e.preventDefault();
@@ -165,7 +170,7 @@ const DashboardInstanceCard: Component<{ instance: Instance }> = (props) => {
                             </Show>
                         </Suspense>
                         <Suspense>
-                            <Show when={canToggle(state())}>
+                            <Show when={canToggle(state()) && !updating()}>
                                 <ToggleSwitch
                                     class={styles.raised}
                                     id={`toggle-${id}`}
@@ -184,7 +189,7 @@ const DashboardInstanceCard: Component<{ instance: Instance }> = (props) => {
             <div class={styles.content}>
                 <div class={styles.cta}>
                     <p class="statsText">{props.instance.name}</p>
-                    <InstanceOptions endpoint={provisioning.endpoint() ?? ""} instance={props.instance} class={styles.raised} />
+                    <InstanceOptions endpoint={provisioning.endpoint() ?? ""} instance={props.instance} class={styles.raised} onUpdateStarted={provisioning.onConfigSubmitted} />
                 </div>
                 <Suspense fallback={<p class={`${styles.metaText} ${effects.skeleton} ${styles.textSkeleton}`} aria-busy="true">&nbsp;</p>}>
                     <p class={`${styles.metaText} ${provisioning.inProgress() ? styles.dotsAnim : ""}`}>{subtitleText()}</p>

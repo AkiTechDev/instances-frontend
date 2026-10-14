@@ -77,12 +77,12 @@
 
 /* Drop Down Box Style */
 
+/* The panel. The items sit in .menu inside it, and the notice under them. */
 .options {
   box-sizing: border-box;
 
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
   padding: 0.75rem 0rem;
 
   background-color: var(--colour-text-tertiary);
@@ -100,6 +100,14 @@
   padding-right: 0.5rem;
 
   z-index: 100; /* For some reason an element in another grid is visible ontop of this element */
+}
+
+/* Apart from the panel so the notice can sit outside role="menu". */
+.menu {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
 }
 
 .options button {
@@ -123,12 +131,14 @@
 }
 
 
-.options button:hover:not(:disabled) {
+/* Only items you can act on react. Busy and done ones are aria-disabled
+   rather than disabled (so focus stays on them) and must not light up. */
+.options button:hover:not(:disabled, [aria-disabled="true"]) {
   color: var(--colour-text-secondary);
   background-color: var(--c-cream-grey);
 }
 
-.options button:active:not(:disabled) {
+.options button:active:not(:disabled, [aria-disabled="true"]) {
   background-color: var(--c-grey-200);
   transition-duration: var(--dur-press);
 }
@@ -141,6 +151,67 @@
 .options button:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+/* In flight. The label swaps and pulses at the call site; this keeps the item
+   highlighted and the cursor honest. */
+.options button.busy {
+  cursor: progress;
+  background-color: var(--c-cream-grey);
+}
+
+/* Gone through. The green + tick of a saved settings form, tinted down so ink
+   text keeps its contrast on the white panel. */
+.options button.done {
+  cursor: default;
+  background-color: color-mix(in srgb, var(--c-green-bright) 30%, transparent);
+}
+
+.options button.done::before {
+  content: "";
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 0.375rem;
+  vertical-align: -2px;
+
+  background-color: currentColor;
+  mask: var(--icon) no-repeat center / contain;
+  -webkit-mask: var(--icon) no-repeat center / contain;
+}
+
+/* Not built yet. Dimmed by colour rather than opacity, so the pill stays
+   readable — a phone has no hover to show the "Coming soon" title. */
+.options button.comingSoon:disabled {
+  opacity: 1;
+  color: color-mix(in srgb, var(--colour-text-primary) 45%, transparent);
+}
+
+.soon {
+  display: inline-block;
+  margin-left: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  vertical-align: 1px;
+
+  color: var(--colour-text-primary);
+  background-color: var(--c-grey-200);
+  border-radius: var(--r-chip);
+}
+
+/* What happened, under the items. `contain` sizes it by the menu instead of
+   by its own text, so a long message wraps rather than widening the panel. It
+   spans the items' hover width, like the buttons' negative margins do. */
+.notice {
+  contain: inline-size;
+  white-space: normal;
+
+  margin: 0 -0.5rem;
+  padding: 0.5rem 0.5rem 0;
+  border-top: 1px solid var(--c-grey-200);
+}
+
+.note {
+  color: var(--c-grey-700);
 }
 
 .options button.destructive {
