@@ -70,18 +70,30 @@ export interface GamePage {
     draft?: boolean;
 }
 
+/**
+ * One thing a player should know before creating an instance — see
+ * `Game.setupNotes`. Plain strings: the modal sets `title` in bold and runs
+ * `body` on after it.
+ */
+export interface SetupNote {
+    /** The point itself, as a sentence that stands alone: "Setup takes about 10 minutes." */
+    title: string;
+    /** What it means for the player, and what they'll need to do. */
+    body: string;
+}
+
 export interface Game {
     name: string;
     category: string;
     profiles: { [id: string]: InstanceProfile };
     /**
-     * Roughly how long a new instance takes to become playable, in minutes:
-     * building its infrastructure plus installing the game. The create modal
-     * shows it above the create button. Leave it out for games that are up in
-     * the "few minutes" the FAQ promises — it's for the ones where the wait
-     * would otherwise surprise someone.
+     * What a player should know before creating an instance of this game: a
+     * long setup, an account to authorise, any constraint that would otherwise
+     * catch them out later. The create modal lists them above the create
+     * button, in this order. Leave it out for games with nothing to warn
+     * about — most have none, and a note on every game is one nobody reads.
      */
-    setupMinutes?: number;
+    setupNotes?: SetupNote[];
     // Lazy loaders — nothing is imported until called
     getBanner: () => Promise<ImageData>;
     getSchema: () => Promise<v.ObjectSchema<any, undefined>>;

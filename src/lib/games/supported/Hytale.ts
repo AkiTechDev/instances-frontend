@@ -77,6 +77,14 @@ const Hytale: Game = {
     name:     'Hytale',
     category: 'Hytale',
     profiles: HytaleProfiles,
+    // The server can't install or run until it's signed in to a Hytale account,
+    // so its first start publishes a device-login link for the owner to approve
+    // (SERVER_AUTH_REQUIRED). The code dies after about ten minutes, and an
+    // account with no Hytale game profile is refused.
+    setupNotes: [{
+        title: "You'll need to authorise the server with your Hytale account.",
+        body: "The first time you start it, we'll send you a link. Sign in there within 10 minutes, using an account that owns Hytale — the server can't start until you do.",
+    }],
     getBanner: async () => banner,
     getSchema: async () => HytaleConfigurationSchema,
     page: HytalePage,

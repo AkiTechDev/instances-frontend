@@ -39,7 +39,7 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
     const [showAdvanced, setShowAdvanced] = createSignal(false);
     const [creating, setCreating] = createSignal(false);
     const [error, setError] = createSignal<string | null>(null);
-    const setupNoteId = createUniqueId();
+    const setupNotesId = createUniqueId();
     let mainBodyRef: HTMLDivElement | undefined;
 
     // Creation can't be called back once the PUT is away, so every dismissal
@@ -95,6 +95,7 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
     });
 
     const profiles = createMemo(() => game()?.profiles);
+    const setupNotes = createMemo(() => game()?.setupNotes ?? []);
 
     // The form can only be built once both the game's profiles and the ranked
     // region list are in — `initialInput` reads a key out of each, and building
@@ -335,15 +336,18 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                                 </div>
                             </Show>
 
-                            {/* Only games that set `setupMinutes` — most are up
-                                in the few minutes nobody needs warning about. */}
-                            <Show when={game()?.setupMinutes}>
-                                {(minutes) => (
-                                    <p id={setupNoteId} class={`${styles.setupNote} bodyTextSmall`}>
-                                        Setup takes <strong>about {minutes()} {minutes() === 1 ? "minute" : "minutes"}</strong> while
-                                        we install the game and build its server. Your dashboard will show you the moment it's ready.
-                                    </p>
-                                )}
+                            {/* Only games that set `setupNotes` — most have
+                                nothing a player needs warning about. */}
+                            <Show when={setupNotes().length > 0}>
+                                <div id={setupNotesId} class={styles.setupNotes}>
+                                    <For each={setupNotes()}>
+                                        {(note) => (
+                                            <p class={`${styles.setupNote} bodyTextSmall`}>
+                                                <strong>{note.title}</strong> {note.body}
+                                            </p>
+                                        )}
+                                    </For>
+                                </div>
                             </Show>
 
                             <div class={styles.formFooter}>
@@ -354,7 +358,7 @@ const CreateInstanceModal: Component<{ setIsOpen: Setter<boolean>, game_id: stri
                                     style={`--icon: url("${iconTick.src}")`}
                                     type="submit"
                                     disabled={creating()}
-                                    aria-describedby={game()?.setupMinutes ? setupNoteId : undefined}
+                                    aria-describedby={setupNotes().length > 0 ? setupNotesId : undefined}
                                 >
                                     {creating() ? "Creating Instance…" : "Create Instance"}
                                 </button>

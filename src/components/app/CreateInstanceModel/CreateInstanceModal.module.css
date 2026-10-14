@@ -140,14 +140,21 @@
     margin: 0;
 }
 
-/* Setup-time estimate for the slower games, just above the create button
-   where the decision is made. Ink rather than the muted grey: grey-700 on
-   this tint falls short of 4.5:1.
+/* The game's setup notes — a long setup, an account to authorise — just above
+   the create button where the decision is made.
    `span 2`, as the name field does, not `1 / -1`: at the modal's width the
    form grid has one explicit column, and the second exists only because a
    field spans into it, so `-1` stops after the first. */
-.setupNote {
+.setupNotes {
     grid-column: span 2;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* A box per note, so separate constraints read as separate. Ink rather than
+   the muted grey: grey-700 on this tint falls short of 4.5:1. */
+.setupNote {
     color: var(--colour-text-primary);
     background: var(--c-grey-100);
     border-radius: var(--r-sm);

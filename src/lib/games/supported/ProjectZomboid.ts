@@ -1,5 +1,6 @@
 import type { Game, GamePage } from '../types';
 import type { InstanceProfile } from '../types';
+import { setupTime } from '../setupNotes';
 
 import banner from '../../../assets/games/ProjectZomboid/banner.png?format=avif;webp&responsive';
 
@@ -83,7 +84,7 @@ const ProjectZomboid: Game = {
     name:     'Project Zomboid',
     category: 'ProjectZomboid',
     profiles: ProjectZomboidProfiles,
-    setupMinutes: 10,
+    setupNotes: [setupTime(10)],
     getBanner: async () => banner,
     getSchema: async () => ProjectZomboidConfigurationSchema,
     page: ProjectZomboidPage,
