@@ -1,19 +1,9 @@
-export const regions: {[id: string]: string} = {
-  'sa-east-1': 'Sao Paulo',
-  'us-east-1': 'N. Virginia',
-  'us-east-2': 'Ohio',
-  'us-west-1': 'N. California',
-  'us-west-2': 'Oregon',
-  'ap-south-1': 'Mumbai',
-  'ap-northeast-1': 'Tokyo',
-  'ap-northeast-2': 'Seoul',
-  'ap-southeast-1': 'Singapore',
-  'ap-southeast-2': 'Sydney',
-  'ca-central-1': 'Canada',
-  'eu-central-1': 'Frankfurt',
-  'eu-west-1': 'Ireland',
-  'eu-west-2': 'London',
-};
+import { regions } from "./regions.generated";
+
+// The regions a server can be created in, by id, with their names: generated
+// from control-plane-cdk's cdk.json, the list the control plane accepts and
+// the rate card prices.
+export { regions };
 
 type Ranked = { region: string; latency: number }[];
 
@@ -128,7 +118,7 @@ export async function getRegionsByLatency(): Promise<{ [id: string]: string }> {
 
 /**
  * Ranks the regions in the background once the page is idle, so the create
- * modal normally opens onto a finished list instead of waiting on 14 regions.
+ * modal normally opens onto a finished list instead of waiting on every region.
  * Idle rather than immediate so the handshakes don't compete with the page's
  * own first requests, and a busy main thread doesn't skew the timings. Cheap
  * to call on every visit: it's a no-op while the ranking is cached.
