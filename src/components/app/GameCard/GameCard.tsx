@@ -3,6 +3,7 @@ import { gameRegistry } from "../../../lib/games/index"
 import { createAsync } from "@solidjs/router"
 
 import styles from "./GameCard.module.css";
+import effects from "../../../styles/components/effects.module.css";
 import { ResponsiveImage } from "@responsive-image/solid";
 import type { ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
 
@@ -66,5 +67,17 @@ const GameCard: Component<{game_id: string, OpenCreateInstanceModal: ((options: 
         </Show>
     )
 }
+
+/**
+ * A GameCard while its game module is still loading. Built from the card's own
+ * .container and .banner, and the name line carries the same type class, so it
+ * fills exactly the box the card will and nothing moves when the card lands.
+ */
+export const GameCardSkeleton: Component = () => (
+    <div class={`${styles.container} ${styles.skeleton}`} aria-hidden="true">
+        <div class={`${styles.banner} ${effects.skeleton}`} />
+        <p class="subTitle"><span class={`${effects.skeleton} ${styles.skeletonName}`}>&nbsp;</span></p>
+    </div>
+)
 
 export default GameCard

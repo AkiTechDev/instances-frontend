@@ -56,9 +56,37 @@
     .collapsed {}
 
 
-    /* Style when there are no created instances */
+    /* Zero-state — no instances yet, so the content column is a game picker.
+       Pairs with .gamesContainer (applied alongside in the markup), so it keeps
+       the populated column's padding and rhythm and the heading sits where
+       "All Instances" will once there is one. */
+    .getStarted {
+        /* There's no sidebar to fill the first track, so without an explicit
+           area the auto-placement drops this into that zero-width column. */
+        grid-area: content;
+        /* The 5rem bottom row that keeps the cards off the newsletter comes
+           with the sidebar (:has(.sidebar) above), so it's padding here. */
+        padding-bottom: 5rem;
+    }
 
-    .noInstancesContainer {
+    .getStartedHeader {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        /* Full width like .gamesListHeader: the column aligns to the start,
+           and a shrink-to-fit header would leave its skeleton bars, sized in
+           percent, nothing to be a percentage of. */
+        width: 100%;
+    }
+
+    .getStartedHeader p {
+        opacity: 0.8;
+    }
+
+    /* The list couldn't be fetched (InstanceListError): a centred message and
+       a retry button. */
+
+    .listError {
         grid-area: content;
         display: flex;
         flex-direction: column;
@@ -69,20 +97,20 @@
         margin-top: var(--margin-el-nm);
     }
 
-    .noInstancesContainer button::before {
+    .listError button::before {
         content: "";
         height: 20px;
         width: 20px;
         background: var(--icon) no-repeat center;
     }
 
-    /* The icon here is 14px where the zero-state's is 16px, and the shared
-       ::before box is a fixed 20px — scale it so both buttons read the same. */
-    .noInstancesContainer .retryIcon::before {
+    /* The refresh icon is drawn at 14px and the ::before box above is a fixed
+       20px — scale it to fill the box. */
+    .listError .retryIcon::before {
         background-size: contain;
     }
 
-    .noContent {
+    .listErrorText {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -91,7 +119,7 @@
         margin-bottom: var(--margin-el-md);
     }
 
-    .noContent p {
+    .listErrorText p {
         opacity: 0.8;
     }
 
@@ -370,38 +398,26 @@
         border-radius: 6px;
     }
 
-    /* Empty-account loading state — traces NoInstances so the get-started
-       screen lands exactly where the skeleton was. */
-    .skeletonEmptyArt {
-        width: 144px;
-        height: 144px;
+    /* Empty-account loading state — traces NoInstances so the game picker
+       lands exactly where the skeleton was. The cards come from GameGrid's own
+       skeleton; these are the two lines above them. Each bar's parent carries
+       the real line's type class, and 1lh makes it one of those lines tall. */
+    .skeletonLine {
+        display: flex;
+        align-items: center;
+        height: 1lh;
+    }
+
+    .skeletonGetStartedTitle {
+        width: min(560px, 100%);
+        height: 70%;
         border-radius: var(--r-sm);
     }
 
-    .skeletonEmptyTitle {
-        width: 220px;
-        height: 1.75rem;
+    .skeletonGetStartedLead {
+        width: min(760px, 100%);
+        height: 80%;
         border-radius: 6px;
-    }
-
-    .skeletonEmptyLine {
-        width: 340px;
-        max-width: 80vw;
-        height: 1rem;
-        border-radius: 6px;
-    }
-
-    .skeletonEmptyLineShort {
-        width: 260px;
-        max-width: 70vw;
-        height: 1rem;
-        border-radius: 6px;
-    }
-
-    .skeletonEmptyButton {
-        width: 200px;
-        height: 48px;
-        border-radius: var(--r-chip);
     }
 
     /* One card that couldn't load its instance.

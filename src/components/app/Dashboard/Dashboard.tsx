@@ -29,7 +29,7 @@ import search from "../../../styles/components/search.module.css";
 
 /* Which layout this account resolved to last time, remembered per browser.
    The two dashboard layouts are 290px apart — a list gets the sidebar column,
-   an empty account gets the centred get-started screen — so a skeleton in the
+   an empty account gets the full-width game picker — so a skeleton in the
    wrong shape shunts the whole page sideways the moment the data lands. An
    account that has never loaded here has no answer, and "empty" is the right
    guess for it: that is exactly what a brand-new account is, and a new user's
@@ -54,8 +54,8 @@ const writeLayoutHint = (sub: string, hasInstances: boolean) => {
 const Dashboard = () => {
     const { account } = useAuth();
     // No `initialValue`: with one, `instances()` was an empty array until the
-    // fetch resolved, and the zero-state below greeted every returning user
-    // with "No Games Added Yet!" before their servers appeared. Undefined means
+    // fetch resolved, and the zero-state below told every returning user they
+    // had no games before their servers appeared. Undefined means
     // "still loading" and shows the skeleton; only a resolved, genuinely empty
     // list reaches the zero-state.
     const instances = createAsync(() => getInstances());
@@ -153,7 +153,7 @@ const Dashboard = () => {
                     skeleton covers loading and the zero-state below can only be
                     reached by a resolved — genuinely empty — list. */}
                 <Show when={instances()} fallback={<DashboardSkeleton shape={expectedShape} />}>
-                    <Show when={hasInstances()} fallback={<NoInstances onCreate={() => OpenCreateInstanceModal({game_id: null, allow_game_change: true})} />}>
+                    <Show when={hasInstances()} fallback={<NoInstances onCreate={OpenCreateInstanceModal} />}>
                         <DashboardSidebarNav filter={gameFilter} setFilter={setGameFilter} openCreateIntanceModal={OpenCreateInstanceModal}/>
                         <div class={styles.gamesContainer}>
                             <div class={styles.gamesListHeader}>

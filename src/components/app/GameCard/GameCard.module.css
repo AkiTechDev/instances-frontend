@@ -76,10 +76,24 @@ button.container:focus-visible p {
     color: var(--hover-colour);
 }
 
-@container card (min-width: 520px) {
-    .card { flex-direction: row; }
-    .banner { aspect-ratio: 1 / 1; width: 40%; }
-    .content { flex: 1; }
+/* GameCardSkeleton. It shares .container, so it also shares the fade-in —
+   which would blink every time one skeleton is swapped for another (the
+   dashboard's loading state for the grid's own). Skeletons appear at once; only
+   the real card fades. Not hoverable either: there is nothing to pick yet. */
+.skeleton {
+    animation: none;
+    pointer-events: none;
+}
+
+/* The real image sits inside the banner's 3px frame, so the shimmer does too. */
+.skeleton .banner {
+    background-clip: padding-box;
+}
+
+.skeletonName {
+    display: inline-block;
+    width: 55%;
+    border-radius: 6px;
 }
 
 @keyframes fadeIn {

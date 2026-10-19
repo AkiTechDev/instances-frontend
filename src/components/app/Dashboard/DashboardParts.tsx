@@ -1,14 +1,13 @@
 import { createSignal, Index, Show, type Component } from "solid-js";
-import { ResponsiveImage } from "@responsive-image/solid";
 
 import styles from "./Dashboard.module.css";
 import effects from "../../../styles/components/effects.module.css";
 import button from "../../../styles/components/button.module.css";
 
 import { type Instance } from "../../../lib/apis";
+import type { ModalOptions } from "../CreateInstanceModel/CreateInstanceModal";
+import GameGrid, { GameGridSkeleton } from "../GameGrid/GameGrid";
 
-import mouseImage from "../../../assets/images/mouse.png?format=avif;webp&responsive";
-import crossIcon from "../../../assets/icons/cross.svg";
 import refreshIcon from "../../../assets/icons/refresh.svg";
 
 /* Presentational pieces of the dashboard. Split out so Dashboard.tsx holds the
@@ -30,18 +29,26 @@ const InstanceCardSkeleton: Component = () => (
 
 /**
  * Loading state for an account we expect to be empty — mirrors NoInstances
- * (art, two lines, button) inside the same centred container, so the
- * get-started screen lands exactly where the skeleton was.
+ * (heading, one line, the game grid) in the same column, so the game picker
+ * lands exactly where the skeleton was.
+ *
+ * Bars rather than the real words: until the list resolves we don't know the
+ * account is empty, and "You don't have any instances yet" over someone's
+ * loading servers is the very thing this skeleton exists to avoid.
  */
 const EmptyStateSkeleton: Component = () => (
-    <div class={styles.noInstancesContainer} aria-busy="true">
-        <div class={`${effects.skeleton} ${styles.skeletonEmptyArt}`} />
-        <div class={styles.noContent}>
-            <div class={`${effects.skeleton} ${styles.skeletonEmptyTitle}`} />
-            <div class={`${effects.skeleton} ${styles.skeletonEmptyLine}`} />
-            <div class={`${effects.skeleton} ${styles.skeletonEmptyLineShort}`} />
+    <div class={`${styles.gamesContainer} ${styles.getStarted}`} aria-busy="true">
+        <div class={styles.getStartedHeader}>
+            {/* Each bar sits in a box carrying the real line's type class, so
+                the box is exactly that line's height. */}
+            <div class={`h4 ${styles.skeletonLine}`}>
+                <div class={`${effects.skeleton} ${styles.skeletonGetStartedTitle}`} />
+            </div>
+            <div class={`statsTitle ${styles.skeletonLine}`}>
+                <div class={`${effects.skeleton} ${styles.skeletonGetStartedLead}`} />
+            </div>
         </div>
-        <div class={`${effects.skeleton} ${styles.skeletonEmptyButton}`} />
+        <GameGridSkeleton />
     </div>
 );
 
@@ -94,19 +101,21 @@ export const DashboardSkeleton: Component<{
 );
 
 /**
- * Zero-state for an account with no instances. Rendered only once the list has
- * resolved and is genuinely empty — never while it's still loading.
+ * Zero-state for an account with no instances: every game we host, each a card
+ * that opens the create flow already set to that game. Rendered only once the
+ * list has resolved and is genuinely empty — never while it's still loading.
+ *
+ * Explore's cards rather than instance cards, deliberately. An instance card
+ * means "a server you have" — badge, switch, menu — and a grid of them here
+ * would read as ten servers the account doesn't own.
  */
-export const NoInstances: Component<{ onCreate: () => void }> = (props) => (
-    <div class={styles.noInstancesContainer}>
-        {/* Spot illustration for the get-started screen — says nothing the
-            heading beside it doesn't. */}
-        <ResponsiveImage src={mouseImage} width={144} alt="" />
-        <div class={styles.noContent}>
-            <h6 class="h6">No Games Added Yet!</h6>
-            <p class="statsTitle">All the added games will add up here.<br />Tap "Create new Game" to add games.</p>
+export const NoInstances: Component<{ onCreate: (options: ModalOptions) => void }> = (props) => (
+    <div class={`${styles.gamesContainer} ${styles.getStarted}`}>
+        <div class={styles.getStartedHeader}>
+            <h4 class="h4">Pick a game to get started</h4>
+            <p class="statsTitle">You don't have any instances yet. Choose a game, then name your instance and pick its size.</p>
         </div>
-        <button type="button" class={`${button.btn} ${button.vibrant} ${button.icon} ${button.rotate45}`} style={`--icon: url(${crossIcon.src})`} onClick={() => props.onCreate()}><p class="buttonText">Create New Game</p></button>
+        <GameGrid OpenCreateInstanceModal={props.onCreate} />
     </div>
 );
 
@@ -142,8 +151,8 @@ export const InstanceListError: Component<{ onRetry: () => void | Promise<void> 
     };
 
     return (
-        <div class={styles.noInstancesContainer} role="alert">
-            <div class={styles.noContent}>
+        <div class={styles.listError} role="alert">
+            <div class={styles.listErrorText}>
                 <h6 class="h6">We couldn't load your games</h6>
                 <p class="statsTitle">Your instances are still running — we just couldn't reach the server.<br />Check your connection and try again.</p>
             </div>

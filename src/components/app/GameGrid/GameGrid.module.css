@@ -1,0 +1,13 @@
+/* Lifted from Explore.module.css unchanged when the dashboard's zero-state
+   started showing the same grid. The hover colours are read by GameCard. */
+.grid {
+    --hover-colour: var(--c-purple);
+    --hover-colour-frame: var(--c-purple);
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, 300px), 1fr)
+    );
+    gap: clamp(1rem, 2vw, 1.5rem);
+    width: 100%;
+}
