@@ -195,6 +195,10 @@ export interface InstanceConfig {
     domain: string,
     region: string,
     webhook_url?: string,
+    /** Premium's idle shutdown, as deployed. Absent from a stack deployed
+        before the setting existed, whose Lambda would drop it on save. */
+    idle_shutdown?: boolean,
+    idle_timeout_minutes?: number,
     game: any
 }
 
@@ -336,7 +340,10 @@ export interface PostInstanceConfig {
     cpu: number,
     memory: number,
     auto_start: boolean,
-    webhook_url?: string
+    webhook_url?: string,
+    /** Omitted keeps what the server runs with now. */
+    idle_shutdown?: boolean,
+    idle_timeout_minutes?: number
 }
 
 export const postInstanceConfig = async (endpoint: string, config: PostInstanceConfig): Promise<GenericResponse> => {

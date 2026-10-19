@@ -6,12 +6,15 @@ import { createForm, Form, Field, useField, type SubmitHandler } from "@formisch
 import * as v from 'valibot';
 import FormSelect from "../FormModules/FormSelect";
 import FormTextInput from "../FormModules/FormTextInput";
+import FormNumberInput from "../FormModules/FormNumberInput";
+import FormCheckbox from "../FormModules/FormCheckbox";
 import FormError from "../FormModules/FormError";
 import AdvancedSettingsToggle from "../FormModules/AdvancedSettingsToggle";
 
 import { fgCalc } from "../../../lib/pricing";
 import instance_tiers from "../../../lib/instance_tiers";
 import { webhookUrlPlaceholder, webhookUrlSchema } from "../../../lib/webhook";
+import { IDLE_TIMEOUT_DEFAULT_MINUTES, idleTimeoutMinutesSchema } from "../../../lib/idleShutdown";
 
 import styles from "./ManagementInstanceConfiguration.module.css";
 
@@ -74,7 +77,9 @@ const InstanceConfigForm: Component<InstanceConfigFormProps & {
       plan: v.picklist(instance_tiers),
       profile: v.picklist(Object.keys(props.profiles)),
       auto_start: v.boolean(),
-      webhook_url: webhookUrlSchema
+      webhook_url: webhookUrlSchema,
+      idle_shutdown: v.boolean(),
+      idle_timeout_minutes: idleTimeoutMinutesSchema
     });
 
 
@@ -84,12 +89,24 @@ const InstanceConfigForm: Component<InstanceConfigFormProps & {
         "auto_start": false,
         "plan": props.config["plan"],
         "profile": selectedProfileLabel(),
-        "webhook_url": props.config["webhook_url"] ?? ""
+        "webhook_url": props.config["webhook_url"] ?? "",
+        "idle_shutdown": props.config["idle_shutdown"] ?? true,
+        "idle_timeout_minutes": props.config["idle_timeout_minutes"] ?? IDLE_TIMEOUT_DEFAULT_MINUTES
       }
     })
 
     const formProfile = useField(instanceForm, { path: ["profile"] })
     const formTier = useField(instanceForm, { path: ["plan"] })
+
+    /**
+     * Idle shutdown is premium's watchdog, so it is offered on Premium — the
+     * plan picked in this form, which may not be the one saved yet. And only
+     * once this server reports the setting: a stack deployed before it existed
+     * runs a settings Lambda that would silently drop it on save.
+     */
+    const offersIdleShutdown = () =>
+        (formTier.input || props.config["plan"]) === "Premium" &&
+        props.config["idle_shutdown"] !== undefined;
 
     /**
      * Hourly price of the selected profile in *this instance's* region — the
@@ -127,7 +144,11 @@ const InstanceConfigForm: Component<InstanceConfigFormProps & {
                 plan: values["plan"],
                 auto_start: values["auto_start"],
                 // Always sent — a blank value is how the user clears a webhook.
-                webhook_url: (values["webhook_url"] ?? "").trim()
+                webhook_url: (values["webhook_url"] ?? "").trim(),
+                // Sent even when not offered: they hold what is deployed, and
+                // a stack too old to know them ignores them.
+                idle_shutdown: values["idle_shutdown"],
+                idle_timeout_minutes: values["idle_timeout_minutes"]
               };
               setSaveFailure(undefined);
               setSaved(false);
@@ -187,6 +208,36 @@ const InstanceConfigForm: Component<InstanceConfigFormProps & {
                 </select>
             </div>
           )}
+        </Show>
+
+        {/* Both shown whenever it is offered, the minutes even while it is
+            off: hidden, a minutes value left invalid would block the save
+            with an error nobody can see. */}
+        <Show when={offersIdleShutdown()}>
+          <Field of={instanceForm} path={["idle_shutdown"]}>
+            {(field) => (
+              <div class={`${selectStyles.instanceConfigSettingsContainer} ${selectStyles.sizeXS}`}>
+                <label class="bodyTextSmall">AUTO_SHUTDOWN</label>
+                <div class={selectStyles.control}>
+                  <FormCheckbox field={field}
+                    field_id="idle_shutdown"
+                    field_label="AUTO_SHUTDOWN"
+                    field_placeholder={true}
+                  />
+                </div>
+              </div>
+            )}
+          </Field>
+
+          <Field of={instanceForm} path={["idle_timeout_minutes"]}>
+            {(field) => (
+              <FormNumberInput field={field}
+                field_id="idle_timeout_minutes"
+                field_label="IDLE_MINUTES"
+                field_placeholder={IDLE_TIMEOUT_DEFAULT_MINUTES}
+              />
+            )}
+          </Field>
         </Show>
 
         {/* <Field of={instanceForm} path={["auto_start"]}>
