@@ -25,7 +25,7 @@ const RootSidebarNav = () => (
         <A href="/explore" class={styles.menuItem} activeClass={styles.menuItemActive} aria-label="Explore games" style={`--gamesIconUrl: url(${exploreIcon.src})`}>
             
         </A>
-        <A href="https://discord.gg/qtnvJEvuDw" target="_blank" class={styles.menuItem} activeClass={styles.menuItemActive} aria-label="Community on Discord (opens in a new tab)" style={`--gamesIconUrl: url(${socialIcon.src})`}>
+        <A href="https://discord.gg/F7s7DnZcqV" target="_blank" class={styles.menuItem} activeClass={styles.menuItemActive} aria-label="Community on Discord (opens in a new tab)" style={`--gamesIconUrl: url(${socialIcon.src})`}>
             
         </A>
         <A href="/extra" class={styles.menuItem} activeClass={styles.menuItemActive} aria-label="Extras" style={`--gamesIconUrl: url(${extraIcon.src})`}>

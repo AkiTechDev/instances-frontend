@@ -16,7 +16,7 @@
  */
 
 export const SUPPORT_EMAIL = "help@aki-labs.com";
-export const DISCORD_INVITE = "https://discord.gg/nhCEXaZVMX";
+export const DISCORD_INVITE = "https://discord.gg/F7s7DnZcqV";
 
 /**
  * POST target for a composed ticket. Empty string means "no endpoint yet" —
