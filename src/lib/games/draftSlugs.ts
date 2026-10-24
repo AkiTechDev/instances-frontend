@@ -20,4 +20,5 @@ export const draftSlugs: string[] = [
     "minecraft-bedrock",
     "hytale",
     "project-zomboid",
+    "rimworld",
 ];

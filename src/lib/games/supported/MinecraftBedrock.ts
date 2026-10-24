@@ -54,7 +54,7 @@ const MinecraftBedrockPage: GamePage = {
 
     tierNotes: {
         "Solo · 1-4 Players":
-            "A realm-style server for a small group of friends. The lowest floor of any game we host.",
+            "A realm-style server for a small group of friends.",
         "Small · 5-10 Players":
             "A small community running a few behaviour and resource packs.",
         "Medium · 10-20 Players":

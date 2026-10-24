@@ -4,6 +4,7 @@ import MinecraftIcon from '../../assets/games/MinecraftJava/icon.svg';
 import ValheimIcon from '../../assets/games/Valheim/icon.svg';
 import HytaleIcon from '../../assets/games/Hytale/icon.svg';
 import ProjectZomboidIcon from '../../assets/games/ProjectZomboid/icon.svg';
+import RimWorldIcon from '../../assets/games/RimWorld/icon.svg';
 import type { SvgComponent } from 'astro/types';
 import type { ImageMetadata } from 'astro';
 
@@ -67,5 +68,11 @@ export const gameRegistry: Record<string, {
         name: 'Project Zomboid',
         icon: ProjectZomboidIcon,
         load: () => import('./supported/ProjectZomboid')
+    },
+
+    'RimWorld': {
+        name: 'RimWorld',
+        icon: RimWorldIcon,
+        load: () => import('./supported/RimWorld')
     }
 };

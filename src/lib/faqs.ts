@@ -136,7 +136,7 @@ export const faqs: Faq[] = [
         category: "games",
         q: "Which games can I run?",
         a: [
-            "Minecraft — both Java and Bedrock editions — several ready-made Minecraft modpacks, Valheim, and Project Zomboid, with more being added.",
+            "Minecraft — both Java and Bedrock editions — several ready-made Minecraft modpacks, Valheim, Project Zomboid, and RimWorld, with more being added.",
             "The games page has the current list, and each game has its own page showing what it costs to run and what you can change about it.",
         ],
         links: [{ label: "See every game we host", href: "/games" }],
@@ -149,6 +149,7 @@ export const faqs: Faq[] = [
         a: [
             "Yes, if it's one of the modpacks we host. A modpack is a bundle of mods that have been tested together, and we install and configure the whole bundle for you — there's nothing to download or set up on your side beyond installing the same pack in your own game.",
             "We don't currently support uploading your own custom set of mods. If there's a pack you want that we don't have yet, tell us — it's the most useful thing you can send us.",
+            "RimWorld is the exception. Its mods run in each player's own game rather than on the server, so your group can play with whichever you like — the server just turns away anyone whose mods don't match the list the world was created with.",
         ],
         links: [{ label: "Ask for a modpack", href: "/contact?topic=game-request" }],
     },

@@ -103,8 +103,14 @@ const ManagementGameConfiguration: Component<{ schema: v.ObjectSchema<any, undef
                                         />
                                     )
                                 } else if (schema.schema.type === 'boolean') {
+                                    // A toggle's box fits a short word per line. A longer
+                                    // one can't wrap, and ran into the next toggle's label
+                                    // (RimWorld's "ENABLE LEADERBOARD"), so it gets a wider box.
+                                    const size = prettifyLabel(name).split(" ").some((word) => word.length > 8)
+                                        ? selectStyles.sizeSM
+                                        : selectStyles.sizeXS;
                                     return (
-                                        <div class={`${selectStyles.instanceConfigSettingsContainer} ${selectStyles.sizeXS}`}>
+                                        <div class={`${selectStyles.instanceConfigSettingsContainer} ${size}`}>
                                             <label class="bodyTextSmall">{prettifyLabel(name)}</label>
                                             <div class={selectStyles.control}>
                                                 <FormCheckbox

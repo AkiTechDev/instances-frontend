@@ -14,6 +14,7 @@ Instances is designed for everyday players who want to host multiplayer game ser
 - **Valheim**
 - **Abiotic Factor**
 - **Project Zomboid**
+- **RimWorld** — multiplayer through the RimWorld Together mod
 - **Hytale** (upcoming / supported on launch)
 
 ## Key Features
